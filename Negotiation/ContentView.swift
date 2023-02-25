@@ -1,13 +1,11 @@
-//
-//  ContentView.swift
-//  Negotiation
-//
-//  Created by CogModel on 23/02/2023.
-//
+// This is the View file
 
 import SwiftUI
 
+
 struct ContentView: View {
+    @ObservedObject var viewModel: NGViewModel
+    
     var body: some View {
         VStack {
             Image(systemName: "globe")
@@ -21,9 +19,8 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        let model = NGViewModel()
+        ContentView(viewModel: model)
     }
 }
-
-// hello
 
