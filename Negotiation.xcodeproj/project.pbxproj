@@ -90,7 +90,6 @@
 				622F299C29AA981E00E1C774 /* ACT-R */,
 				620BEBCB29A7B89300DAE4FF /* NegotiationApp.swift */,
 				622F29BD29AA998100E1C774 /* NegotiationModel.swift */,
-				62A12FB829AA93ED00FB7B09 /* PublicChunk.swift */,
 				62A12FB629AA863E00FB7B09 /* ViewModel.swift */,
 				620BEBCD29A7B89300DAE4FF /* ContentView.swift */,
 				620BEBCF29A7B89700DAE4FF /* Assets.xcassets */,
@@ -110,6 +109,7 @@
 		622F299C29AA981E00E1C774 /* ACT-R */ = {
 			isa = PBXGroup;
 			children = (
+				62A12FB829AA93ED00FB7B09 /* PublicChunk.swift */,
 				622F29A229AA983E00E1C774 /* BufferAction.swift */,
 				622F29A929AA983F00E1C774 /* BufferCondition.swift */,
 				622F29A629AA983F00E1C774 /* Chunk.swift */,

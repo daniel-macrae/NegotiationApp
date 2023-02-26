@@ -17,6 +17,7 @@ struct NGModel {
     var waitingForAction = true
     /// String that is displayed to show the outcome of a round
     var feedback = ""
+    // MARK: Game state management
     /// Amount of points the model gets
     var modelreward = 0
     /// Amount of points the player gets
@@ -26,6 +27,24 @@ struct NGModel {
     /// Player's total score
     var playerScore = 0
     /// The ACT-R model
+    var playerMNS = 2
+    var modelMNS = 3
+    
+    // MARK: Player and Model offer management
+    var playerNegotiationValue = 1
+    var modelNegotiationValue = 2
+    var playerPreviousOffer = Offer.none
+    var playerCurrentOffer = Offer.none
+    var modelPreviousOffer = Offer.none
+    var modelCurrentOffer = Offer.none
+    
+   
+    // an attempt at making a neat dictiory, that failed...
+    ///var offerHistory[String:Offer] = ["prev player bid": Offer.none,
+    ///                    "current player bid": Offer,
+    ///                 "prev model bid": Offer,
+    ///                    "current model bid": Offer.none ]
+    
     internal var model = Model()
     
     /// Here we do not actually load in anything: we just reset the model
@@ -35,6 +54,45 @@ struct NGModel {
         model.waitingForAction = true
     }
     
+    /// an enum to represent the possible offers the model and the player can make
+    enum Offer: CustomStringConvertible {
+        case Concede(value: Int, isFinal: Bool)
+        case Raise(value: Int, isFinal: Bool)
+        case Insist(isFinal: Bool)  // value will always be 0
+        case StopNegotiation
+        case none // no bids have been made (e.g. its the start of the game)
+        
+        var description: String {
+            switch self {
+            case .Concede:
+                return "concede"
+            case .Raise:
+                return "raise"
+            case .Insist:
+                return "insist"
+            case .StopNegotiation:
+                return "stop negotiation"
+            case .none:
+                return "N/A"
+            }
+        }
+    }
+    
+    mutating func placeholderResponse(playerOffer: Float) {
+        modelPreviousOffer = modelCurrentOffer
+        modelCurrentOffer = Offer.Concede(value: 1, isFinal: false)
+        modelNegotiationValue = 4
+    }
+    
+    
+    
+        
+        
+    // ###########################################
+    // MARK: leftover code scraps below this !
+    // ###########################################
+
+        
     /// Enum to represent the choices. It is always good to use enums for internal representation, because
     /// they can help you with preventing bugs. (e.g., if you use strings it is easy to make a typo)
     enum Choice: CustomStringConvertible {
@@ -104,21 +162,6 @@ struct NGModel {
         currentModel = nil
         currentPlayer = nil
         run()
-    }
-    
-    /// Modify a slot in the action buffer.
-    /// Not used in this version.
-    /// - Parameters:
-    ///   - slot: the slot to be modified
-    ///   - value: the new value
-    /// - Returns: whether successful
-    func modifyLastAction(slot: String, value: String) -> Bool {
-        if model.waitingForAction {
-            model.modifyLastAction(slot: slot, value: value)
-            return true
-        } else {
-            return false
-        }
     }
         
     /// Function that is executed whenever the player makes a choice. At that point
