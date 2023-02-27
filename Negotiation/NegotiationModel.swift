@@ -3,49 +3,36 @@
 import Foundation
 
 
-// maybe an enum for the actions?
-
 
 struct NGModel {
-    /// The trace from the model
-    var traceText: String = ""
-    /// The model code
-    var modelText: String = ""
-    /// Part of the contents of DM that can needs to be displayed in the interface
-    var dmContent: [PublicChunk] = []
-    /// Boolean that states whether the model is waiting for an action.
-    var waitingForAction = true
-    /// String that is displayed to show the outcome of a round
-    var feedback = ""
+    // for printing of errors and function calls
+    var verbose = true
+    
     // MARK: Game state management
-    /// Amount of points the model gets
-    var modelreward = 0
-    /// Amount of points the player gets
-    var playerreward = 0
+    var MNS_combinations: Array<(Int, Int)> = [(2,2),(1,3),(3,1),(2,2),(3,3),(2,3),(3,2),(3,4),(4,3),(2,4),(4,4)]
     /// Model's total score
     var modelScore = 0
     /// Player's total score
     var playerScore = 0
-    /// The ACT-R model
+    /// Player's MNS, score and reward
     var playerMNS = 2
     var modelMNS = 3
     
     // MARK: Player and Model offer management
-    var playerNegotiationValue = 1
-    var modelNegotiationValue = 2
-    var playerPreviousOffer = Offer.none
-    var playerCurrentOffer = Offer.none
-    var modelPreviousOffer = Offer.none
-    var modelCurrentOffer = Offer.none
+    var playerPreviousOffer: Int?
+    var playerCurrentOffer: Int?  // work on how to display this if it has no value?
+    var modelPreviousOffer: Int?
+    var modelCurrentOffer: Int?  // same here
+    var playerIsFinalOffer = false
+    var modelIsFinalOffer = false
+    var playerHasQuit = false
+    var modelHasQuit = false
     
-   
-    // an attempt at making a neat dictiory, that failed...
-    ///var offerHistory[String:Offer] = ["prev player bid": Offer.none,
-    ///                    "current player bid": Offer,
-    ///                 "prev model bid": Offer,
-    ///                    "current model bid": Offer.none ]
+    /// Boolean that states whether the model is waiting for an action.
+    var waitingForAction = true
     
     internal var model = Model()
+    
     
     /// Here we do not actually load in anything: we just reset the model
     /// - Parameter filename: filename to be loaded (extension .actr is added by the function)
@@ -54,35 +41,62 @@ struct NGModel {
         model.waitingForAction = true
     }
     
-    /// an enum to represent the possible offers the model and the player can make
-    enum Offer: CustomStringConvertible {
-        case Concede(value: Int, isFinal: Bool)
-        case Raise(value: Int, isFinal: Bool)
-        case Insist(isFinal: Bool)  // value will always be 0
-        case StopNegotiation
-        case none // no bids have been made (e.g. its the start of the game)
+    // placeholder function (implement the actual model later...)
+    // this is just to figure out how to pass info back and forth
+    mutating func placeholderResponse(playerOffer: Float, playerIsFinalOffer: Bool) {
+        if verbose {print("M: model is responding/making a new offer")}
+        modelPreviousOffer = modelCurrentOffer
+        modelCurrentOffer = Int.random(in: 1..<10)  /// model makes a completely random offer
         
-        var description: String {
-            switch self {
-            case .Concede:
-                return "concede"
-            case .Raise:
-                return "raise"
-            case .Insist:
-                return "insist"
-            case .StopNegotiation:
-                return "stop negotiation"
-            case .none:
-                return "N/A"
-            }
+        modelIsFinalOffer = !modelIsFinalOffer   /// just flip the boolean for now
+        
+        
+    }
+    
+    
+    // select new MNSs for both players (call this once a round finishes)
+    mutating func pickMNS() {
+        if verbose {print("M: picking new MNS values")}
+        if let randomMNS = MNS_combinations.randomElement() {
+            playerMNS = randomMNS.0
+            modelMNS = randomMNS.1
+        }
+        else { /// this should never happen, but swift won't pick a randomElement without it :/
+            print("M: MNS error!")
         }
     }
     
-    mutating func placeholderResponse(playerOffer: Float) {
-        modelPreviousOffer = modelCurrentOffer
-        modelCurrentOffer = Offer.Concede(value: 1, isFinal: false)
-        modelNegotiationValue = 4
+    mutating func updateScores() {
+        if verbose {print("M: updating scores")}
+        playerScore += (playerCurrentOffer! - playerMNS)
+        modelScore += (modelCurrentOffer! - modelMNS)
     }
+    
+    mutating func newRound() {
+        if verbose {print("M: preparing new negotiation round")}
+        // if neither player has quit, an agreement was made and their scores should be updated
+        if !(playerHasQuit || modelHasQuit) {
+            updateScores()
+        }
+        // reset offer history
+        playerPreviousOffer = nil; playerCurrentOffer = nil
+        modelPreviousOffer = nil; modelCurrentOffer  = nil
+        playerIsFinalOffer = false; modelIsFinalOffer = false
+        playerHasQuit = false; modelHasQuit = false
+        
+        // new MNS values for the next round
+        pickMNS()
+        
+        // start next round
+        model.waitingForAction = true
+        
+        update()
+        
+    }
+    
+    
+    
+    
     
     
     
@@ -90,8 +104,29 @@ struct NGModel {
         
     // ###########################################
     // MARK: leftover code scraps below this !
+    // just to look at, really
     // ###########################################
 
+    
+    
+    
+    
+    
+    
+    
+    /// The trace from the model
+    var traceText: String = ""
+    /// The model code
+    var modelText: String = ""
+    /// Part of the contents of DM that can needs to be displayed in the interface
+    var dmContent: [PublicChunk] = []
+    
+    /// String that is displayed to show the outcome of a round
+    var feedback = ""
+    /// Amount of points the model gets
+    var modelreward = 0
+    /// Amount of points the player gets
+    var playerreward = 0
         
     /// Enum to represent the choices. It is always good to use enums for internal representation, because
     /// they can help you with preventing bugs. (e.g., if you use strings it is easy to make a typo)

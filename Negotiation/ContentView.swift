@@ -1,4 +1,4 @@
-// This is the View file
+// This is the VIEW file
 
 import SwiftUI
 
@@ -7,6 +7,7 @@ struct ContentView: View {
     @ObservedObject var viewModel: NGViewModel
     
     @State private var sliderValue : Float = 0.0
+    @State private var finalOfferToggle : Bool = false
     
     var body: some View {
         VStack {
@@ -31,24 +32,33 @@ struct ContentView: View {
             
             Spacer()
             
-            // stack to display the offers
+            // stack to display player negotiation actions
             VStack {
-                Slider(value: $sliderValue, in: 0...9, step: 1)
+                HStack {
+                    Slider(value: $sliderValue, in: 0...9, step: 1)
                     // prints "hi" for as long as the slider is moving
                     // "onEditingChanged" returns true when the user starts moving it, false when the user lets go
                     // !!! Slider has to take a float value !!!
-                HStack {
-                    Text(String(Int(sliderValue)))
+                    Text("Offer Value: " + String(Int(sliderValue)))
                         .padding()
-                    Button("Confirm Offer",
-                           action: {viewModel.playerMakeOffer(value: sliderValue) }
-                    )
                 }
-                HStack {
-                    Text(String(viewModel.modelNegotiationValue))
-                }
+                Toggle("Final Offer", isOn: $finalOfferToggle)
                 
+                HStack {
+                    Button("Accept Model Offer", action: {viewModel.playerAccepts()})
+                    Button("Confirm Offer", action: {viewModel.playerMakeOffer(value: sliderValue, isFinal: finalOfferToggle)})
+                    Button(action: {viewModel.playerQuits()}) {
+                        Text("Quit")
+                    }.foregroundColor(Color(.red))
+                } .padding()
             }
+            Spacer()
+            
+            // see model response
+            HStack {
+                Text("Model offer = " + String(viewModel.modelNegotiationValue))
+                Text("Final? = " + String(viewModel.modelIsFinalOffer))
+            } .padding()
             
             
             Spacer()
