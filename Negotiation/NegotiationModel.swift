@@ -15,8 +15,9 @@ struct NGModel {
     /// Player's total score
     var playerScore = 0
     /// Player's MNS, score and reward
-    var playerMNS = 2
-    var modelMNS = 3
+    var playerMNS: Int = 2
+    var modelMNS: Int = 3   /// CHANGE
+    
     
     // MARK: Player and Model offer management
     var playerPreviousOffer: Int?
@@ -34,11 +35,38 @@ struct NGModel {
     internal var model = Model()
     
     
+    // functions to save and load the model (calls functions from JSONManger.swift file)
+    mutating func testSave() {
+        saveModel2(model: model, filename: "test")  // function that does the actual saving
+        print("M: model saved")
+    }
+    
+    mutating func testLoad() {
+        model = loadModel2(filename: "test")  // loading the model
+        print("M: model loaded")
+        //print(model.dm)
+        //print(model.imaginalActionTime)
+        //print(model.time)
+    }
+    
+    
+    
     /// Here we do not actually load in anything: we just reset the model
     /// - Parameter filename: filename to be loaded (extension .actr is added by the function)
-    func loadModel(filename: String) {
+    func resetModel(filename: String) {
         model.reset()
         model.waitingForAction = true
+    }
+    
+    
+    func saveModel(filename: String) {
+        let encoder = JSONEncoder()
+        do {
+            let data = try encoder.encode(model)        /// convert the model to JSON
+            print(String(data: data, encoding: .utf8)!)  /// print to console
+        } catch {
+            print("M: failure to save model")
+        }
     }
     
     // placeholder function (implement the actual model later...)
@@ -66,12 +94,15 @@ struct NGModel {
         }
     }
     
+    
+    // add the current round scores to the total score
     mutating func updateScores() {
         if verbose {print("M: updating scores")}
         playerScore += (playerCurrentOffer! - playerMNS)
         modelScore += (modelCurrentOffer! - modelMNS)
     }
     
+    // the round has ended, clean up and start a new one
     mutating func newRound() {
         if verbose {print("M: preparing new negotiation round")}
         // if neither player has quit, an agreement was made and their scores should be updated
@@ -87,7 +118,7 @@ struct NGModel {
         // new MNS values for the next round
         pickMNS()
         
-        // start next round
+        // start next round, player makes move
         model.waitingForAction = true
         
         update()

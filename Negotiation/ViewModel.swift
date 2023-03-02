@@ -65,4 +65,10 @@ class NGViewModel: ObservableObject {
         model.newRound()
     }
     
+    func saveModel() {
+        model.testSave()
+    }
+    func loadModel() {
+        model.testLoad()
+    }
 }

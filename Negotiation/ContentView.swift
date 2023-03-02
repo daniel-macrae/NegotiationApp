@@ -62,6 +62,10 @@ struct ContentView: View {
             
             
             Spacer()
+            HStack {
+                Button("save model", action: {viewModel.saveModel()})
+                Button("load model", action: {viewModel.loadModel()})
+            }
         }
     }
 }

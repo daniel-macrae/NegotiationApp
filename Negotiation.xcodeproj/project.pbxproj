@@ -27,6 +27,7 @@
 		622F29BB29AA984000E1C774 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622F29A529AA983F00E1C774 /* Model.swift */; };
 		622F29BC29AA984000E1C774 /* BufferAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622F29A229AA983E00E1C774 /* BufferAction.swift */; };
 		622F29BE29AA998100E1C774 /* NegotiationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622F29BD29AA998100E1C774 /* NegotiationModel.swift */; };
+		622F29C029B12E4A00E1C774 /* JSONManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622F29BF29B12E4A00E1C774 /* JSONManager.swift */; };
 		62A12FB729AA863E00FB7B09 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62A12FB629AA863E00FB7B09 /* ViewModel.swift */; };
 		62A12FB929AA93ED00FB7B09 /* PublicChunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62A12FB829AA93ED00FB7B09 /* PublicChunk.swift */; };
 /* End PBXBuildFile section */
@@ -53,6 +54,7 @@
 		622F29AC29AA984000E1C774 /* Production.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Production.swift; sourceTree = "<group>"; };
 		622F29AD29AA984000E1C774 /* Instantiation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instantiation.swift; sourceTree = "<group>"; };
 		622F29BD29AA998100E1C774 /* NegotiationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NegotiationModel.swift; sourceTree = "<group>"; };
+		622F29BF29B12E4A00E1C774 /* JSONManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONManager.swift; sourceTree = "<group>"; };
 		62A12FB629AA863E00FB7B09 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		62A12FB829AA93ED00FB7B09 /* PublicChunk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicChunk.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -90,6 +92,7 @@
 				622F299C29AA981E00E1C774 /* ACT-R */,
 				620BEBCB29A7B89300DAE4FF /* NegotiationApp.swift */,
 				622F29BD29AA998100E1C774 /* NegotiationModel.swift */,
+				622F29BF29B12E4A00E1C774 /* JSONManager.swift */,
 				62A12FB629AA863E00FB7B09 /* ViewModel.swift */,
 				620BEBCD29A7B89300DAE4FF /* ContentView.swift */,
 				620BEBCF29A7B89700DAE4FF /* Assets.xcassets */,
@@ -200,6 +203,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				622F29AE29AA984000E1C774 /* BufferCondition.swift in Sources */,
+				622F29C029B12E4A00E1C774 /* JSONManager.swift in Sources */,
 				622F29B729AA984000E1C774 /* Vision.swift in Sources */,
 				62A12FB929AA93ED00FB7B09 /* PublicChunk.swift in Sources */,
 				622F29B629AA984000E1C774 /* Production.swift in Sources */,
