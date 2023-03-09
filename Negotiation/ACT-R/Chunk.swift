@@ -175,6 +175,12 @@ Set the baselevel of a chunk
         if slotvals[slot] == nil { printOrder.append(slot) }
         slotvals[slot] = Value.Number(value)
     }
+    /**
+    Set a slot to a particular value
+    - parameter slot: the name of the slot
+    - parameter value: the value the goes into the slot
+    */
+    
 
     /**
      Set a slot to a particular value

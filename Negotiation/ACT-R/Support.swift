@@ -70,14 +70,18 @@ func readModel(filename: String) -> Model? {
 // Chunk values can be a symbol, a number or nil
 
 enum Value: CustomStringConvertible, Codable {
-   case symbol(Chunk)
+    case symbol(Chunk)
     case Number(Double)
+    //case NumberInt(Int)
+    //case Boolean(Bool)
     case Text(String)
     case Empty
     
     private enum CodingKeys: String, CodingKey {
         case symbol
         case Number
+        //case NumberInt
+        //case Boolean
         case Text
         case Empty
     }
