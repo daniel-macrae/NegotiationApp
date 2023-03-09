@@ -37,15 +37,30 @@ class NGViewModel: ObservableObject {
     
     // MARK: ##########     Intents     ############
     
+    /// a function when the player declares their MNS
+    func declarePlayerMNS(value: Float){
+        model.playerDeclaredMNS = Int(value)
+        if verbose {print("VM: player MNS! = " + String(value))}
+        //call function for the model to declare MSN
+        model.declareModelMNS()
+    }
+    
+    
     /// a function for when the player makes an offer
+    ///
+    ///
     func playerMakeOffer(value: Float, isFinal: Bool) {
         /// overwrite the (now-outdated) previous offer
         
         model.playerPreviousOffer = model.playerCurrentOffer
         model.playerCurrentOffer = Int(value)
+        
+        
         if verbose {print("VM: player offer made! = " + String(value) + ", is final = " + String(isFinal))}  // check to see if the button works
         // call a function in the model here !
-        model.placeholderResponse(playerOffer: value, playerIsFinalOffer: isFinal)
+        
+        model.modelResponse(playerOffer: value, playerIsFinalOffer: isFinal)
+        
     }
     
     // player quits negotiation, no need to change any scores so just reset everything
