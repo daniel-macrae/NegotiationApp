@@ -2,7 +2,6 @@
 //  SelectModelScreen.swift
 //  Negotiation
 //
-//  Created by Mandy Slagter on 10/03/2023.
 //
 
 import SwiftUI
