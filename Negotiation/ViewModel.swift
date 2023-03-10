@@ -5,6 +5,7 @@ import Foundation
 
 class NGViewModel: ObservableObject {
     @Published private var model = NGModel()
+    
     var verbose: Bool {model.verbose}
     
     // MARK: ########  Acess to the Model   ########

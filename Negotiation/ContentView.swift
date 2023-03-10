@@ -5,7 +5,7 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var viewModel: NGViewModel
-    
+    @Binding var player_name: String
     @State private var sliderValue : Float = 0.0
     @State private var finalOfferToggle : Bool = false
     
@@ -75,7 +75,7 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let model = NGViewModel()
-        ContentView(viewModel: model)
+        ContentView(viewModel: model, player_name: .constant("name"))
     }
 }
 

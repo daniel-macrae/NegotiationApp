@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		224EFBEF29BB41ED00B78AA2 /* TitleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224EFBEE29BB41ED00B78AA2 /* TitleScreen.swift */; };
+		224EFBF129BB422D00B78AA2 /* SelectModelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224EFBF029BB422D00B78AA2 /* SelectModelScreen.swift */; };
 		620BEBCC29A7B89300DAE4FF /* NegotiationApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 620BEBCB29A7B89300DAE4FF /* NegotiationApp.swift */; };
 		620BEBCE29A7B89300DAE4FF /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 620BEBCD29A7B89300DAE4FF /* ContentView.swift */; };
 		620BEBD029A7B89700DAE4FF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 620BEBCF29A7B89700DAE4FF /* Assets.xcassets */; };
@@ -33,6 +35,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		224EFBEE29BB41ED00B78AA2 /* TitleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleScreen.swift; sourceTree = "<group>"; };
+		224EFBF029BB422D00B78AA2 /* SelectModelScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectModelScreen.swift; sourceTree = "<group>"; };
 		620BEBC829A7B89300DAE4FF /* Negotiation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Negotiation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		620BEBCB29A7B89300DAE4FF /* NegotiationApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NegotiationApp.swift; sourceTree = "<group>"; };
 		620BEBCD29A7B89300DAE4FF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -91,6 +95,8 @@
 			children = (
 				622F299C29AA981E00E1C774 /* ACT-R */,
 				620BEBCB29A7B89300DAE4FF /* NegotiationApp.swift */,
+				224EFBF029BB422D00B78AA2 /* SelectModelScreen.swift */,
+				224EFBEE29BB41ED00B78AA2 /* TitleScreen.swift */,
 				622F29BD29AA998100E1C774 /* NegotiationModel.swift */,
 				622F29BF29B12E4A00E1C774 /* JSONManager.swift */,
 				62A12FB629AA863E00FB7B09 /* ViewModel.swift */,
@@ -204,6 +210,8 @@
 			files = (
 				622F29AE29AA984000E1C774 /* BufferCondition.swift in Sources */,
 				622F29C029B12E4A00E1C774 /* JSONManager.swift in Sources */,
+				224EFBF129BB422D00B78AA2 /* SelectModelScreen.swift in Sources */,
+				224EFBEF29BB41ED00B78AA2 /* TitleScreen.swift in Sources */,
 				622F29B729AA984000E1C774 /* Vision.swift in Sources */,
 				62A12FB929AA93ED00FB7B09 /* PublicChunk.swift in Sources */,
 				622F29B629AA984000E1C774 /* Production.swift in Sources */,
