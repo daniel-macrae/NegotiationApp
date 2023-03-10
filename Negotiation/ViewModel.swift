@@ -5,15 +5,23 @@ import Foundation
 
 class NGViewModel: ObservableObject {
     @Published private var model = NGModel()
-    
+    @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
     
     // MARK: ########  Acess to the Model   ########
     
+    struct Message: Identifiable{
+        let id = UUID()
+        let text:String
+        let sender: Bool
+        
+    }
     /// We need to make vars for:
     /// - player and model score
     /// - player and model MSE
     /// -
+    ///
+    ///
     ///
     var playerNegotiationValue: String {
         let val = model.playerCurrentOffer
@@ -46,6 +54,9 @@ class NGViewModel: ObservableObject {
         model.declareModelMNS()
     }
     
+    func sendMessage(_ text:String, isMe: Bool){
+        messages.append(Message(text: text, sender: isMe))
+    }
     
     /// a function for when the player makes an offer
     ///

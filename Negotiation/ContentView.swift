@@ -10,66 +10,108 @@ struct ContentView: View {
     @State private var finalOfferToggle : Bool = false
     
     var body: some View {
-        VStack {
-            Spacer()
-            // simple stack to show both scores and MNS's
-            HStack {
-                Spacer()
-                VStack {
-                    Text("PLAYER").bold()
-                    Text("Score = " + viewModel.playerScore)
-                    Text("MNS = " + viewModel.playerMNS)
-                }
-                Spacer()
-                VStack {
-                    Text("MODEL").bold()
-                    Text("Score = " + viewModel.modelScore)
-                    Text("MNS = " + viewModel.modelMNS)
-                }
-                Spacer()
-            }
-            .padding()
-            
-            Spacer()
-            
-            // stack to display player negotiation actions
+        NavigationStack{
             VStack {
-                HStack {
-                    Slider(value: $sliderValue, in: 0...9, step: 1)
-                    // prints "hi" for as long as the slider is moving
-                    // "onEditingChanged" returns true when the user starts moving it, false when the user lets go
-                    // !!! Slider has to take a float value !!!
-                    Text("Offer Value: " + String(Int(sliderValue)))
-                        .padding()
-                }
-                Toggle("Final Offer", isOn: $finalOfferToggle)
                 
+                
+                
+                ChatBox(messages: viewModel.messages)
+                /*Spacer()
+                 // simple stack to show both scores and MNS's
+                 HStack {
+                 Spacer()
+                 VStack {
+                 Text("PLAYER").bold()
+                 Text("Score = " + viewModel.playerScore)
+                 Text("MNS = " + viewModel.playerMNS)
+                 }
+                 Spacer()
+                 VStack {
+                 Text("MODEL").bold()
+                 Text("Score = " + viewModel.modelScore)
+                 Text("MNS = " + viewModel.modelMNS)
+                 }
+                 Spacer()
+                 }
+                 .padding()
+                 
+                 Spacer()
+                 */
+                // stack to display player negotiation actions
+                VStack {
+                    HStack {
+                        Slider(value: $sliderValue, in: 0...9, step: 1)
+                        // prints "hi" for as long as the slider is moving
+                        // "onEditingChanged" returns true when the user starts moving it, false when the user lets go
+                        // !!! Slider has to take a float value !!!
+                        Text("Offer Value: " + String(Int(sliderValue)))
+                            .padding()
+                    }
+                    Toggle("Final Offer", isOn: $finalOfferToggle)
+                    
+                    HStack {
+                        Button("Accept Model Offer", action: {viewModel.playerAccepts()})
+                        Button("Confirm Offer", action: {viewModel.sendMessage("hello", isMe: true)})
+                        Button(action: {viewModel.playerQuits()}) {
+                            Text("Quit")
+                        }.foregroundColor(Color(.red))
+                    } .padding()
+                }
+                Spacer()
+                
+                // see model response
                 HStack {
-                    Button("Accept Model Offer", action: {viewModel.playerAccepts()})
-                    Button("Confirm Offer", action: {viewModel.playerMakeOffer(value: sliderValue, isFinal: finalOfferToggle)})
-                    Button(action: {viewModel.playerQuits()}) {
-                        Text("Quit")
-                    }.foregroundColor(Color(.red))
+                    Text("Model offer = " + String(viewModel.modelNegotiationValue))
+                    Text("Final? = " + String(viewModel.modelIsFinalOffer))
                 } .padding()
-            }
-            Spacer()
-            
-            // see model response
-            HStack {
-                Text("Model offer = " + String(viewModel.modelNegotiationValue))
-                Text("Final? = " + String(viewModel.modelIsFinalOffer))
-            } .padding()
-            
-            
-            Spacer()
-            HStack {
-                Button("save model", action: {viewModel.saveModel()})
-                Button("load model", action: {viewModel.loadModel()})
+                
+                
+                Spacer()
+                HStack {
+                    Button("save model", action: {print(viewModel.messages)})
+                    Button("load model", action: {viewModel.loadModel()})
+                }
             }
         }
     }
 }
 
+
+
+struct MessageView: View{
+    let message: NGViewModel.Message
+    var body: some View{
+
+            if message.sender{
+                HStack{
+                    Spacer()
+                    Text(message.text)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(Color.white)
+                        .cornerRadius(10)
+                }
+            } else {
+                HStack{
+                    Text(message.text)
+                        .padding()
+                        .background(Color.gray.opacity(0.6))
+                        .foregroundColor(Color.black.opacity(0.7))
+                        .cornerRadius(20)
+                    Spacer()
+                }
+            }
+        }
+}
+
+struct ChatBox: View{
+    var messages: [NGViewModel.Message]
+    var body: some View{
+        List(messages){
+            message in MessageView(message: message)
+        }
+    }
+}
 
 
 struct ContentView_Previews: PreviewProvider {
