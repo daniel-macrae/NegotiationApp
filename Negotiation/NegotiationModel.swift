@@ -93,8 +93,8 @@ struct NGModel {
     
     mutating func modelResponse(playerOffer: Float, playerIsFinalOffer: Bool){
         //maybe this things should be three different functions
-        var playerOfferInt = Int(playerOffer) // not pretty, I guess you defined as float to use slider :|
-        var changePlayerBid = playerOfferInt - playerPreviousOffer!
+        let playerOfferInt = Int(playerOffer) // not pretty, I guess you defined as float to use slider :|
+        let changePlayerBid = playerOfferInt - playerPreviousOffer!
 
         
 //DETECT STRATEGY // In the paper they use how usually the player concedes
@@ -147,7 +147,7 @@ struct NGModel {
             }
             
 //SAVE THIS EXPERIENCE
-        var changeModelBid = modelCurrentOffer! - modelPreviousOffer! // this cant be enforced here, maybe use another function
+        let changeModelBid = modelCurrentOffer! - modelPreviousOffer! // this cant be enforced here, maybe use another function
         //determine models move type
         if changeModelBid > 0 {modelMoveType = "raise"}
         else if changeModelBid == 0 {modelMoveType = "insist"}
@@ -229,25 +229,32 @@ struct NGModel {
     var dmContent: [PublicChunk] = []
     
   
-        mutating func update() {
-                self.traceText = model.trace
-                self.modelText = model.modelText
-                dmContent = []
-                var count = 0
-                for (_,chunk) in model.dm.chunks {
-                    var slots: [(slot: String,val: String)] = []
-                    for slot in chunk.printOrder {
-                        if let val = chunk.slotvals[slot] {
-                            slots.append((slot:slot, val:val.description))
-                        }
+    mutating func update() {
+            self.traceText = model.trace
+            self.modelText = model.modelText
+            dmContent = []
+            var count = 0
+            for (_,chunk) in model.dm.chunks {
+                var slots: [(slot: String,val: String)] = []
+                for slot in chunk.printOrder {
+                    if let val = chunk.slotvals[slot] {
+                        slots.append((slot:slot, val:val.description))
                     }
-                    dmContent.append(PublicChunk(name: chunk.name, slots: slots, activation: chunk.activation(),id: count))
-                    count += 1
                 }
-                dmContent.sort { $0.activation > $1.activation }
-                waitingForAction = true
+                dmContent.append(PublicChunk(name: chunk.name, slots: slots, activation: chunk.activation(),id: count))
+                count += 1
             }
+            dmContent.sort { $0.activation > $1.activation }
+            waitingForAction = true
+        }
 
+    
+    
+    mutating func makeNewModel() {
+        model = initNewModel()
+    }
+    
+    
     }
 
     

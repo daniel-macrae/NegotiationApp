@@ -49,7 +49,7 @@ func loadModel2(filename: String) -> Model {
         return model
  
     } catch {
-        print("error while loading model")
+        print("error while loading model, returning empty one")
         return Model() // just return an new empty model idk
     }
     

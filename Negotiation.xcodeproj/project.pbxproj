@@ -32,6 +32,8 @@
 		622F29C029B12E4A00E1C774 /* JSONManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622F29BF29B12E4A00E1C774 /* JSONManager.swift */; };
 		62A12FB729AA863E00FB7B09 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62A12FB629AA863E00FB7B09 /* ViewModel.swift */; };
 		62A12FB929AA93ED00FB7B09 /* PublicChunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62A12FB829AA93ED00FB7B09 /* PublicChunk.swift */; };
+		62D93B5F29BBBE39007883D4 /* InitModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D93B5E29BBBE39007883D4 /* InitModel.swift */; };
+		62D93B6129BBCF90007883D4 /* PremadeMemory.csv in Resources */ = {isa = PBXBuildFile; fileRef = 62D93B6029BBCF90007883D4 /* PremadeMemory.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +63,8 @@
 		622F29BF29B12E4A00E1C774 /* JSONManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONManager.swift; sourceTree = "<group>"; };
 		62A12FB629AA863E00FB7B09 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		62A12FB829AA93ED00FB7B09 /* PublicChunk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicChunk.swift; sourceTree = "<group>"; };
+		62D93B5E29BBBE39007883D4 /* InitModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitModel.swift; sourceTree = "<group>"; };
+		62D93B6029BBCF90007883D4 /* PremadeMemory.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PremadeMemory.csv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +103,8 @@
 				224EFBEE29BB41ED00B78AA2 /* TitleScreen.swift */,
 				622F29BD29AA998100E1C774 /* NegotiationModel.swift */,
 				622F29BF29B12E4A00E1C774 /* JSONManager.swift */,
+				62D93B5E29BBBE39007883D4 /* InitModel.swift */,
+				62D93B6029BBCF90007883D4 /* PremadeMemory.csv */,
 				62A12FB629AA863E00FB7B09 /* ViewModel.swift */,
 				620BEBCD29A7B89300DAE4FF /* ContentView.swift */,
 				620BEBCF29A7B89700DAE4FF /* Assets.xcassets */,
@@ -196,6 +202,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62D93B6129BBCF90007883D4 /* PremadeMemory.csv in Resources */,
 				620BEBD329A7B89700DAE4FF /* Preview Assets.xcassets in Resources */,
 				620BEBD029A7B89700DAE4FF /* Assets.xcassets in Resources */,
 			);
@@ -231,6 +238,7 @@
 				622F29AF29AA984000E1C774 /* Support.swift in Sources */,
 				622F29B229AA984000E1C774 /* Chunk.swift in Sources */,
 				622F29BA29AA984000E1C774 /* SlotCondition.swift in Sources */,
+				62D93B5F29BBBE39007883D4 /* InitModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
