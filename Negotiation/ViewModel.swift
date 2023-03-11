@@ -37,7 +37,7 @@ class NGViewModel: ObservableObject {
     
     var playerScore: String {String(model.playerScore)}
     var modelScore: String {String(model.modelScore)}
-    var playerMNS: String {String(model.playerMNS)}
+    var playerMNS: Float {Float(model.playerMNS)}
     var modelMNS: String {String(model.modelMNS)}
     
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
@@ -90,6 +90,11 @@ class NGViewModel: ObservableObject {
         model.playerCurrentOffer = 9 - (Int(modelNegotiationValue) ?? 0)
         
         model.newRound()
+    }
+    
+    func FinalOfferPlayerChanged(){
+        model.playerIsFinalOffer.toggle()
+        print(model.playerIsFinalOffer)
     }
     
     func saveModel() {

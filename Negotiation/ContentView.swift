@@ -16,27 +16,12 @@ struct ContentView: View {
             VStack {
                 HStack{
                     Spacer()
-                    VStack{
-                        Text("Round").foregroundColor(Color.white)
-                        Text(String(round_no)+"/10").foregroundColor(Color.white)
-                    }
-                    .padding(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.blue.opacity(0.6), lineWidth: 1)
-                    )
-                    .background(
-                         RoundedRectangle(cornerRadius: 10)
-                             .fill(Color.blue.opacity(0.6))
-                     )
+                    round_box(round_no: round_no)
                     Spacer()
                 }
-
-                
                 Spacer()
                 ChatBox(messages: viewModel.messages)
                 /*Spacer()
-                 // simple stack to show both scores and MNS's
                  HStack {
                  Spacer()
                  VStack {
@@ -49,45 +34,14 @@ struct ContentView: View {
                  Text("MODEL").bold()
                  Text("Score = " + viewModel.modelScore)
                  Text("MNS = " + viewModel.modelMNS)
-                 }
-                 Spacer()
-                 }
-                 .padding()
-                 
-                 Spacer()
                  */
-                // stack to display player negotiation actions
-                Spacer()
                 Divider()
-                    .background(Color.black)
-                    .frame(height: 4)
-                
                 VStack {
                     VStack{
-                        HStack{
-                            Spacer()
-                            Text("Offer Value: " + String(Int(sliderValue)))
-                                .padding(.top)
-                            Spacer()
-                        }
-                        HStack {
-                            Slider(value: $sliderValue, in: 0...9, step: 1)
-                            // prints "hi" for as long as the slider is moving
-                            // "onEditingChanged" returns true when the user starts moving it, false when the user lets go
-                            // !!! Slider has to take a float value !!!
-                        }.padding([.bottom,.horizontal])
-                        HStack {
-                            VStack(alignment: .center){
-                                Text("Finale Offer")
-                                    .foregroundColor(finalOfferToggle ? Color.green : Color.gray)
-                                Toggle("", isOn: $finalOfferToggle)
-                                    .foregroundColor(finalOfferToggle ? Color.green : Color.gray).labelsHidden()
-                            }.padding(.horizontal)
-                            Spacer()
-                        }
-
-
-
+                        sliderView(sliderValue: sliderValue, thresholdValue: viewModel.playerMNS)
+                        
+                        Toggle_box(finalOfferToggle: $finalOfferToggle)        .onChange(of: finalOfferToggle) { value in
+                            viewModel.FinalOfferPlayerChanged()}
                         HStack {
                             Button("Accept Model Offer", action: {viewModel.sendMessage("hello", isMe: false);
                                 round_no = round_no + 1
@@ -103,7 +57,7 @@ struct ContentView: View {
                     // see model response
                     HStack {
                         Text("Model offer = " + String(viewModel.modelNegotiationValue))
-                        Text("Final? = " + String(viewModel.modelIsFinalOffer))
+                        Text("Final? = " + String(viewModel.playerIsFinalOffer))
                     } .padding()
                     
                     
@@ -114,17 +68,83 @@ struct ContentView: View {
                     }
                     Spacer()
                 }
-            }.onAppear {
+            }.background(Color.black.opacity(0.4))
+                .onAppear{viewModel.sendMessage("Hello " + String(player_name), isMe: false)}
+            .onAppear {
                 UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation") // Forcing the rotation to portrait
                 AppDelegate.orientationLock = .portrait // And making sure it stays that way
             }.onDisappear {
                 AppDelegate.orientationLock = .all // Unlocking the rotation when leaving the view
+                ;
+                viewModel.messages = []
             }
         }
     }
 }
 
 
+struct sliderView: View{
+    @State var sliderValue : Float
+    var thresholdValue : Float
+
+    var body: some View {
+        VStack{
+            HStack{
+                Spacer()
+                Text("Offer Value:")
+                    .foregroundColor(Color.black.opacity(0.7))
+                Text(String(Int(sliderValue)))
+                    .foregroundColor(sliderValue > thresholdValue ? .green : .orange)
+                Spacer()
+            }.padding([.top,.horizontal])
+            HStack {
+                Slider(value: $sliderValue, in: 0...10, step: 1)
+                
+                    .accentColor(sliderValue > thresholdValue ? .green : .orange)
+                    .frame(height: 10)
+                    .padding([.bottom,.horizontal])
+            }
+        }
+    }
+}
+
+struct round_box: View{
+    
+    var round_no = 1
+    
+    var body: some View{
+        VStack{
+            Text("Round").foregroundColor(Color.white)
+            Text(String(round_no)+"/10").foregroundColor(Color.white)
+        }.padding(10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.blue.opacity(0.6), lineWidth: 1)
+        )
+        .background(
+             RoundedRectangle(cornerRadius: 10)
+                 .fill(Color.blue.opacity(0.6))
+         )
+    }
+}
+
+struct Toggle_box: View{
+    var toggleAction: ((Bool) -> Void)?
+    @Binding var finalOfferToggle: Bool
+    
+    var body: some View{
+        HStack{
+            VStack(alignment: .center){
+                Text("Finale Offer")
+                    .foregroundColor(finalOfferToggle ? Color.green : Color.gray)
+                Toggle("", isOn: $finalOfferToggle)
+                    .foregroundColor(finalOfferToggle ? Color.green : Color.gray).labelsHidden()
+            }.padding(.all, 8).background(Color.white.opacity(0.5)).cornerRadius(20)
+            Spacer()
+        }
+        .scaleEffect(0.8)
+    }
+}
 
 struct MessageView: View{
     let message: NGViewModel.Message

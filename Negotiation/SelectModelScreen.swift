@@ -46,7 +46,7 @@ struct SelectModelScreen: View {
                                         .background(Color.white)
                                         .foregroundColor(Color.black)
                                         .cornerRadius(20)
-                                }
+                                }.onAppear{name = ""}
                                 nextPageButton(action: {StartGame = true})
                                 Spacer()
                             }
@@ -71,13 +71,16 @@ struct SelectModelScreen: View {
                             Spacer()
                             Picker("", selection: $selectedOption){
                                 ForEach(0..<names.count, id: \.self){
-                                    index in Text(names[index]).foregroundColor(Color.black)
+                                    index in
+                                    Text(names[index]).foregroundColor(Color.black)          .onAppear{
+                                        name = names[index]
+                                    }
                                 }
                             }.pickerStyle(MenuPickerStyle())
                                 .frame(width:200)
                                 .background(Color.white.opacity(0.4))
                                 .cornerRadius(20)
-                            
+                    
                             nextPageButton(action: {StartGame = true})
                             Spacer()
                         }
