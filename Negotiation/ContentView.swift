@@ -14,10 +14,16 @@ struct ContentView: View {
     var body: some View {
         NavigationStack{
             VStack {
-                HStack{
-                    Spacer()
-                    round_box(round_no: round_no)
-                    Spacer()
+                ZStack{
+                    HStack{
+                        Spacer()
+                        round_box(round_no: round_no)
+                        Spacer()
+                    }
+                    HStack{
+                        Spacer()
+                        infoButton().padding(.horizontal)
+                    }
                 }
                 Spacer()
                 ChatBox(messages: viewModel.messages)
@@ -47,9 +53,6 @@ struct ContentView: View {
                                 round_no = round_no + 1
                             })
                             Button("Confirm Offer", action: {viewModel.sendMessage("hello", isMe: true)})
-                            Button(action: {viewModel.playerQuits()}) {
-                                Text("Quit")
-                            }.foregroundColor(Color(.red))
                         } .padding()
                     }
                     Spacer()
@@ -59,13 +62,6 @@ struct ContentView: View {
                         Text("Model offer = " + String(viewModel.modelNegotiationValue))
                         Text("Final? = " + String(viewModel.playerIsFinalOffer))
                     } .padding()
-                    
-                    
-                    Spacer()
-                    HStack {
-                        Button("save model", action: {print(viewModel.messages)})
-                        Button("load model", action: {viewModel.loadModel()})
-                    }
                     Spacer()
                 }
             }.background(Color.black.opacity(0.4))
@@ -127,6 +123,63 @@ struct round_box: View{
          )
     }
 }
+
+struct infoButton: View {
+    @State private var showPicker = false
+    @State private var showExplanation = false
+    var body: some View {
+        VStack {
+            Button(action: {
+                showPicker = true
+            }) {
+                Image(systemName: "questionmark.circle")
+                    .foregroundColor(.black)
+            }.scaleEffect(1.6)
+
+        }
+        .sheet(isPresented: $showPicker) {
+            VStack {
+                Text("What can I help you with:")
+                    .font(.headline)
+                    .padding()
+
+                Button("How to Play") {
+                    showExplanation = true
+                    showPicker = false
+                }
+                Button("Save Model") {
+                    showPicker = false
+                }
+                Button("Load Model") {
+                    showPicker = false
+                }
+                Button("Return to Game") {
+                    showPicker = false
+                }
+                Button("Quit Game") {
+                    showPicker = false
+                }.foregroundColor(Color.red)
+
+                .padding(.bottom)
+            }
+        }
+        .sheet(isPresented: $showExplanation){
+            VStack{
+                Text("HELLO THIS IS HOW GAME WORKS")
+                Button("Return to Game") {
+                    showExplanation = false
+                }
+                Button("Return to Options") {
+                    showPicker = true
+                    showExplanation = false
+                }
+                
+            }
+        }
+    }
+}
+
+
 
 struct Toggle_box: View{
     var toggleAction: ((Bool) -> Void)?
