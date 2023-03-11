@@ -8,13 +8,32 @@ struct ContentView: View {
     @Binding var player_name: String
     @State private var sliderValue : Float = 0.0
     @State private var finalOfferToggle : Bool = false
+    @State private var OfferAccepted: Bool = false
+    @State private var round_no: Int = 1
     
     var body: some View {
         NavigationStack{
             VStack {
+                HStack{
+                    Spacer()
+                    VStack{
+                        Text("Round").foregroundColor(Color.white)
+                        Text(String(round_no)+"/10").foregroundColor(Color.white)
+                    }
+                    .padding(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.blue.opacity(0.6), lineWidth: 1)
+                    )
+                    .background(
+                         RoundedRectangle(cornerRadius: 10)
+                             .fill(Color.blue.opacity(0.6))
+                     )
+                    Spacer()
+                }
+
                 
-                
-                
+                Spacer()
                 ChatBox(messages: viewModel.messages)
                 /*Spacer()
                  // simple stack to show both scores and MNS's
@@ -38,38 +57,62 @@ struct ContentView: View {
                  Spacer()
                  */
                 // stack to display player negotiation actions
+                Spacer()
+                Divider()
+                    .background(Color.black)
+                    .frame(height: 4)
+                
                 VStack {
-                    HStack {
-                        Slider(value: $sliderValue, in: 0...9, step: 1)
-                        // prints "hi" for as long as the slider is moving
-                        // "onEditingChanged" returns true when the user starts moving it, false when the user lets go
-                        // !!! Slider has to take a float value !!!
-                        Text("Offer Value: " + String(Int(sliderValue)))
-                            .padding()
+                    VStack{
+                        HStack{
+                            Spacer()
+                            Text("Offer Value: " + String(Int(sliderValue)))
+                                .padding(.top)
+                            Spacer()
+                        }
+                        HStack {
+                            Slider(value: $sliderValue, in: 0...9, step: 1)
+                            // prints "hi" for as long as the slider is moving
+                            // "onEditingChanged" returns true when the user starts moving it, false when the user lets go
+                            // !!! Slider has to take a float value !!!
+                        }.padding([.bottom,.horizontal])
+                        HStack {
+                            VStack(alignment: .center){
+                                Text("Finale Offer")
+                                    .foregroundColor(finalOfferToggle ? Color.green : Color.gray)
+                                Toggle("", isOn: $finalOfferToggle)
+                                    .foregroundColor(finalOfferToggle ? Color.green : Color.gray).labelsHidden()
+                            }.padding(.horizontal)
+                            Spacer()
+                        }
+
+
+
+                        HStack {
+                            Button("Accept Model Offer", action: {viewModel.sendMessage("hello", isMe: false);
+                                round_no = round_no + 1
+                            })
+                            Button("Confirm Offer", action: {viewModel.sendMessage("hello", isMe: true)})
+                            Button(action: {viewModel.playerQuits()}) {
+                                Text("Quit")
+                            }.foregroundColor(Color(.red))
+                        } .padding()
                     }
-                    Toggle("Final Offer", isOn: $finalOfferToggle)
+                    Spacer()
                     
+                    // see model response
                     HStack {
-                        Button("Accept Model Offer", action: {viewModel.playerAccepts()})
-                        Button("Confirm Offer", action: {viewModel.sendMessage("hello", isMe: true)})
-                        Button(action: {viewModel.playerQuits()}) {
-                            Text("Quit")
-                        }.foregroundColor(Color(.red))
+                        Text("Model offer = " + String(viewModel.modelNegotiationValue))
+                        Text("Final? = " + String(viewModel.modelIsFinalOffer))
                     } .padding()
-                }
-                Spacer()
-                
-                // see model response
-                HStack {
-                    Text("Model offer = " + String(viewModel.modelNegotiationValue))
-                    Text("Final? = " + String(viewModel.modelIsFinalOffer))
-                } .padding()
-                
-                
-                Spacer()
-                HStack {
-                    Button("save model", action: {print(viewModel.messages)})
-                    Button("load model", action: {viewModel.loadModel()})
+                    
+                    
+                    Spacer()
+                    HStack {
+                        Button("save model", action: {print(viewModel.messages)})
+                        Button("load model", action: {viewModel.loadModel()})
+                    }
+                    Spacer()
                 }
             }
         }
