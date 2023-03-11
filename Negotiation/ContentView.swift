@@ -114,6 +114,11 @@ struct ContentView: View {
                     }
                     Spacer()
                 }
+            }.onAppear {
+                UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation") // Forcing the rotation to portrait
+                AppDelegate.orientationLock = .portrait // And making sure it stays that way
+            }.onDisappear {
+                AppDelegate.orientationLock = .all // Unlocking the rotation when leaving the view
             }
         }
     }
