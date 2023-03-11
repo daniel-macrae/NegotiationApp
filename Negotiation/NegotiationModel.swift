@@ -63,15 +63,23 @@ struct NGModel {
     /// - Parameter filename: filename to be loaded (extension .actr is added by the function)
     func resetModel(filename: String) {
         model.reset()
-        // have to add the strategy chunks. HERE?
-        let aggresiveStrategy = model.generateNewChunk(string: "agressive")
-        aggresiveStrategy.setSlot(slot: "isa", value: "strategy")
-        model.dm.addToDM(aggresiveStrategy)
-        
-        let cooperativeStrategy = model.generateNewChunk(string: "cooperative")
-        cooperativeStrategy.setSlot(slot: "isa", value: "strategy")
-        model.dm.addToDM(cooperativeStrategy)
         model.waitingForAction = true
+        
+        // have to add the strategy chunks. HERE?
+        
+        // MARK:  I have added these two chunks to the InitModel file
+        // but left them here just to show how they were written - Dan
+        
+        ///let aggresiveStrategy = model.generateNewChunk(string: "agressive")
+        ///aggresiveStrategy.setSlot(slot: "isa", value: "strategy")
+        ///aggresiveStrategy.setSlot(slot: "strategy", value: "agressive")
+        ///model.dm.addToDM(aggresiveStrategy)
+        
+        ///let cooperativeStrategy = model.generateNewChunk(string: "cooperative")
+        ///cooperativeStrategy.setSlot(slot: "isa", value: "strategy")
+        ///cooperativeStrategy.setSlot(slot: "strategy", value: "cooperative")
+        ///model.dm.addToDM(cooperativeStrategy)
+        
     }
     
     
@@ -112,6 +120,8 @@ struct NGModel {
         if verbose {print("M: model is responding/making a new offer")}
             // first offer
             if modelCurrentOffer == nil{
+                // MARK: I think this can be retrieved with a chunk now, using just the keys "myMNS"=modelMNS and "myMoveType"="Opening" and "opponentMoveType"="Opening" (the chunks do contain the move type, so this should work)
+                
                 modelCurrentOffer = Int.random(in: modelMNS..<10)  /// model makes a completely random offer above their MNS
                 model.time += 1.0
                 model.addToTrace(string: "First decision: random pick")
@@ -119,25 +129,37 @@ struct NGModel {
         else{// im assuming the playes goes first (so here previousPlayerOffer is ensured
             
             //determine players move type
+            // MARK: the way the chunks are in the paper, the only (useful) values for the player's move type are "Bid" and "Opening", so I changed the query chunk slot value to "Bid", but we can still use the three lines below for generating the player's text message for the UI - Dan
             if changePlayerBid > 0 {playerMoveType = "raise"}
             else if changePlayerBid == 0 {playerMoveType = "insist"}
             else {playerMoveType = "concede"}
             
+            //
+            // MARK: CHUNK SLOT NAMES ARE NOW:
+            // "myStrategy","myMNS","myBidMNSDifference","opponentMoveType","opponentMove","opponentIsFinal",
+            // "myMoveType","myMove","myIsFinal"
+            // - Dan
+            /// (where 'opponentMove' and 'myMove' are the player's and model's change in bid value respectively)
+            
             modelPreviousOffer = modelCurrentOffer
             let query = Chunk(s: "query", m: model)
             // i dont get why retrieve MNS-Bid Diff
-            query.setSlot(slot: "changePlayer", value: changePlayerBid.description)
-            //query.setSlot(slot: "playerIsFinal", value: playerIsFinalOffer)
-            query.setSlot(slot: "Strategy", value: playerStrategy!)
-            query.setSlot(slot: "playerMoveType", value: playerMoveType!)
+            query.setSlot(slot: "myStrategy", value: playerStrategy!)
+            //query.setSlot(slot: "myBidMNSDifference", value: "Something") /// String(modelCurrentOffer-modelMNS) ?
+            query.setSlot(slot: "opponentMove", value: changePlayerBid.description)
+            //query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer)
+            query.setSlot(slot: "opponentMoveType", value: "Bid")
             
             let (latency, chunk) = model.dm.retrieve(chunk: query)
             //im very confused with types here
-            if let changeModelBid = chunk?.slotvals["changeModel"]?.description {
+            // CHECK for what move the model is making here (as the may quit, or accept the offer)
+            // then decide what to do. (slot is = ["myMoveType"])
+            
+            if let changeModelBid = chunk?.slotvals["myMove"]?.description {
                     modelCurrentOffer = modelPreviousOffer! + Int(changeModelBid)! // idk why this one is an optional though
                     model.addToTrace(string: "Retrieving \(chunk!)")
                 //maybe retrieve modelMoveType, but that can be calculated
-                //if let modelIsFinal = chunk?.slotvals["modelIsFinal"]?.description {
+                //if let modelIsFinal = chunk?.slotvals["myIsFinal"]?.description {
                    // modelIsFinalOffer = Bool(modelIsFinal)!
             
                 } else {
@@ -153,25 +175,31 @@ struct NGModel {
         else if changeModelBid == 0 {modelMoveType = "insist"}
         else {modelMoveType = "concede"}
  
-            
+        
         let newExperience = model.generateNewChunk(string: "instance")
         
+        // "myStrategy","myMNS","myBidMNSDifference","opponentMoveType","opponentMove","opponentIsFinal",
+        // "myMoveType","myMove","myIsFinal"
             
+        // MARK: I think it might make sense to put this newExperience at the start of this function, and then do it by infering the POV of the player. So the "opponent" slots refer to what the model did, and the "my" slots are for what the player just did. This way, new negetiation response types are learned by how the player responds to the model
+        // (would require guessing what the opponent's MNS is, but the data sheet might have a suggestion on how to do it, or we just keep a running average of the model's MNSs and assume the player has the same) - Dan
+        
         //save new experience
-        newExperience.setSlot(slot: "changePlayer", value: changePlayerBid.description)
-        newExperience.setSlot(slot: "changeModel", value: changeModelBid.description)
-        newExperience.setSlot(slot: "playerMoveType", value: playerMoveType!) // this cant be enforced here, maybe use another function
-        newExperience.setSlot(slot: "modelMoveType", value: modelMoveType!) // this cant be enforced here, maybe use another function
-        //newExperience.setSlot(slot: "playerIsFinal", value: playerIsFinalOffer)
-        //newExperience.setSlot(slot: "modelIsFinal", value: modelIsFinalOffer)
-        newExperience.setSlot(slot: "Strategy", value: playerStrategy!)
+        newExperience.setSlot(slot: "opponentMove", value: changePlayerBid.description)
+        newExperience.setSlot(slot: "myMove", value: changeModelBid.description)
+        newExperience.setSlot(slot: "opponentMoveType", value: playerMoveType!) // this cant be enforced here, maybe use another function
+        newExperience.setSlot(slot: "myMoveType", value: modelMoveType!) // this cant be enforced here, maybe use another function
+        //newExperience.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer)
+        //newExperience.setSlot(slot: "myIsFinal", value: modelIsFinalOffer)
+        newExperience.setSlot(slot: "myStrategy", value: playerStrategy!)
+        
+        //newExperience.setSlot(slot: "myBidMNSDifference", value: "something")  //  maybe?
+        //newExperience.setSlot(slot: "myMNS", value: modelMNS.description)  //  ?
         model.dm.addToDM(newExperience)
         
         //add more time?
         update()
         waitingForAction = true
-    
-            
 
     }
 
@@ -255,9 +283,7 @@ struct NGModel {
     }
     
     
-    }
-
-    
+}
     
         
         
