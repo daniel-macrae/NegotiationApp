@@ -10,7 +10,7 @@ class NGViewModel: ObservableObject {
     
     // MARK: ########  Acess to the Model   ########
     
-    struct Message: Identifiable{
+    struct Message: Identifiable, Equatable{
         let id = UUID()
         let text:String
         let sender: Bool

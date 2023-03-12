@@ -60,11 +60,11 @@ struct ContentView: View {
                             Toggle_box(finalOfferToggle: $finalOfferToggle)        .onChange(of: finalOfferToggle) { value in
                                 viewModel.FinalOfferPlayerChanged()}
                             HStack {
-                                GameButton(text: "Accept Offer", action: {viewModel.sendMessage("hello", isMe: false);
-                                    round_no = round_no + 1;
-                                    mnsDeclared = false
+                                GameButton(text: "Send Offer", action: {viewModel.sendMessage("This is my offer", isMe: true)
                                 })
-                                GameButton(text: "Send Offer", action: {viewModel.sendMessage("hello", isMe: true)})
+                                GameButton(text: "Accept Offer", action: {viewModel.sendMessage("I accept your offer", isMe: true);
+                                    round_no = round_no + 1;
+                                    mnsDeclared = false})
                             } .padding()
                         } else{
                             HStack{
@@ -97,6 +97,21 @@ struct GameButton: View{
     let text: String
     let action: () -> Void
     let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
+    
+    var body: some View {
+            Button(text, action: action)
+                .frame(width: 160, height:50)
+                .foregroundColor(.white)
+                .background(buttonColor)
+                .cornerRadius(50)
+    }
+}
+
+struct QuitButton: View{
+    
+    let text: String
+    let action: () -> Void
+    let buttonColor = Color.red
     
     var body: some View {
             Button(text, action: action)
@@ -221,42 +236,46 @@ struct infoButton: View {
 
         }
         .sheet(isPresented: $showPicker) {
-            VStack {
-                Text("What can I help you with:")
-                    .font(.headline)
-                    .padding()
-
-                Button("How to Play") {
-                    showExplanation = true
-                    showPicker = false
+            ZStack{
+                backgroundImg(image: "secondbackground").background()
+                    .ignoresSafeArea(.all)
+                VStack {
+                    GameButton(text: "How to Play") {
+                        showExplanation = true
+                        showPicker = false
+                    }
+                    GameButton(text: "Save Model") {
+                        showPicker = false
+                    }
+                    GameButton(text: "Load Model") {
+                        showPicker = false
+                    }
+                    GameButton(text: "Return to Game") {
+                        showPicker = false
+                    }
+                    QuitButton(text: "Quit Game") {
+                        showPicker = false
+                    }.foregroundColor(Color.red)
+                    
+                        .padding(.bottom)
                 }
-                Button("Save Model") {
-                    showPicker = false
-                }
-                Button("Load Model") {
-                    showPicker = false
-                }
-                Button("Return to Game") {
-                    showPicker = false
-                }
-                Button("Quit Game") {
-                    showPicker = false
-                }.foregroundColor(Color.red)
-
-                .padding(.bottom)
             }
         }
         .sheet(isPresented: $showExplanation){
-            VStack{
-                Text("HELLO THIS IS HOW GAME WORKS")
-                Button("Return to Game") {
-                    showExplanation = false
+            ZStack{
+                backgroundImg(image: "secondbackground").background()
+                    .ignoresSafeArea(.all)
+                VStack{
+                    Text("HELLO THIS IS HOW GAME WORKS")
+                    GameButton(text:"Go to Game") {
+                        showExplanation = false
+                    }
+                    GameButton(text:"Go to Options") {
+                        showPicker = true
+                        showExplanation = false
+                    }
+                    
                 }
-                Button("Return to Options") {
-                    showPicker = true
-                    showExplanation = false
-                }
-                
             }
         }
     }
@@ -311,9 +330,26 @@ struct MessageView: View{
 struct ChatBox: View{
     var messages: [NGViewModel.Message]
     var body: some View{
-        List(messages){
-            message in MessageView(message: message)
-        }
+        ZStack{
+            ScrollView{
+                ScrollViewReader { scrollView in
+                    VStack{
+                        ForEach(messages){ message in
+                            MessageView(message: message).padding([.horizontal,.top], 8)
+                        }
+                        HStack{
+                            Spacer()
+                        }.id("Empty")
+                    }.onChange(of: messages.count){ _ in
+                        withAnimation(.easeOut(duration: 0.5)){
+                            scrollView.scrollTo("Empty", anchor: .bottom)
+            
+                        }
+                    }
+                }
+            }
+        }.background(Color.white)
+
     }
 }
 
