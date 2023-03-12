@@ -10,6 +10,7 @@
 		224EFBEF29BB41ED00B78AA2 /* TitleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224EFBEE29BB41ED00B78AA2 /* TitleScreen.swift */; };
 		224EFBF129BB422D00B78AA2 /* SelectModelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224EFBF029BB422D00B78AA2 /* SelectModelScreen.swift */; };
 		224EFBF329BCB43700B78AA2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224EFBF229BCB43700B78AA2 /* AppDelegate.swift */; };
+		224EFBF529BE244600B78AA2 /* gameOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224EFBF429BE244500B78AA2 /* gameOverView.swift */; };
 		620BEBCC29A7B89300DAE4FF /* NegotiationApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 620BEBCB29A7B89300DAE4FF /* NegotiationApp.swift */; };
 		620BEBCE29A7B89300DAE4FF /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 620BEBCD29A7B89300DAE4FF /* ContentView.swift */; };
 		620BEBD029A7B89700DAE4FF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 620BEBCF29A7B89700DAE4FF /* Assets.xcassets */; };
@@ -41,6 +42,7 @@
 		224EFBEE29BB41ED00B78AA2 /* TitleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleScreen.swift; sourceTree = "<group>"; };
 		224EFBF029BB422D00B78AA2 /* SelectModelScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectModelScreen.swift; sourceTree = "<group>"; };
 		224EFBF229BCB43700B78AA2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		224EFBF429BE244500B78AA2 /* gameOverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gameOverView.swift; sourceTree = "<group>"; };
 		620BEBC829A7B89300DAE4FF /* Negotiation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Negotiation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		620BEBCB29A7B89300DAE4FF /* NegotiationApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NegotiationApp.swift; sourceTree = "<group>"; };
 		620BEBCD29A7B89300DAE4FF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				62D93B6229BD1BD0007883D4 /* PremadeMemory.csv */,
 				62A12FB629AA863E00FB7B09 /* ViewModel.swift */,
 				620BEBCD29A7B89300DAE4FF /* ContentView.swift */,
+				224EFBF429BE244500B78AA2 /* gameOverView.swift */,
 				620BEBCF29A7B89700DAE4FF /* Assets.xcassets */,
 				620BEBD129A7B89700DAE4FF /* Preview Content */,
 			);
@@ -218,6 +221,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				224EFBF529BE244600B78AA2 /* gameOverView.swift in Sources */,
 				622F29AE29AA984000E1C774 /* BufferCondition.swift in Sources */,
 				622F29C029B12E4A00E1C774 /* JSONManager.swift in Sources */,
 				224EFBF129BB422D00B78AA2 /* SelectModelScreen.swift in Sources */,

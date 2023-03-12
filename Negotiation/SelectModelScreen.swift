@@ -101,6 +101,7 @@ struct SelectModelScreen: View {
                             if !names.isEmpty{
                                 SelectModelScreenButton(text: "Load Session", action: {loadNames = true
                                     goBack = true
+                                    //NEEDS model.loadgame()
                                 })
                             }
                             Spacer()

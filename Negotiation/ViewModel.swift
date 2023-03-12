@@ -5,8 +5,10 @@ import Foundation
 
 class NGViewModel: ObservableObject {
     @Published private var model = NGModel()
+    @Published var player_name : String = ":placeholder:"
     @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
+   
     
     // MARK: ########  Acess to the Model   ########
     
@@ -49,11 +51,18 @@ class NGViewModel: ObservableObject {
     /// a function when the player declares their MNS
     func declarePlayerMNS(value: Float){
         model.playerDeclaredMNS = Int(value)
-        if verbose {print("VM: player MNS! = " + String(value))}
+        self.sendMessage("My MNS is " + String(Int(value)), isMe: true)
+        //: TODO MAKE MODEL AWARE of MNS
         //call function for the model to declare MSN
         model.declareModelMNS()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.SendModelMNS()
+        }
     }
     
+    func SendModelMNS(){
+        sendMessage("My MNS is" + String(Int(modelMNS)), isMe: false)
+    }
     func sendMessage(_ text:String, isMe: Bool){
         messages.append(Message(text: text, sender: isMe))
     }
@@ -63,35 +72,33 @@ class NGViewModel: ObservableObject {
     ///
     func playerMakeOffer(value: Float, isFinal: Bool) {
         /// overwrite the (now-outdated) previous offer
-        
+        if isFinal {
+            self.sendMessage("This is my final offer " + String(Int(value)) , isMe: true)
+            // TODO Make model aware of offer and that it is final offer
+        } else {
+            self.sendMessage("This is my offer " + String(Int(value)) , isMe: true)
+            // TODO Make model aware of offer
+        }
         model.playerPreviousOffer = model.playerCurrentOffer
         model.playerCurrentOffer = Int(value)
         
-        
-        if verbose {print("VM: player offer made! = " + String(value) + ", is final = " + String(isFinal))}  // check to see if the button works
-        // call a function in the model here !
-        
-        model.modelResponse(playerOffer: value, playerIsFinalOffer: isFinal)
+        //The code below causes a crash probably due to the rules not being fully implemented or working with a nill value
+        //model.modelResponse(playerOffer: value, playerIsFinalOffer: isFinal)
         
     }
     
-    // player quits negotiation, no need to change any scores so just reset everything
-    func playerQuits () {
-        if verbose {print("VM: player has quit")}
-        model.playerHasQuit = true
-        model.newRound()
-    }
     // player accepts the model's offer
     func playerAccepts () {
-        if verbose {print("VM: player has accepted the model's offer")}
-        
+        self.sendMessage("I accept your offer of " + String(modelNegotiationValue), isMe: true)
         /// change the value of the player's offer in accordance to their acceptance of the model's offer
         /// (e.g. the player's "new offer" is whats left of the 9 points)
-        model.playerCurrentOffer = 9 - (Int(modelNegotiationValue) ?? 0)
+        //model.playerCurrentOffer = 9 - (Int(modelNegotiationValue) ?? 0)
         
-        model.newRound()
+        //model.newRound()
     }
-    
+    func setPlayerName(name: String){
+        self.player_name = name
+    }
     func FinalOfferPlayerChanged(){
         model.playerIsFinalOffer.toggle()
         print(model.playerIsFinalOffer)

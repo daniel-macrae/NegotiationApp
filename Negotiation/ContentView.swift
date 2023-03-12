@@ -11,9 +11,13 @@ struct ContentView: View {
     @State private var OfferAccepted: Bool = false
     @State private var round_no: Int = 1
     @State private var mnsDeclared: Bool = false
+    @State private var isQuitting: Bool = false
+    @State private var gameOver: Bool = false
     
     var body: some View {
         NavigationStack{
+            NavigationLink(destination: TitleScreen().navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
+            NavigationLink(destination: gameOverView(viewModel: viewModel, player_name: player_name).navigationBarBackButtonHidden(true), isActive: $gameOver, label: {})
             VStack {
                 ZStack{
                     HStack{
@@ -23,7 +27,7 @@ struct ContentView: View {
                     }
                     HStack{
                         Spacer()
-                        infoButton().padding(.horizontal)
+                        infoButton(isQuitting: $isQuitting).padding(.horizontal)
                     }
                 }
                 ZStack{
@@ -60,15 +64,20 @@ struct ContentView: View {
                             Toggle_box(finalOfferToggle: $finalOfferToggle)        .onChange(of: finalOfferToggle) { value in
                                 viewModel.FinalOfferPlayerChanged()}
                             HStack {
-                                GameButton(text: "Send Offer", action: {viewModel.sendMessage("This is my offer", isMe: true)
-                                })
-                                GameButton(text: "Accept Offer", action: {viewModel.sendMessage("I accept your offer", isMe: true);
+                                GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(value: sliderValue, isFinal: finalOfferToggle)})
+                             
+                                GameButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                     round_no = round_no + 1;
+                                    if round_no == 10 {
+                                        //Pop up or something needs to appear probably in the bottom so that the user can still see the chat and what happen to the point
+                                        gameOver = true
+                                    };
                                     mnsDeclared = false})
                             } .padding()
                         } else{
                             HStack{
-                                GameButton(text: "Declare MNS", action: {viewModel.sendMessage("Hello my mns is " + String(Int(sliderValue)), isMe: true); mnsDeclared = true
+                                GameButton(text: "Declare MNS", action: {mnsDeclared = true;
+                                    viewModel.declarePlayerMNS(value: sliderValue)
                                     
                                 }).padding()
                             }
@@ -126,7 +135,7 @@ struct UserIcon: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(Color.blue)
+                .fill(Color.blue.opacity(0.8))
             Image(systemName: "person.fill")
                 .resizable()
                 .scaledToFit()
@@ -153,7 +162,7 @@ struct ComputerIcon: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(Color.blue)
+                .fill(Color.blue.opacity(0.8))
             Image(systemName: "desktopcomputer")
                 .resizable()
                 .scaledToFit()
@@ -225,6 +234,8 @@ struct round_box: View{
 struct infoButton: View {
     @State private var showPicker = false
     @State private var showExplanation = false
+    @Binding var isQuitting: Bool
+
     var body: some View {
         VStack {
             Button(action: {
@@ -245,9 +256,13 @@ struct infoButton: View {
                         showPicker = false
                     }
                     GameButton(text: "Save Model") {
+                        NGViewModel().saveModel()
+                        //Some animation for the model being save
                         showPicker = false
                     }
                     GameButton(text: "Load Model") {
+                        //Some animation for the model being loaded
+                        //NGViewModel().loadModel("some_model")
                         showPicker = false
                     }
                     GameButton(text: "Return to Game") {
@@ -255,6 +270,7 @@ struct infoButton: View {
                     }
                     QuitButton(text: "Quit Game") {
                         showPicker = false
+                        isQuitting = true
                     }.foregroundColor(Color.red)
                     
                         .padding(.bottom)
@@ -266,7 +282,9 @@ struct infoButton: View {
                 backgroundImg(image: "secondbackground").background()
                     .ignoresSafeArea(.all)
                 VStack{
-                    Text("HELLO THIS IS HOW GAME WORKS")
+                    //Need to adjust this so that it looks nice and is easier for th reader to understand
+                    Text("The game of nines is a negotiation game played between two players, the proposer and the responder. The game is played over several rounds, and in each round, the proposer makes an offer, and the responder can either accept or reject the offer. The goal of the game is to maximize the total score over all rounds, where the score is calculated by subtracting the proposer's offer from the number nine.At the start of each round, both players declare their minimum acceptable score (MNS), which is the minimum score they are willing to accept. The proposer makes the first offer, which must be a whole number between 1 and 8 (inclusive), and the responder can either accept or reject the offer. If the responder accepts the offer, the round ends, and both players receive a score equal to the difference between nine and the offer. If the responder rejects the offer, the proposer can make a new offer, which must be higher than the previous offer, and the responder can again choose to accept or reject the offer. If the proposer makes a final offer, the responder must accept or reject it, and the round ends regardless of their decision. The game continues for a fixed number of rounds, and the player with the highest total score at the end of the game is the winner.").foregroundColor(.white)
+                        .padding(.horizontal)
                     GameButton(text:"Go to Game") {
                         showExplanation = false
                     }
@@ -348,7 +366,7 @@ struct ChatBox: View{
                     }
                 }
             }
-        }.background(Color.white)
+        }.background(Color.white.opacity(0.8))
 
     }
 }
