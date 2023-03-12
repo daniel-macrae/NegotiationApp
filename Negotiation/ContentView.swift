@@ -25,46 +25,45 @@ struct ContentView: View {
                         infoButton().padding(.horizontal)
                     }
                 }
+                ZStack{
+                    HStack{
+                        HStack{
+                            UserIcon()
+                            VStack{
+                                Text("Score = " + String(Int(viewModel.playerScore)))
+                                // What to display here? We cant just
+                                Text("MNS = " + String(Int(viewModel.playerMNS)))
+                            }
+                        }
+                        Spacer()
+                        
+                        VStack{
+                            Text("Score = " + String(Int(viewModel.modelScore)))
+                            Text("MNS = " + String(Int(viewModel.modelMNS)))
+                        }
+                        ComputerIcon()
+                        }
+                }.padding(.all)
+                    .background(Color.white.opacity(0.5))
+                    .cornerRadius(20)
                 Spacer()
                 ChatBox(messages: viewModel.messages)
-                /*Spacer()
-                 HStack {
-                 Spacer()
-                 VStack {
-                 Text("PLAYER").bold()
-                 Text("Score = " + viewModel.playerScore)
-                 Text("MNS = " + viewModel.playerMNS)
-                 }
-                 Spacer()
-                 VStack {
-                 Text("MODEL").bold()
-                 Text("Score = " + viewModel.modelScore)
-                 Text("MNS = " + viewModel.modelMNS)
-                 */
                 Divider()
                 VStack {
                     VStack{
-                        sliderView(sliderValue: sliderValue, thresholdValue: viewModel.playerMNS)
+                        sliderView(sliderValue: sliderValue, thresholdValue: viewModel.playerMNS).background(Color.white.opacity(0.5)).cornerRadius(20).padding(.horizontal)
                         
                         Toggle_box(finalOfferToggle: $finalOfferToggle)        .onChange(of: finalOfferToggle) { value in
                             viewModel.FinalOfferPlayerChanged()}
                         HStack {
-                            Button("Accept Model Offer", action: {viewModel.sendMessage("hello", isMe: false);
+                            GameButton(text: "Accept Model Offer", action: {viewModel.sendMessage("hello", isMe: false);
                                 round_no = round_no + 1
                             })
-                            Button("Confirm Offer", action: {viewModel.sendMessage("hello", isMe: true)})
+                            Button("Co`dasdnfirm Offer", action: {viewModel.sendMessage("hello", isMe: true)})
                         } .padding()
                     }
-                    Spacer()
-                    
-                    // see model response
-                    HStack {
-                        Text("Model offer = " + String(viewModel.modelNegotiationValue))
-                        Text("Final? = " + String(viewModel.playerIsFinalOffer))
-                    } .padding()
-                    Spacer()
                 }
-            }.background(Color.black.opacity(0.4))
+            }.background(backgroundImg(image: "secondbackground"))
                 .onAppear{viewModel.sendMessage("Hello " + String(player_name), isMe: false)}
             .onAppear {
                 UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation") // Forcing the rotation to portrait
@@ -78,6 +77,75 @@ struct ContentView: View {
     }
 }
 
+
+struct GameButton: View{
+    
+    let text: String
+    let action: () -> Void
+    let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
+    
+    var body: some View {
+            Button(text, action: action)
+                .frame(width: 150, height:50)
+                .foregroundColor(.white)
+                .background(buttonColor)
+                .cornerRadius(50)
+    }
+}
+
+struct UserIcon: View {
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color.blue)
+            Image(systemName: "person.fill")
+                .resizable()
+                .scaledToFit()
+                .foregroundColor(.white)
+                .padding(10)
+            ZStack {
+                Rectangle()
+                    .fill(Color.orange.opacity(0.9))
+                    .frame(width: 40, height: 20)
+                    .cornerRadius(8)
+                    .offset(y: 20)
+                    
+                Text("You")
+                    .foregroundColor(.white)
+                    .font(.headline)
+                    .offset(y: 20)
+            }
+        }
+        .frame(width: 50, height: 50)
+    }
+}
+
+struct ComputerIcon: View {
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color.blue)
+            Image(systemName: "desktopcomputer")
+                .resizable()
+                .scaledToFit()
+                .foregroundColor(.white)
+                .padding(10)
+            ZStack {
+                Rectangle()
+                    .fill(Color.orange.opacity(0.9))
+                    .frame(width: 60, height: 20)
+                    .cornerRadius(8)
+                    .offset(y: 20)
+                    
+                Text("Model")
+                    .foregroundColor(.white)
+                    .font(.headline)
+                    .offset(y: 20)
+            }
+        }
+        .frame(width: 50, height: 50)
+    }
+}
 
 struct sliderView: View{
     @State var sliderValue : Float
@@ -103,6 +171,7 @@ struct sliderView: View{
         }
     }
 }
+
 
 struct round_box: View{
     

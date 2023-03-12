@@ -35,10 +35,10 @@ class NGViewModel: ObservableObject {
         else {return "N/A"}
         }
     
-    var playerScore: String {String(model.playerScore)}
-    var modelScore: String {String(model.modelScore)}
+    var playerScore: Float {Float(model.playerScore)}
+    var modelScore: Float {Float(model.modelScore)}
     var playerMNS: Float {Float(model.playerMNS)}
-    var modelMNS: String {String(model.modelMNS)}
+    var modelMNS: Float {Float(model.modelMNS)}
     
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}
@@ -103,4 +103,5 @@ class NGViewModel: ObservableObject {
     func loadModel() {
         model.testLoad()
     }
+    
 }
