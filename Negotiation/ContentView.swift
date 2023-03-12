@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var finalOfferToggle : Bool = false
     @State private var OfferAccepted: Bool = false
     @State private var round_no: Int = 1
+    @State private var mnsDeclared: Bool = false
     
     var body: some View {
         NavigationStack{
@@ -51,16 +52,29 @@ struct ContentView: View {
                 Divider()
                 VStack {
                     VStack{
-                        sliderView(sliderValue: sliderValue, thresholdValue: viewModel.playerMNS).background(Color.white.opacity(0.5)).cornerRadius(20).padding(.horizontal)
-                        
-                        Toggle_box(finalOfferToggle: $finalOfferToggle)        .onChange(of: finalOfferToggle) { value in
-                            viewModel.FinalOfferPlayerChanged()}
-                        HStack {
-                            GameButton(text: "Accept Model Offer", action: {viewModel.sendMessage("hello", isMe: false);
-                                round_no = round_no + 1
-                            })
-                            Button("Co`dasdnfirm Offer", action: {viewModel.sendMessage("hello", isMe: true)})
-                        } .padding()
+                        Spacer()
+                        sliderView(sliderValue: $sliderValue, thresholdValue: viewModel.playerMNS).background(Color.white.opacity(0.5)).cornerRadius(20).padding(.horizontal)
+                        Spacer()
+                        .frame(maxHeight: .infinity)
+                        if mnsDeclared {
+                            Toggle_box(finalOfferToggle: $finalOfferToggle)        .onChange(of: finalOfferToggle) { value in
+                                viewModel.FinalOfferPlayerChanged()}
+                            HStack {
+                                GameButton(text: "Accept Offer", action: {viewModel.sendMessage("hello", isMe: false);
+                                    round_no = round_no + 1;
+                                    mnsDeclared = false
+                                })
+                                GameButton(text: "Send Offer", action: {viewModel.sendMessage("hello", isMe: true)})
+                            } .padding()
+                        } else{
+                            HStack{
+                                GameButton(text: "Declare MNS", action: {viewModel.sendMessage("Hello my mns is " + String(Int(sliderValue)), isMe: true); mnsDeclared = true
+                                    
+                                }).padding()
+                            }
+                            
+                        }
+
                     }
                 }
             }.background(backgroundImg(image: "secondbackground"))
@@ -86,7 +100,7 @@ struct GameButton: View{
     
     var body: some View {
             Button(text, action: action)
-                .frame(width: 150, height:50)
+                .frame(width: 160, height:50)
                 .foregroundColor(.white)
                 .background(buttonColor)
                 .cornerRadius(50)
@@ -148,7 +162,7 @@ struct ComputerIcon: View {
 }
 
 struct sliderView: View{
-    @State var sliderValue : Float
+    @Binding var sliderValue : Float
     var thresholdValue : Float
 
     var body: some View {
