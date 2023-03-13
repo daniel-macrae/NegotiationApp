@@ -228,11 +228,11 @@ struct NGModel {
         var modelCurrentScoreGain: Int = 0
         //Added this to see who made last offer
         if playerOffered {
-            modelCurrentScoreGain = (9 - (modelMNS - playerCurrentOffer))
-            playerCurrentScoreGain = (9 - (playerMNS - playerCurrentOffer))
+            modelCurrentScoreGain = (9 - playerCurrentOffer)-modelMNS
+            playerCurrentScoreGain = playerCurrentOffer - playerMNS
         } else { // model made accepted offer
-            playerCurrentScoreGain = (9 - (modelMNS - modelCurrentOffer!))
-            modelCurrentScoreGain = (9 - (modelMNS - modelCurrentOffer!))
+            playerCurrentScoreGain = (9 - modelCurrentOffer!)-playerMNS
+            modelCurrentScoreGain = modelCurrentOffer!-modelMNS
 
         }
         playerScore += playerCurrentScoreGain

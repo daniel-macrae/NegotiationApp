@@ -7,6 +7,7 @@ class NGViewModel: ObservableObject {
     @Published private var model = NGModel()
     @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
+    @Published var offerHasBeenMade: Bool = false
     
     ///SENTENCES for accepting and declining an offer in a happy/neutral and angry tone
     let acceptingSentencesNeutral = [
@@ -155,6 +156,7 @@ class NGViewModel: ObservableObject {
         model.playerPreviousOffer = model.playerCurrentOffer
         model.playerCurrentOffer = Int(value)
         
+        self.offerHasBeenMade = true
         
         //The code below causes a crash probably due to the rules not being fully implemented or working with a nill value
         //model.modelResponse(playerOffer: Int(value), playerIsFinalOffer: isFinal)
@@ -166,7 +168,8 @@ class NGViewModel: ObservableObject {
         /// change the value of the player's offer in accordance to their acceptance of the model's offer
         /// (e.g. the player's "new offer" is whats left of the 9 points)
         //model.playerCurrentOffer = 9 - (Int(modelNegotiationValue) ?? 0)
-        
+        //offerHasBeenMade needs to change to offer has been made by model so that the player can only accept when both are willing to accept
+        offerHasBeenMade = false
         model.newRound(playerOffered: true)
     }
     

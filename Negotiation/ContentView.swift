@@ -65,14 +65,14 @@ struct ContentView: View {
                                 viewModel.FinalOfferPlayerChanged()}
                             HStack {
                                 GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(value: sliderValue, isFinal: finalOfferToggle)})
-                                //Need to make this unclickable when there is no offer else 
-                                GameButton(text: "Accept Offer", action: {viewModel.playerAccepts();
+                                AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                     round_no = round_no + 1;
                                     if round_no == 10 {
                                         //Pop up or something needs to appear probably in the bottom so that the user can still see the chat and what happen to the point
                                         gameOver = true
                                     };
-                                    mnsDeclared = false})
+                                    mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
+                                
                             } .padding()
                         } else{
                             HStack{
@@ -112,9 +112,26 @@ struct GameButton: View{
                 .frame(width: 160, height:50)
                 .foregroundColor(.white)
                 .background(buttonColor)
+                .cornerRadius(50)    }
+}
+
+struct AcceptButton: View{
+    
+    let text: String
+    let action: () -> Void
+    let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
+    var offerHasBeenMade: Bool
+    
+    var body: some View {
+            Button(text, action: action)
+                .frame(width: 160, height:50)
+                .foregroundColor(.white)
+                .background(offerHasBeenMade ? buttonColor : Color.gray)
                 .cornerRadius(50)
+                .disabled(!offerHasBeenMade)
     }
 }
+
 
 struct QuitButton: View{
     
@@ -200,7 +217,7 @@ struct sliderView: View{
                 Spacer()
             }.padding([.top,.horizontal])
             HStack {
-                Slider(value: $sliderValue, in: 0...10, step: 1)
+                Slider(value: $sliderValue, in: 1...9, step: 1)
                 
                     .accentColor(sliderValue > thresholdValue ? .green : .orange)
                     .frame(height: 10)
