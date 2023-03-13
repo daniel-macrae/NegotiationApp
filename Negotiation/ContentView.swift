@@ -77,7 +77,7 @@ struct ContentView: View {
                         } else{
                             HStack{
                                 GameButton(text: "Declare MNS", action: {mnsDeclared = true;
-                                    viewModel.declarePlayerMNS(value: sliderValue)
+                                    viewModel.declarePlayerMNS(value: sliderValue); 
                                     
                                 }).padding()
                             }
@@ -283,8 +283,13 @@ struct infoButton: View {
                     .ignoresSafeArea(.all)
                 VStack{
                     //Need to adjust this so that it looks nice and is easier for th reader to understand
-                    Text("The game of nines is a negotiation game played between two players, the proposer and the responder. The game is played over several rounds, and in each round, the proposer makes an offer, and the responder can either accept or reject the offer. The goal of the game is to maximize the total score over all rounds, where the score is calculated by subtracting the proposer's offer from the number nine.At the start of each round, both players declare their minimum acceptable score (MNS), which is the minimum score they are willing to accept. The proposer makes the first offer, which must be a whole number between 1 and 8 (inclusive), and the responder can either accept or reject the offer. If the responder accepts the offer, the round ends, and both players receive a score equal to the difference between nine and the offer. If the responder rejects the offer, the proposer can make a new offer, which must be higher than the previous offer, and the responder can again choose to accept or reject the offer. If the proposer makes a final offer, the responder must accept or reject it, and the round ends regardless of their decision. The game continues for a fixed number of rounds, and the player with the highest total score at the end of the game is the winner.").foregroundColor(.white)
-                        .padding(.horizontal)
+                    ScrollView{
+                        Text("The game of nines is a negotiation game played between two players, the proposer (you) and the responder (model). The game is played over several rounds, and in each round, the proposer makes an offer, and the responder can either accept or reject the offer. The goal of the game is to maximize the total score over all rounds, where the score is calculated by subtracting the proposer's offer from the number nine.").padding(.all).foregroundColor(.white)
+                        Text("At the start of each round, both players declare their minimum acceptable score (MNS), which is the minimum score they are willing to accept. The proposer makes the first offer, which must be a number between 0 and 9, and the responder can either accept or reject the offer. If the responder accepts the offer, the round ends, and both players receive a score equal to the difference between nine and the offer.").foregroundColor(.white)
+                            .padding(.all)
+                        Text("If the responder rejects the offer, the proposer can make a new offer and the responder can again choose to accept or reject the offer. If the proposer makes a final offer, the responder must accept or reject it, and the round ends regardless of their decision. The game continues for a fixed number of rounds, and the player with the highest total score at the end of the game is the winner.").foregroundColor(.white)
+                            .padding(.all)
+                    }
                     GameButton(text:"Go to Game") {
                         showExplanation = false
                     }

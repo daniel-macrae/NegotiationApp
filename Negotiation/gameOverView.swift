@@ -19,21 +19,37 @@ struct gameOverView: View {
             VStack{
                 if viewModel.playerScore > viewModel.modelScore{
                     Spacer()
-                    Text("You win")
+                    Image("win")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .padding([.top, .leading, .trailing], 20)
+                        .scaleEffect(0.7)
+                    
+                    statsView(playerPoints: Int(viewModel.playerScore), modelPoints: Int(viewModel.modelScore))
                     Spacer()
                     FinalButtons(isQuitting: $isQuitting, newGame: $newGame)
                     Spacer()
                     
                 } else if viewModel.playerScore == viewModel.modelScore {
                     Spacer()
-                    Text("It's a tie")
+                    Image("tie")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .padding([.top, .leading, .trailing], 20)
+                        .scaleEffect(0.7)
+                    statsView(playerPoints: Int(viewModel.playerScore), modelPoints: Int(viewModel.modelScore))
                     Spacer()
                     FinalButtons(isQuitting: $isQuitting, newGame: $newGame)
                     Spacer()
                     
                 } else {
                     Spacer()
-                    Text("You lost")
+                    Image("lose")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .padding([.top, .leading, .trailing], 20)
+                        .scaleEffect(0.7)
+                    statsView(playerPoints: Int(viewModel.playerScore), modelPoints: Int(viewModel.modelScore))
                     Spacer()
                     FinalButtons(isQuitting: $isQuitting, newGame: $newGame)
                     Spacer()
@@ -56,6 +72,18 @@ struct FinalButtons: View{
             QuitButton(text: "Return to Start", action: {
                 isQuitting = true
             })
+        }
+    }
+}
+
+struct statsView: View{
+    
+    var playerPoints: Int
+    var modelPoints: Int
+    var body: some View{
+        VStack{
+            Text("Your points: " + String(playerPoints))
+            Text("Model points: " + String(modelPoints))
         }
     }
 }

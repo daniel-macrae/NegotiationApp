@@ -5,7 +5,6 @@ import Foundation
 
 class NGViewModel: ObservableObject {
     @Published private var model = NGModel()
-    @Published var player_name : String = ":placeholder:"
     @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
    
@@ -57,11 +56,12 @@ class NGViewModel: ObservableObject {
         model.declareModelMNS()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.SendModelMNS()
+        
         }
     }
     
     func SendModelMNS(){
-        sendMessage("My MNS is" + String(Int(modelMNS)), isMe: false)
+        sendMessage("My MNS is " + String(Int(modelMNS)), isMe: false)
     }
     func sendMessage(_ text:String, isMe: Bool){
         messages.append(Message(text: text, sender: isMe))
@@ -96,9 +96,7 @@ class NGViewModel: ObservableObject {
         
         //model.newRound()
     }
-    func setPlayerName(name: String){
-        self.player_name = name
-    }
+
     func FinalOfferPlayerChanged(){
         model.playerIsFinalOffer.toggle()
         print(model.playerIsFinalOffer)
