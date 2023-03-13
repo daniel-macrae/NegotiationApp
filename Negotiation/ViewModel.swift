@@ -7,23 +7,98 @@ class NGViewModel: ObservableObject {
     @Published private var model = NGModel()
     @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
-   
+    ///SENTENCES for accepting and declining an offer in a happy/neutral and angry tone
+    let acceptingSentencesNeutral = [
+        "I accept your offer.",
+        "That's acceptable, I'm in.",
+        "Sounds good, I accept.",
+        "Count me in, I accept.",
+        "I'm happy to accept.",
+        "I agree, I accept.",
+        "I'm ready to proceed, I accept.",
+        "Yes, let's do it, I accept.",
+        "I'm fine with that, I accept.",
+        "Alright, I accept."
+    ]
+
+    let decliningSentencesNeutral = [
+        "I must decline, thank you.",
+        "I'm unable to accept, thanks.",
+        "I appreciate the offer, but I must decline.",
+        "That won't be possible, thanks.",
+        "Thanks for the offer, but I can't accept.",
+        "Unfortunately, I have to decline.",
+        "Thank you, but I can't accept.",
+        "I'm honored, but I have to decline.",
+        "I'm sorry, but I have to decline.",
+        "I'm unable to accept at this time."
+    ]
+    
+    let acceptingSentencesHappy = [
+        "Yes! Thank you so much!",
+        "Awesome, I'm in!",
+        "Absolutely, I accept!",
+        "Yay! Let's do it!",
+        "I'm thrilled, I accept!",
+        "Fantastic, count me in!",
+        "Yes, this is perfect!",
+        "I'm excited, I accept!",
+        "This is great news, I accept!",
+        "Thank you, I'm so happy to accept!"
+    ]
+
+    let acceptingSentencesAngry = [
+        "Fine, I'll accept.",
+        "Whatever, I accept.",
+        "Okay, I guess I'll accept.",
+        "Sure, I accept.",
+        "If I have to, I'll accept.",
+        "Ugh, fine, I accept.",
+        "I suppose I'll accept.",
+        "Joy of joys, I accept.",
+        "Alright, I'll accept.",
+        "Don't get too excited, but I accept."
+    ]
+
+    let decliningSentencesHappy = [
+        "Thanks, but I'm going to decline.",
+        "I appreciate the offer, but I'll pass.",
+        "Thank you, but I have to say no.",
+        "That's very kind, but I can't accept.",
+        "I'm grateful, but I have to decline.",
+        "I'm honored, but I'll have to say no.",
+        "Thanks for considering me, but I'll decline.",
+        "I appreciate it, but I can't accept.",
+        "I'm flattered, but I'll have to decline.",
+        "Thanks, but I'll have to pass."
+    ]
+
+    let decliningSentencesAngry = [
+        "No way, not interested.",
+        "Absolutely not, don't waste my time.",
+        "You must be joking, no thanks.",
+        "Not a chance, no thanks.",
+        "You've got to be kidding me, no way.",
+        "Nope, not interested.",
+        "I don't think so, no thanks.",
+        "Save your breath, no thanks.",
+        "I'm not even going to dignify that with a response.",
+        "Don't even bother asking."
+    ]
+
+    
     
     // MARK: ########  Acess to the Model   ########
-    
-    struct Message: Identifiable, Equatable{
-        let id = UUID()
-        let text:String
-        let sender: Bool
-        
-    }
     /// We need to make vars for:
     /// - player and model score
     /// - player and model MSE
-    /// -
-    ///
-    ///
-    ///
+
+    struct Message: Identifiable, Equatable{
+        let id = UUID()
+        let text:String
+        let sender: Bool //true is the player flase is the model
+    }
+    
     var playerNegotiationValue: String {
         let val = model.playerCurrentOffer
         if val != nil {return String(val!)}
@@ -56,7 +131,6 @@ class NGViewModel: ObservableObject {
         model.declareModelMNS()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.SendModelMNS()
-        
         }
     }
     
@@ -96,7 +170,7 @@ class NGViewModel: ObservableObject {
         
         //model.newRound()
     }
-
+    
     func FinalOfferPlayerChanged(){
         model.playerIsFinalOffer.toggle()
         print(model.playerIsFinalOffer)
