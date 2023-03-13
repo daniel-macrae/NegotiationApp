@@ -65,7 +65,7 @@ struct ContentView: View {
                                 viewModel.FinalOfferPlayerChanged()}
                             HStack {
                                 GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(value: sliderValue, isFinal: finalOfferToggle)})
-                             
+                                //Need to make this unclickable when there is no offer else 
                                 GameButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                     round_no = round_no + 1;
                                     if round_no == 10 {

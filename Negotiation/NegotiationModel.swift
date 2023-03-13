@@ -23,7 +23,7 @@ struct NGModel {
     
     // MARK: Player and Model offer management
     var playerPreviousOffer: Int?
-    var playerCurrentOffer: Int?  // work on how to display this if it has no value?
+    var playerCurrentOffer: Int = 0 // work on how to display this if it has no value?
     var modelPreviousOffer: Int?
     var modelCurrentOffer: Int?  // same here
     var playerIsFinalOffer = false
@@ -94,7 +94,8 @@ struct NGModel {
     }
     
     mutating func declareModelMNS(){
-        modelDeclaredMNS = modelMNS //think how we want to do this
+        modelDeclaredMNS = Int(arc4random_uniform(9)) + 1
+ //think how we want to do this
         // model should probably retrieve a chunk with the right mns to max change of succes 
     }
    
@@ -202,6 +203,10 @@ struct NGModel {
         waitingForAction = true
 
     }
+    
+    func ModelDeclMNSValueGet() -> Int{
+        return self.modelDeclaredMNS!
+    }
 
             
     // select new MNSs for both players (call this once a round finishes)
@@ -218,21 +223,31 @@ struct NGModel {
     
     
     // add the current round scores to the total score
-    mutating func updateScores() {
-        if verbose {print("M: updating scores")}
-        playerScore += (playerCurrentOffer! - playerMNS)
-        modelScore += (modelCurrentOffer! - modelMNS)
+    mutating func updateScores(playerOffered: Bool) {
+        var playerCurrentScoreGain: Int = 0
+        var modelCurrentScoreGain: Int = 0
+        //Added this to see who made last offer
+        if playerOffered {
+            modelCurrentScoreGain = (9 - (modelMNS - playerCurrentOffer))
+            playerCurrentScoreGain = (9 - (playerMNS - playerCurrentOffer))
+        } else { // model made accepted offer
+            playerCurrentScoreGain = (9 - (modelMNS - modelCurrentOffer!))
+            modelCurrentScoreGain = (9 - (modelMNS - modelCurrentOffer!))
+
+        }
+        playerScore += playerCurrentScoreGain
+        modelScore += modelCurrentScoreGain
     }
     
     // the round has ended, clean up and start a new one
-    mutating func newRound() {
+    mutating func newRound(playerOffered: Bool) {
         if verbose {print("M: preparing new negotiation round")}
         // if neither player has quit, an agreement was made and their scores should be updated
         if !(playerHasQuit || modelHasQuit) {
-            updateScores()
+            updateScores(playerOffered: playerOffered)
         }
         // reset offer history
-        playerPreviousOffer = nil; playerCurrentOffer = nil
+        playerPreviousOffer = nil; playerCurrentOffer = 0
         modelPreviousOffer = nil; modelCurrentOffer  = nil
         playerIsFinalOffer = false; modelIsFinalOffer = false
         playerHasQuit = false; modelHasQuit = false

@@ -7,6 +7,7 @@ class NGViewModel: ObservableObject {
     @Published private var model = NGModel()
     @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
+    
     ///SENTENCES for accepting and declining an offer in a happy/neutral and angry tone
     let acceptingSentencesNeutral = [
         "I accept your offer.",
@@ -101,7 +102,7 @@ class NGViewModel: ObservableObject {
     
     var playerNegotiationValue: String {
         let val = model.playerCurrentOffer
-        if val != nil {return String(val!)}
+        if val != 0 {return String(val)}
         else {return "N/A"}
         }
     
@@ -127,22 +128,21 @@ class NGViewModel: ObservableObject {
         model.playerDeclaredMNS = Int(value)
         self.sendMessage("My MNS is " + String(Int(value)), isMe: true)
         model.declareModelMNS()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { //makes it more lifelike i guess when adding a wait
             self.SendModelMNS()
         }
     }
     
     func SendModelMNS(){
-        sendMessage("My MNS is " + String(Int(modelMNS)), isMe: false)
+        sendMessage("My MNS is " + String(model.ModelDeclMNSValueGet()), isMe: false)
     }
     
+    //simple sendMessage function isMe: true is the player is the sender false is the model
     func sendMessage(_ text:String, isMe: Bool){
         messages.append(Message(text: text, sender: isMe))
     }
     
-    /// a function for when the player makes an offer
-    ///
-    ///
+
     func playerMakeOffer(value: Float, isFinal: Bool) {
         /// overwrite the (now-outdated) previous offer
         if isFinal {
@@ -155,6 +155,7 @@ class NGViewModel: ObservableObject {
         model.playerPreviousOffer = model.playerCurrentOffer
         model.playerCurrentOffer = Int(value)
         
+        
         //The code below causes a crash probably due to the rules not being fully implemented or working with a nill value
         //model.modelResponse(playerOffer: Int(value), playerIsFinalOffer: isFinal)
     }
@@ -166,7 +167,7 @@ class NGViewModel: ObservableObject {
         /// (e.g. the player's "new offer" is whats left of the 9 points)
         //model.playerCurrentOffer = 9 - (Int(modelNegotiationValue) ?? 0)
         
-        //model.newRound()
+        model.newRound(playerOffered: true)
     }
     
     func FinalOfferPlayerChanged(){
