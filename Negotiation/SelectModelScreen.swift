@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct SelectModelScreen: View {
+    @ObservedObject var viewModel: NGViewModel
     @State private var name : String = ""
     @State private var showNameField = false
     @State private var StartGame = false
@@ -14,40 +15,25 @@ struct SelectModelScreen: View {
     @State private var loadNames = false
     @State private var selectedOption = 0
     
-    
-    let names = ["N1", "N3", "asda"]
+    //works for now but needs to be changed
+    @State private var names = NGViewModel().getLoadFilesNames()
     //var names = [String]()
     
     var body: some View {
+        
         NavigationStack{
-            NavigationLink(destination: ContentView(viewModel: NGViewModel(), player_name : $name), isActive: $StartGame, label: {})
+            NavigationLink(destination: ContentView(viewModel: viewModel, player_name : $name), isActive: $StartGame, label: {})
             ZStack{
                 if showNameField{
                     VStack{
-                        HStack{
-                            Button(action: {showNameField=false
-                                goBack=false
-                            }){HStack(spacing:5){
-                                Image(systemName: "chevron.backward")
-                                Text("Back")
-                            }}
-                            .padding(.all).foregroundColor(Color.white)
-                            Spacer()
-                        }
+                        backButton(action: {showNameField=false
+                            goBack=false})
                         VStack{
                             Spacer()
                             HStack{
                                 Spacer()
-                                ZStack(alignment: .leading){
-                                    TextField("", text:$name)
-                                        .placeholder(when: name.isEmpty){  Text("Enter your name").foregroundColor(.black.opacity(0.6))}
-                                        .padding()
-                                        .frame(width:200)
-                                        .background(Color.white)
-                                        .foregroundColor(Color.black)
-                                        .cornerRadius(20)
-                                }.onAppear{name = ""}
-                                nextPageButton(action: {StartGame = true})
+                                textFieldView(name: $name)
+                                nextPageButton(action: {StartGame = true; viewModel.createNewLoadFile(fileName: name)})
                                 Spacer()
                             }
                             Spacer()
@@ -56,16 +42,8 @@ struct SelectModelScreen: View {
                     }
                 } else if loadNames {
                     VStack{
-                        HStack{
-                            Button(action: {loadNames=false
-                                goBack=false
-                            }){HStack(spacing:5){
-                                Image(systemName: "chevron.backward")
-                                Text("Back")
-                            }}
-                            .padding(.all).foregroundColor(Color.white)
-                            Spacer()
-                        }
+                        backButton(action: {loadNames=false
+                            goBack=false})
                         Spacer()
                         HStack{
                             Spacer()
@@ -81,7 +59,7 @@ struct SelectModelScreen: View {
                                 .background(Color.white.opacity(0.4))
                                 .cornerRadius(20)
                     
-                            nextPageButton(action: {StartGame = true})
+                            nextPageButton(action: {StartGame = true; viewModel.loadModel(fileName: name)})
                             Spacer()
                         }
                         Spacer()
@@ -101,7 +79,6 @@ struct SelectModelScreen: View {
                             if !names.isEmpty{
                                 SelectModelScreenButton(text: "Load Session", action: {loadNames = true
                                     goBack = true
-                                    //NEEDS model.loadgame()
                                 })
                             }
                             Spacer()
@@ -127,6 +104,39 @@ extension View{
         }
 }
 
+struct backButton: View{
+    let action: ()->Void
+
+    var body: some View{
+        HStack{
+            Button(action:action){
+                HStack(spacing:5){
+                    Image(systemName: "chevron.backward")
+                    Text("Back")
+                }
+                .padding(.all).foregroundColor(Color.white)
+                Spacer()
+            }
+        }
+    }
+}
+
+struct textFieldView: View{
+    @Binding var name: String
+    
+    var body: some View{
+        ZStack(alignment: .leading){
+            TextField("", text:$name)
+                .placeholder(when: name.isEmpty){  Text("Enter your name").foregroundColor(.black.opacity(0.6))}
+                .padding()
+                .frame(width:200)
+                .background(Color.white)
+                .foregroundColor(Color.black)
+                .cornerRadius(20)
+        }.onAppear{name = ""}
+    }
+}
+
 struct nextPageButton: View{
     let action: ()->Void
     
@@ -135,6 +145,7 @@ struct nextPageButton: View{
             .frame(width: 50, height:50)
             .foregroundColor(.white)
             .background(Color.green)
+            .buttonStyle(CustomButtonStyle())
             .cornerRadius(50)
         
     }
@@ -157,6 +168,6 @@ struct SelectModelScreenButton: View{
 
 struct SelectModelScreen_Previews: PreviewProvider {
     static var previews: some View {
-        SelectModelScreen()
+        SelectModelScreen(viewModel: NGViewModel())
     }
 }

@@ -83,8 +83,10 @@ struct statsView: View{
     var body: some View{
         VStack{
             Text("Your points: " + String(playerPoints))
-            Text("Model points: " + String(modelPoints))
-        }
+                .padding([.top,.horizontal])
+            Text("Model points: " + String(modelPoints)).padding([.bottom, .horizontal])
+        }                        .background(Color.white.opacity(0.5))
+            .cornerRadius(20)
     }
 }
 

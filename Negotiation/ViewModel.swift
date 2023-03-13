@@ -8,7 +8,6 @@ class NGViewModel: ObservableObject {
     @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
     @Published var offerHasBeenMade: Bool = false
-    
     ///SENTENCES for accepting and declining an offer in a happy/neutral and angry tone
     let acceptingSentencesNeutral = [
         "I accept your offer.",
@@ -181,8 +180,15 @@ class NGViewModel: ObservableObject {
     func saveModel() {
         model.testSave()
     }
-    func loadModel() {
-        model.testLoad()
+    func loadModel(fileName: String) {
+        model.testLoad(fileName: fileName)
     }
     
+    func getLoadFilesNames() -> [String]{
+        return model.loadFilesNames
+    }
+    //Needs proper implementation
+    func createNewLoadFile(fileName: String){
+        model.loadFilesNames.append(fileName)
+    }
 }

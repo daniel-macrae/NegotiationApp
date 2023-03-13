@@ -13,11 +13,12 @@ struct ContentView: View {
     @State private var mnsDeclared: Bool = false
     @State private var isQuitting: Bool = false
     @State private var gameOver: Bool = false
+    @State private var finalScreen: Bool = false
     
     var body: some View {
         NavigationStack{
             NavigationLink(destination: TitleScreen().navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
-            NavigationLink(destination: gameOverView(viewModel: viewModel, player_name: player_name).navigationBarBackButtonHidden(true), isActive: $gameOver, label: {})
+            NavigationLink(destination: gameOverView(viewModel: viewModel, player_name: player_name).navigationBarBackButtonHidden(true), isActive: $finalScreen, label: {})
             VStack {
                 ZStack{
                     HStack{
@@ -57,6 +58,15 @@ struct ContentView: View {
                 VStack {
                     VStack{
                         Spacer()
+                        if gameOver{
+                            VStack{
+                                Spacer()
+                                GameButton(text: "Continue", action: {
+                                    finalScreen = true
+                                })
+                                Spacer()
+                            }
+                        }else{
                         sliderView(sliderValue: $sliderValue, thresholdValue: viewModel.playerMNS).background(Color.white.opacity(0.5)).cornerRadius(20).padding(.horizontal)
                         Spacer()
                         .frame(maxHeight: .infinity)
@@ -68,19 +78,20 @@ struct ContentView: View {
                                 AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                     round_no = round_no + 1;
                                     if round_no == 10 {
-                                        //Pop up or something needs to appear probably in the bottom so that the user can still see the chat and what happen to the point
                                         gameOver = true
                                     };
                                     mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
                                 
                             } .padding()
+
                         } else{
                             HStack{
                                 GameButton(text: "Declare MNS", action: {mnsDeclared = true;
-                                    viewModel.declarePlayerMNS(value: sliderValue); 
+                                    viewModel.declarePlayerMNS(value: sliderValue);
                                     
                                 }).padding()
                             }
+                        }
                             
                         }
 
@@ -112,6 +123,7 @@ struct GameButton: View{
                 .frame(width: 160, height:50)
                 .foregroundColor(.white)
                 .background(buttonColor)
+                .buttonStyle(CustomButtonStyle())
                 .cornerRadius(50)    }
 }
 
@@ -128,7 +140,17 @@ struct AcceptButton: View{
                 .foregroundColor(.white)
                 .background(offerHasBeenMade ? buttonColor : Color.gray)
                 .cornerRadius(50)
+                .buttonStyle(CustomButtonStyle())
                 .disabled(!offerHasBeenMade)
+    }
+}
+
+struct CustomButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding()
+            .scaleEffect(configuration.isPressed ? 1.5 : 1)
+            .animation(.easeOut(duration: 0.2), value: configuration.isPressed)
     }
 }
 
@@ -144,6 +166,7 @@ struct QuitButton: View{
                 .frame(width: 160, height:50)
                 .foregroundColor(.white)
                 .background(buttonColor)
+                .buttonStyle(CustomButtonStyle())
                 .cornerRadius(50)
     }
 }

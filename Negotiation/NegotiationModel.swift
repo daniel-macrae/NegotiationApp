@@ -37,6 +37,9 @@ struct NGModel {
     var playerMoveType: String?
     var modelMoveType: String?
     
+    //Need some function to get these from JSONManager
+    var loadFilesNames: [String] = ["loadfile1", "loadfile2", "thisNeedsImplementation"]
+    
     /// Boolean that states whether the model is waiting for an action.
     var waitingForAction = true
     
@@ -49,8 +52,8 @@ struct NGModel {
         print("M: model saved")
     }
     
-    mutating func testLoad() {
-        model = loadModel2(filename: "test")  // loading the model
+    mutating func testLoad(fileName: String) {
+        model = loadModel2(filename: fileName)  // loading the model
         print("M: model loaded")
         //print(model.dm)
         //print(model.imaginalActionTime)
