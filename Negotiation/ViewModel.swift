@@ -126,8 +126,6 @@ class NGViewModel: ObservableObject {
     func declarePlayerMNS(value: Float){
         model.playerDeclaredMNS = Int(value)
         self.sendMessage("My MNS is " + String(Int(value)), isMe: true)
-        //: TODO MAKE MODEL AWARE of MNS
-        //call function for the model to declare MSN
         model.declareModelMNS()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.SendModelMNS()
@@ -137,6 +135,7 @@ class NGViewModel: ObservableObject {
     func SendModelMNS(){
         sendMessage("My MNS is " + String(Int(modelMNS)), isMe: false)
     }
+    
     func sendMessage(_ text:String, isMe: Bool){
         messages.append(Message(text: text, sender: isMe))
     }
@@ -157,8 +156,7 @@ class NGViewModel: ObservableObject {
         model.playerCurrentOffer = Int(value)
         
         //The code below causes a crash probably due to the rules not being fully implemented or working with a nill value
-        //model.modelResponse(playerOffer: value, playerIsFinalOffer: isFinal)
-        
+        //model.modelResponse(playerOffer: Int(value), playerIsFinalOffer: isFinal)
     }
     
     // player accepts the model's offer

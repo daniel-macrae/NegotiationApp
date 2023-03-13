@@ -94,7 +94,7 @@ struct ContentView: View {
             }.onDisappear {
                 AppDelegate.orientationLock = .all // Unlocking the rotation when leaving the view
                 ;
-                viewModel.messages = []
+                viewModel.messages = [] //Emptying the message log
             }
         }
     }
@@ -282,7 +282,6 @@ struct infoButton: View {
                 backgroundImg(image: "secondbackground").background()
                     .ignoresSafeArea(.all)
                 VStack{
-                    //Need to adjust this so that it looks nice and is easier for th reader to understand
                     ScrollView{
                         Text("The game of nines is a negotiation game played between two players, the proposer (you) and the responder (model). The game is played over several rounds, and in each round, the proposer makes an offer, and the responder can either accept or reject the offer. The goal of the game is to maximize the total score over all rounds, where the score is calculated by subtracting the proposer's offer from the number nine.").padding(.all).foregroundColor(.white)
                         Text("At the start of each round, both players declare their minimum acceptable score (MNS), which is the minimum score they are willing to accept. The proposer makes the first offer, which must be a number between 0 and 9, and the responder can either accept or reject the offer. If the responder accepts the offer, the round ends, and both players receive a score equal to the difference between nine and the offer.").foregroundColor(.white)
@@ -333,15 +332,15 @@ struct MessageView: View{
                     Spacer()
                     Text(message.text)
                         .padding()
-                        .background(Color.blue)
+                        .background(Color.blue.opacity(0.6))
                         .foregroundColor(Color.white)
-                        .cornerRadius(10)
+                        .cornerRadius(20)
                 }
             } else {
                 HStack{
                     Text(message.text)
                         .padding()
-                        .background(Color.gray.opacity(0.6))
+                        .background(Color.white.opacity(0.6))
                         .foregroundColor(Color.black.opacity(0.7))
                         .cornerRadius(20)
                     Spacer()

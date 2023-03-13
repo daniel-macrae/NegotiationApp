@@ -95,21 +95,21 @@ struct NGModel {
     
     mutating func declareModelMNS(){
         modelDeclaredMNS = modelMNS //think how we want to do this
+        // model should probably retrieve a chunk with the right mns to max change of succes 
     }
    
     // the strategy chunk can be used to set the mood of the UI too
     
-    mutating func modelResponse(playerOffer: Float, playerIsFinalOffer: Bool){
+    mutating func modelResponse(playerOffer: Int, playerIsFinalOffer: Bool){
         //maybe this things should be three different functions
-        let playerOfferInt = Int(playerOffer) // not pretty, I guess you defined as float to use slider :|
-        let changePlayerBid = playerOfferInt - playerPreviousOffer!
+        let changePlayerBid = playerOffer - playerPreviousOffer!
 
         
 //DETECT STRATEGY // In the paper they use how usually the player concedes
         
         //they offer what they are keeping out of the nine
         if let modelDecMNS = modelDeclaredMNS{
-            if modelDecMNS < (9 - playerOfferInt){ // see how we want to define this. now NOT INCLUDING NEUTRAL
+            if modelDecMNS < (9 - playerOffer){ // see how we want to define this. now NOT INCLUDING NEUTRAL
                 playerStrategy = "agressive"
             } else{ playerStrategy = "cooperative"}
             //reinforce strategy chunk (maybe addEncounter???)
