@@ -45,12 +45,12 @@ func loadModel(name: String) -> Model {
         
         let data = try Data(contentsOf: fileURL)
         //print(data)
-        var model = try JSONDecoder().decode(Model.self, from: data)
+        let model = try JSONDecoder().decode(Model.self, from: data)
         return model
  
     } catch {
         print("JSON: error while loading model (or filename not found)")
-        var model = initNewModel()
+        let model = initNewModel()
         return model // just return an new model
     }
     

@@ -5,12 +5,17 @@ import Foundation
 import SwiftUI
 
 class NGViewModel: ObservableObject {
-    @Published private var model = NGModel()
+    @Published private var model : NGModel
     @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
     
     @Published var numberOfRounds: Int = 5
     @Published var offerHasBeenMade: Bool = false
+    
+    init() {
+        model = NGModel()
+        print("new VM")
+    }
     ///SENTENCES for accepting and declining an offer in a happy/neutral and angry tone
     let acceptingSentencesNeutral = [
         "I accept your offer.",
@@ -162,7 +167,7 @@ class NGViewModel: ObservableObject {
         self.offerHasBeenMade = true
         
         //The code below causes a crash probably due to the rules not being fully implemented or working with a nill value
-        //model.modelResponse(playerOffer: Int(value), playerIsFinalOffer: isFinal)
+        model.modelResponse(playerOffer: Int(value), playerIsFinalOffer: playerIsFinalOffer)
     }
     
     // player accepts the model's offer
@@ -187,8 +192,8 @@ class NGViewModel: ObservableObject {
     func saveModel() {
         model.testSave()
     }
-    func loadModel(fileName: String) {
-        model.testLoad(fileName: fileName)
+    func loadModel(name: String) {
+        model.testLoad(fileName: name)
     }
     
     func getLoadFilesNames() -> [String]{

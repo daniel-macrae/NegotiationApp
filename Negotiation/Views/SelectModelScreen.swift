@@ -16,8 +16,8 @@ struct SelectModelScreen: View {
     @State private var selectedOption = 0
     
     //works for now but needs to be changed
-    @State private var names = NGViewModel().getLoadFilesNames()
-    //var names = [String]()
+    //@State private var names = NGViewModel().getLoadFilesNames()
+    var names = ["name1","name2"]
     
     var body: some View {
         
@@ -59,7 +59,7 @@ struct SelectModelScreen: View {
                                 .background(Color.white.opacity(0.4))
                                 .cornerRadius(20)
                     
-                            nextPageButton(action: {StartGame = true; viewModel.loadModel(fileName: name)})
+                            nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name)})
                             Spacer()
                         }
                         Spacer()

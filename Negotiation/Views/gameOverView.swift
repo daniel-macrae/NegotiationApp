@@ -14,8 +14,8 @@ struct gameOverView: View {
 
     var body: some View {
         NavigationStack{
-            NavigationLink(destination: TitleScreen().navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
-            NavigationLink(destination: ContentView(viewModel: NGViewModel(), player_name : $player_name).navigationBarBackButtonHidden(true), isActive: $newGame, label: {})
+            NavigationLink(destination: TitleScreen(viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
+            NavigationLink(destination: ContentView(viewModel: viewModel, player_name : $player_name).navigationBarBackButtonHidden(true), isActive: $newGame, label: {})
             VStack{
                 if viewModel.playerScore > viewModel.modelScore{
                     Spacer()
@@ -90,9 +90,9 @@ struct statsView: View{
     }
 }
 
-struct SwiftUIView_Previews: PreviewProvider {
-    static var previews: some View {
-        let model = NGViewModel()
-        gameOverView(viewModel: model)
-    }
-}
+//struct SwiftUIView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let model = NGViewModel()
+//        gameOverView(viewModel: model)
+//    }
+//}

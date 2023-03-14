@@ -45,34 +45,43 @@ struct NGModel {
     
     internal var model = Model()
     
-    
     // functions to save and load the model (calls functions from JSONManger.swift file)
-    mutating func testSave() {
+    mutating func makeNewModel() {
+        model = initNewModel()
+    }
+    
+    //  THIS IS FINE
+    mutating func testLoad(fileName: String) {
+        print("M: Before Load: " + String(model.dm.chunks.count)) // zero as well?!?!
+        model = loadModel(name: fileName)  // loading the model
+        print("M: model loaded")
+        print("M: Number of Chunks in model: " + String(model.dm.chunks.count))
+        //print(model.time)
+        //model.time += 5.0
+        //print(model.time)
+    }
+    
+    // THIS IS NOT FINE
+    func testSave() {
+        print("M: Number of Chunks in model to save: " + String(model.dm.chunks.count)) // why the shitfuck is this 0, where is it overwriting the model...
+        print("M: Time of model to save: " + String(model.time))
         saveModel(model: model, filename: "test")  // function that does the actual saving
         print("M: model saved")
     }
     
-    mutating func testLoad(fileName: String) {
-        model = loadModel(name: fileName)  // loading the model
-        print("M: model loaded")
-        //print(model.dm)
-        //print(model.imaginalActionTime)
-        //print(model.time)
-    }
-    
-    
     
     /// Here we do not actually load in anything: we just reset the model
     /// - Parameter filename: filename to be loaded (extension .actr is added by the function)
-    func resetModel(filename: String) {
+    mutating func resetModel() {
         model.reset()
         model.waitingForAction = true
-        
     }
     
     
     mutating func declareModelMNS(){
+        print("M: decl MNS! chunks: " + String(model.dm.chunks.count))
         modelDeclaredMNS = Int(arc4random_uniform(9)) + 1
+
  //think how we want to do this
         // model should probably retrieve a chunk with the right mns to max change of succes 
     }
@@ -80,6 +89,7 @@ struct NGModel {
     // the strategy chunk can be used to set the mood of the UI too
     
     mutating func modelResponse(playerOffer: Int, playerIsFinalOffer: Bool){
+        print("M: Responding! chunks: " + String(model.dm.chunks.count))
         //maybe this things should be three different functions
         let changePlayerBid = playerOffer - playerPreviousOffer!
 
@@ -88,9 +98,9 @@ struct NGModel {
         
         //they offer what they are keeping out of the nine
         if let modelDecMNS = modelDeclaredMNS{
-            if modelDecMNS < (9 - playerOffer){ // see how we want to define this. now NOT INCLUDING NEUTRAL
+            if modelDecMNS < (9 - playerOffer) { // see how we want to define this. now NOT INCLUDING NEUTRAL
                 playerStrategy = "agressive"
-            } else{ playerStrategy = "cooperative"}
+            } else { playerStrategy = "cooperative"}
             //reinforce strategy chunk (maybe addEncounter???)
             let (latency, _) = model.dm.retrieve(chunk: Chunk(s: playerStrategy!, m: model))
             model.time += 1.0 + latency
@@ -98,14 +108,15 @@ struct NGModel {
 //DECIDE MODEL'S MOVE
         if verbose {print("M: model is responding/making a new offer")}
             // first offer
-            if modelCurrentOffer == nil{
+            if modelCurrentOffer == nil {
                 // MARK: I think this can be retrieved with a chunk now, using just the keys "myMNS"=modelMNS and "myMoveType"="Opening" and "opponentMoveType"="Opening" (the chunks do contain the move type, so this should work)
                 
                 modelCurrentOffer = Int.random(in: modelMNS..<10)  /// model makes a completely random offer above their MNS
+                ///
                 model.time += 1.0
                 model.addToTrace(string: "First decision: random pick")
             }
-        else{// im assuming the playes goes first (so here previousPlayerOffer is ensured
+        else{// im assuming the player goes first (so here previousPlayerOffer is ensured
             
             //determine players move type
             // MARK: the way the chunks are in the paper, the only (useful) values for the player's move type are "Bid" and "Opening", so I changed the query chunk slot value to "Bid", but we can still use the three lines below for generating the player's text message for the UI - Dan
@@ -148,6 +159,11 @@ struct NGModel {
             }
             
 //SAVE THIS EXPERIENCE
+        print("M: Number of Chunks in model: " + String(model.dm.chunks.count))
+        
+        // TEMPORARY, STOPS THE LINE UNDER FROM FINDING NIL! :
+        modelPreviousOffer = 0
+        
         let changeModelBid = modelCurrentOffer! - modelPreviousOffer! // this cant be enforced here, maybe use another function
         //determine models move type
         if changeModelBid > 0 {modelMoveType = "raise"}
@@ -166,8 +182,8 @@ struct NGModel {
         //save new experience
         newExperience.setSlot(slot: "opponentMove", value: changePlayerBid.description)
         newExperience.setSlot(slot: "myMove", value: changeModelBid.description)
-        newExperience.setSlot(slot: "opponentMoveType", value: playerMoveType!) // this cant be enforced here, maybe use another function
-        newExperience.setSlot(slot: "myMoveType", value: modelMoveType!) // this cant be enforced here, maybe use another function
+        //newExperience.setSlot(slot: "opponentMoveType", value: playerMoveType!) // this cant be enforced here, maybe use another function
+        //newExperience.setSlot(slot: "myMoveType", value: modelMoveType!) // this cant be enforced here, maybe use another function
         //newExperience.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer)
         //newExperience.setSlot(slot: "myIsFinal", value: modelIsFinalOffer)
         newExperience.setSlot(slot: "myStrategy", value: playerStrategy!)
@@ -271,9 +287,6 @@ struct NGModel {
 
     
     
-    mutating func makeNewModel() {
-        model = initNewModel()
-    }
     
     
 }
@@ -437,3 +450,8 @@ struct NGModel {
 }
 
 */
+
+
+
+
+

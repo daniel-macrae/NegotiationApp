@@ -11,7 +11,7 @@ func initNewModel() -> Model {
     if let df = dataframe  {
         
         let slotNames = df.columns.map { col in col.name }
-        print(slotNames)
+        //print(slotNames)
         for rowNum in 0..<df.shape.0 {
             
             let Experience = model.generateNewChunk(string: "instance")
@@ -25,9 +25,8 @@ func initNewModel() -> Model {
             model.dm.addToDM(Experience)
         }
                 
-    print("Number of Chunks in preloaded model:")
-    print(model.dm.chunks.count)
     
+
     // add the two strategy chunks
     let aggresiveStrategy = model.generateNewChunk(string: "agressive")
     aggresiveStrategy.setSlot(slot: "isa", value: "strategy")
@@ -39,9 +38,13 @@ func initNewModel() -> Model {
     cooperativeStrategy.setSlot(slot: "strategy", value: "cooperative")
     model.dm.addToDM(cooperativeStrategy)
         
+    print("MAKING NEW MODEL, number of chunks = " + String(model.dm.chunks.count))
+        
     } else {
         print("CSV ERROR: failure to return csv data as dataframe, returning model with no memory...")
     }
+    
+    model.time += 1.0
     
     return model
 }

@@ -18,7 +18,7 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            NavigationLink(destination: TitleScreen().navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
+            NavigationLink(destination: TitleScreen(viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
             NavigationLink(destination: gameOverView(viewModel: viewModel, player_name: player_name).navigationBarBackButtonHidden(true), isActive: $finalScreen, label: {})
             
             // main VStack!
@@ -83,7 +83,7 @@ struct ContentView: View {
             // middle of top toolbad: show round #
             ToolbarItem(placement: .principal) { round_box(round_no: round_no, maxRoundNumber: viewModel.numberOfRounds) }
             // right side, show infoButton
-            ToolbarItem(placement: .primaryAction) { infoButton(isQuitting: $isQuitting) }
+            ToolbarItem(placement: .primaryAction) { infoButton(viewModel: viewModel, isQuitting: $isQuitting) }
             //ToolbarItem(placement: .navigationBarLeading) { Text("hiya") }
         }
     }
@@ -277,6 +277,7 @@ struct round_box: View{
 }
 
 struct infoButton: View {
+    var viewModel: NGViewModel
     @State private var showPicker = false
     @State private var showExplanation = false
     @Binding var isQuitting: Bool
@@ -298,13 +299,13 @@ struct infoButton: View {
                         showPicker = false
                     }
                     GameButton(text: "Save Model") {
-                        NGViewModel().saveModel()
+                        viewModel.saveModel()
                         //Some animation for the model being save
                         showPicker = false
                     }
                     GameButton(text: "Load Model") {
                         //Some animation for the model being loaded
-                        //NGViewModel().loadModel("some_model")
+                        viewModel.loadModel(name:"test")
                         showPicker = false
                     }
                     GameButton(text: "Return to Game") {

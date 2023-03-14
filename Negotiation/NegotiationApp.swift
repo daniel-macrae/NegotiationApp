@@ -8,7 +8,7 @@ struct NegotiationApp: App {
     
     var body: some Scene {
         WindowGroup {
-            TitleScreen()
+            TitleScreen(viewModel: viewModel)
         }
     }
 }

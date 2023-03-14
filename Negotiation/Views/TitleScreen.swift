@@ -2,6 +2,8 @@ import SwiftUI
 
 struct TitleScreen: View {
     
+    @ObservedObject var viewModel: NGViewModel
+    
     @State private var isShowingText = false
     @State private var nextPage = false
     
@@ -11,7 +13,7 @@ struct TitleScreen: View {
        
         NavigationStack{
             ZStack{
-                NavigationLink(destination: SelectModelScreen(viewModel: NGViewModel()), isActive: $nextPage, label: {})
+                NavigationLink(destination: SelectModelScreen(viewModel: viewModel), isActive: $nextPage, label: {})
                 VStack{
                     Image("text1")
                         .resizable()
@@ -48,6 +50,6 @@ struct backgroundImg: View{
 }
 struct TitleScreen_Previews: PreviewProvider {
     static var previews: some View {
-        TitleScreen()
+        TitleScreen(viewModel: NGViewModel())
     }
 }
