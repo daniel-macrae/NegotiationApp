@@ -168,6 +168,8 @@ class NGViewModel: ObservableObject {
         
         //The code below causes a crash probably due to the rules not being fully implemented or working with a nill value
         model.modelResponse(playerOffer: Int(value), playerIsFinalOffer: playerIsFinalOffer)
+        
+        // JUST ADD A self.sendMessage HERE !?!
     }
     
     // player accepts the model's offer

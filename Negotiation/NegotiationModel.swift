@@ -50,23 +50,19 @@ struct NGModel {
         model = initNewModel()
     }
     
-    //  THIS IS FINE
     mutating func testLoad(fileName: String) {
-        print("M: Before Load: " + String(model.dm.chunks.count)) // zero as well?!?!
+        print("M: Before Load: " + String(model.dm.chunks.count))
         model = loadModel(name: fileName)  // loading the model
-        print("M: model loaded")
-        print("M: Number of Chunks in model: " + String(model.dm.chunks.count))
+        print("M: Model loaded. Number of chunks: " + String(model.dm.chunks.count))
         //print(model.time)
         //model.time += 5.0
         //print(model.time)
     }
     
-    // THIS IS NOT FINE
     func testSave() {
-        print("M: Number of Chunks in model to save: " + String(model.dm.chunks.count)) // why the shitfuck is this 0, where is it overwriting the model...
-        print("M: Time of model to save: " + String(model.time))
-        saveModel(model: model, filename: "test")  // function that does the actual saving
-        print("M: model saved")
+        print("M: Number of Chunks in model to save: " + String(model.dm.chunks.count))
+        saveModel(model: model, filename: "test") // save the model
+        print("M: model saved!")
     }
     
     
@@ -137,7 +133,7 @@ struct NGModel {
             query.setSlot(slot: "myStrategy", value: playerStrategy!)
             //query.setSlot(slot: "myBidMNSDifference", value: "Something") /// String(modelCurrentOffer-modelMNS) ?
             query.setSlot(slot: "opponentMove", value: changePlayerBid.description)
-            //query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer)
+            query.setSlot(slot: "opponentIsFinal", value: String(playerIsFinalOffer))
             query.setSlot(slot: "opponentMoveType", value: "Bid")
             
             let (latency, chunk) = model.dm.retrieve(chunk: query)
@@ -159,10 +155,10 @@ struct NGModel {
             }
             
 //SAVE THIS EXPERIENCE
-        print("M: Number of Chunks in model: " + String(model.dm.chunks.count))
         
         // TEMPORARY, STOPS THE LINE UNDER FROM FINDING NIL! :
         modelPreviousOffer = 0
+        //
         
         let changeModelBid = modelCurrentOffer! - modelPreviousOffer! // this cant be enforced here, maybe use another function
         //determine models move type
