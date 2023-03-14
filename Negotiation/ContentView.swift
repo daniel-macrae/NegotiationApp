@@ -258,8 +258,7 @@ struct round_box: View{
     var RBColor =  Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
     var body: some View{
         VStack{
-            Text("Round").foregroundColor(Color.white)
-            Text(String(round_no)+"/10").foregroundColor(Color.white)
+            Text("Round: " + (String(round_no)+"/10")).foregroundColor(Color.white)
         }.padding(10)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
