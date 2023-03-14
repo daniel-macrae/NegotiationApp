@@ -15,22 +15,24 @@ struct ContentView: View {
     @State private var gameOver: Bool = false
     @State private var finalScreen: Bool = false
     
+    
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             NavigationLink(destination: TitleScreen().navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
             NavigationLink(destination: gameOverView(viewModel: viewModel, player_name: player_name).navigationBarBackButtonHidden(true), isActive: $finalScreen, label: {})
             VStack {
-                ZStack{
-                    HStack{
-                        Spacer()
-                        round_box(round_no: round_no)
-                        Spacer()
-                    }
-                    HStack{
-                        Spacer()
-                        infoButton(isQuitting: $isQuitting).padding(.horizontal)
-                    }
-                }
+//                HStack{
+//                    HStack{
+//                        Spacer()
+//                        round_box(round_no: round_no, maxRoundNumber: viewModel.numberOfRounds)
+//                        Spacer()
+//                    }
+//                    HStack{
+//                        Spacer()
+//                        infoButton(isQuitting: $isQuitting).padding(.horizontal)
+//                    }
+//                }
+                Spacer().frame(height: 5) // put a little bit of space in between the toolbar and the content
                 ZStack{
                     HStack{
                         HStack{
@@ -78,7 +80,7 @@ struct ContentView: View {
                                 AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                     finalOfferToggle = false;
                                     round_no = round_no + 1;
-                                    if round_no == 10 {
+                                    if round_no == viewModel.numberOfRounds {
                                         gameOver = true
                                     };
                                     mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
@@ -108,6 +110,12 @@ struct ContentView: View {
                 ;
                 viewModel.messages = [] //Emptying the message log
             }
+        }.toolbar {
+            // middle of top toolbad: show round #
+            ToolbarItem(placement: .principal) { round_box(round_no: round_no, maxRoundNumber: viewModel.numberOfRounds) }
+            // right side, show infoButton
+            ToolbarItem(placement: .primaryAction) { infoButton(isQuitting: $isQuitting) }
+            //ToolbarItem(placement: .navigationBarLeading) { Text("hiya") }
         }
     }
 }
@@ -117,7 +125,7 @@ struct GameButton: View{
     
     let text: String
     let action: () -> Void
-    let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
+    let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76, alpha: 0.75))
     
     var body: some View {
             Button(text, action: action)
@@ -253,13 +261,12 @@ struct sliderView: View{
 
 
 struct round_box: View{
-    
     var round_no = 1
+    var maxRoundNumber = 5
     var RBColor =  Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
     var body: some View{
         VStack{
-            Text("Round").foregroundColor(Color.white)
-            Text(String(round_no)+"/10").foregroundColor(Color.white)
+            Text("Round " + String(round_no)+"/" + String(maxRoundNumber)).foregroundColor(Color.white)
         }.padding(10)
         .overlay(
             RoundedRectangle(cornerRadius: 10)

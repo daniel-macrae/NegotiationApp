@@ -8,19 +8,19 @@
 import Foundation
 
 
-func saveModel(model: Model)  {
-    let encoder = JSONEncoder()
-    encoder.outputFormatting = .prettyPrinted
-    
-    // if we can save the codeable as a json format
-    if let data = try? encoder.encode(model) {
-        UserDefaults.standard.set(data, forKey: "UserData")
-        
-    }
-}
+//func saveModel(model: Model)  {
+//    let encoder = JSONEncoder()
+//    encoder.outputFormatting = .prettyPrinted
+//
+//    // if we can save the codeable as a json format
+//    if let data = try? encoder.encode(model) {
+//        UserDefaults.standard.set(data, forKey: "UserData")
+//
+//    }
+//}
 
 
-func saveModel2(model: Model, filename: String) {
+func saveModel(model: Model, filename: String) {
     do {
         let filename = filename + ".json"
         let fileURL = try FileManager.default
@@ -35,9 +35,9 @@ func saveModel2(model: Model, filename: String) {
 }
 
 
-func loadModel2(filename: String) -> Model {
+func loadModel(name: String) -> Model {
     do {
-        let filename = filename + ".json"
+        let filename = name + ".json"
         
         let fileURL = try FileManager.default
             .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
@@ -49,10 +49,10 @@ func loadModel2(filename: String) -> Model {
         return model
  
     } catch {
-        print("error while loading model, returning empty one")
-        return Model() // just return an new empty model idk
+        print("JSON: error while loading model (or filename not found)")
+        let model = initNewModel()
+        return model // just return an new model
     }
     
 }
-
 

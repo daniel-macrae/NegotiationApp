@@ -48,12 +48,12 @@ struct NGModel {
     
     // functions to save and load the model (calls functions from JSONManger.swift file)
     mutating func testSave() {
-        saveModel2(model: model, filename: "test")  // function that does the actual saving
+        saveModel(model: model, filename: "test")  // function that does the actual saving
         print("M: model saved")
     }
     
     mutating func testLoad(fileName: String) {
-        model = loadModel2(filename: fileName)  // loading the model
+        model = loadModel(name: fileName)  // loading the model
         print("M: model loaded")
         //print(model.dm)
         //print(model.imaginalActionTime)
@@ -68,33 +68,8 @@ struct NGModel {
         model.reset()
         model.waitingForAction = true
         
-        // have to add the strategy chunks. HERE?
-        
-        // MARK:  I have added these two chunks to the InitModel file
-        // but left them here just to show how they were written - Dan
-        
-        ///let aggresiveStrategy = model.generateNewChunk(string: "agressive")
-        ///aggresiveStrategy.setSlot(slot: "isa", value: "strategy")
-        ///aggresiveStrategy.setSlot(slot: "strategy", value: "agressive")
-        ///model.dm.addToDM(aggresiveStrategy)
-        
-        ///let cooperativeStrategy = model.generateNewChunk(string: "cooperative")
-        ///cooperativeStrategy.setSlot(slot: "isa", value: "strategy")
-        ///cooperativeStrategy.setSlot(slot: "strategy", value: "cooperative")
-        ///model.dm.addToDM(cooperativeStrategy)
-        
     }
     
-    
-    func saveModel(filename: String) {
-        let encoder = JSONEncoder()
-        do {
-            let data = try encoder.encode(model)        /// convert the model to JSON
-            print(String(data: data, encoding: .utf8)!)  /// print to console
-        } catch {
-            print("M: failure to save model")
-        }
-    }
     
     mutating func declareModelMNS(){
         modelDeclaredMNS = Int(arc4random_uniform(9)) + 1

@@ -1,6 +1,3 @@
-// initialises the app?
-// or smth idk shit doesn't work without this anyway
-
 import SwiftUI
 
 @main

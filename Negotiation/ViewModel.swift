@@ -2,11 +2,14 @@
 
 
 import Foundation
+import SwiftUI
 
 class NGViewModel: ObservableObject {
     @Published private var model = NGModel()
     @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
+    
+    @Published var numberOfRounds: Int = 5
     @Published var offerHasBeenMade: Bool = false
     ///SENTENCES for accepting and declining an offer in a happy/neutral and angry tone
     let acceptingSentencesNeutral = [
