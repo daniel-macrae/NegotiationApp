@@ -101,10 +101,7 @@
 		620BEBCA29A7B89300DAE4FF /* Negotiation */ = {
 			isa = PBXGroup;
 			children = (
-				224EFBF029BB422D00B78AA2 /* SelectModelScreen.swift */,
-				224EFBEE29BB41ED00B78AA2 /* TitleScreen.swift */,
-				620BEBCD29A7B89300DAE4FF /* ContentView.swift */,
-				224EFBF429BE244500B78AA2 /* gameOverView.swift */,
+				6213022129C126A60053F232 /* Views */,
 				622F299C29AA981E00E1C774 /* ACT-R */,
 				620BEBCB29A7B89300DAE4FF /* NegotiationApp.swift */,
 				224EFBF229BCB43700B78AA2 /* AppDelegate.swift */,
@@ -125,6 +122,17 @@
 				620BEBD229A7B89700DAE4FF /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		6213022129C126A60053F232 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				224EFBF029BB422D00B78AA2 /* SelectModelScreen.swift */,
+				224EFBEE29BB41ED00B78AA2 /* TitleScreen.swift */,
+				620BEBCD29A7B89300DAE4FF /* ContentView.swift */,
+				224EFBF429BE244500B78AA2 /* gameOverView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		622F299C29AA981E00E1C774 /* ACT-R */ = {
