@@ -116,10 +116,10 @@ class NGViewModel: ObservableObject {
         else {return "N/A"}
         }
     
-    var playerScore: Float {Float(model.playerScore)}
-    var modelScore: Float {Float(model.modelScore)}
-    var playerMNS: Float {Float(model.playerMNS)}
-    var modelMNS: Float {Float(model.modelMNS)}
+    var playerScore: Int {Int(model.playerScore)}
+    var modelScore: Int {Int(model.modelScore)}
+    var playerMNS: Int {Int(model.playerMNS)}
+    var modelMNS: Int {Int(model.modelMNS)}
     
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}

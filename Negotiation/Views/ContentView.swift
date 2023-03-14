@@ -20,82 +20,51 @@ struct ContentView: View {
         NavigationStack {
             NavigationLink(destination: TitleScreen().navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
             NavigationLink(destination: gameOverView(viewModel: viewModel, player_name: player_name).navigationBarBackButtonHidden(true), isActive: $finalScreen, label: {})
+            
+            // main VStack!
             VStack {
-//                HStack{
-//                    HStack{
-//                        Spacer()
-//                        round_box(round_no: round_no, maxRoundNumber: viewModel.numberOfRounds)
-//                        Spacer()
-//                    }
-//                    HStack{
-//                        Spacer()
-//                        infoButton(isQuitting: $isQuitting).padding(.horizontal)
-//                    }
-//                }
                 Spacer().frame(height: 5) // put a little bit of space in between the toolbar and the content
-                ZStack{
-                    HStack{
-                        HStack{
-                            UserIcon()
-                            VStack{
-                                Text("Score = " + String(Int(viewModel.playerScore)))
-                                // What to display here? We cant just
-                                Text("MNS = " + String(Int(viewModel.playerMNS)))
-                            }
-                        }
-                        Spacer()
-                        
-                        VStack{
-                            Text("Score = " + String(Int(viewModel.modelScore)))
-                            Text("MNS = " + String(Int(viewModel.modelMNS)))
-                        }
-                        ComputerIcon()
-                        }
-                }.padding(.all)
-                    .background(Color.white.opacity(0.5))
-                    .cornerRadius(20)
+                ScoresDisplay(playerScore:viewModel.playerScore, modelScore:viewModel.modelMNS, playerMNS:viewModel.playerMNS, modelMNS:viewModel.modelMNS) // MARK: HELLO
                 Spacer()
                 ChatBox(messages: viewModel.messages)
                 Divider()
                 VStack {
                     VStack{
                         Spacer()
-                        if gameOver{
+                        if gameOver {
                             VStack{
                                 Spacer()
-                                GameButton(text: "Continue", action: {
-                                    finalScreen = true
-                                })
+                                GameButton(text: "Continue", action: { finalScreen = true } )
                                 Spacer()
                             }
-                        }else{
-                        sliderView(sliderValue: $sliderValue, thresholdValue: viewModel.playerMNS).background(Color.white.opacity(0.75)).cornerRadius(20).padding(.horizontal)
-                        Spacer()
-                        .frame(maxHeight: .infinity)
-                        if mnsDeclared {
-                            Toggle_box(finalOfferToggle: $finalOfferToggle)        .onChange(of: finalOfferToggle) { value in
-                                viewModel.FinalOfferPlayerChanged()}
-                            HStack {
-                                GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(value: sliderValue)})
-                                AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
-                                    finalOfferToggle = false;
-                                    round_no = round_no + 1;
-                                    if round_no == viewModel.numberOfRounds {
-                                        gameOver = true
-                                    };
-                                    mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
-                                
-                            } .padding()
-
-                        } else{
-                            HStack{
-                                GameButton(text: "Declare MNS", action: {mnsDeclared = true;
-                                    viewModel.declarePlayerMNS(value: sliderValue);
+                        } else {
+                            sliderView(sliderValue: $sliderValue, thresholdValue: Float(viewModel.playerMNS)).background(Color.white.opacity(0.75)).cornerRadius(20).padding(.horizontal)
+                            Spacer()
+                            .frame(maxHeight: .infinity)
+                            if mnsDeclared {
+                                Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
+                                    viewModel.FinalOfferPlayerChanged()}
+                                HStack {
+                                    GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(value: sliderValue)})
+                                    AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
+                                        finalOfferToggle = false;
+                                        round_no = round_no + 1;
+                                        if round_no == viewModel.numberOfRounds {
+                                            gameOver = true
+                                        };
+                                        mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
                                     
-                                }).padding()
+                                } .padding()
+
+                            } else{
+                                HStack{
+                                    GameButton(text: "Declare MNS", action: {mnsDeclared = true;
+                                        viewModel.declarePlayerMNS(value: sliderValue);
+                                        
+                                    }).padding()
+                                }
                             }
-                        }
-                            
+                                
                         }
 
                     }
@@ -121,8 +90,38 @@ struct ContentView: View {
 }
 
 
-struct GameButton: View{
+struct ScoresDisplay: View {
+    var playerScore: Int
+    var modelScore: Int
+    var playerMNS: Int
+    var modelMNS: Int
     
+    var body: some View {
+        ZStack{
+            HStack{
+                HStack{
+                    UserIcon()
+                    VStack{
+                        Text("Score = " + String(playerScore))
+                        // What to display here? We cant just
+                        Text("MNS = " + String(playerMNS))
+                    }
+                }
+                Spacer()
+                VStack{
+                    Text("Score = " + String(modelScore))
+                    Text("MNS = " + String(modelMNS))
+                }
+                ComputerIcon()
+                }
+        }.padding(.all)
+            .background(Color.white.opacity(0.5))
+            .cornerRadius(20)
+    }
+}
+
+
+struct GameButton: View{
     let text: String
     let action: () -> Void
     let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76, alpha: 0.75))
@@ -137,7 +136,6 @@ struct GameButton: View{
 }
 
 struct AcceptButton: View{
-    
     let text: String
     let action: () -> Void
     let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
@@ -165,7 +163,6 @@ struct CustomButtonStyle: ButtonStyle {
 
 
 struct QuitButton: View{
-    
     let text: String
     let action: () -> Void
     let buttonColor = Color.red
@@ -286,13 +283,10 @@ struct infoButton: View {
 
     var body: some View {
         VStack {
-            Button(action: {
-                showPicker = true
-            }) {
+            Button(action: { showPicker = true } ) {
                 Image(systemName: "questionmark.circle")
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
             }.scaleEffect(1.6)
-
         }
         .sheet(isPresented: $showPicker) {
             ZStack{
