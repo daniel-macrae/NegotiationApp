@@ -98,6 +98,7 @@ class NGViewModel: ObservableObject {
         let id = UUID()
         let text:String
         let sender: Bool //true is the player flase is the model
+        let PSA: Bool
     }
     
     var playerNegotiationValue: String {
@@ -126,7 +127,7 @@ class NGViewModel: ObservableObject {
     /// a function when the player declares their MNS
     func declarePlayerMNS(value: Float){
         model.playerDeclaredMNS = Int(value)
-        self.sendMessage("My MNS is " + String(Int(value)), isMe: true)
+        self.sendMessage("My MNS is " + String(Int(value)), isMe: true, PSA : false)
         model.declareModelMNS()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { //makes it more lifelike i guess when adding a wait
             self.SendModelMNS()
@@ -134,22 +135,22 @@ class NGViewModel: ObservableObject {
     }
     
     func SendModelMNS(){
-        sendMessage("My MNS is " + String(model.ModelDeclMNSValueGet()), isMe: false)
+        sendMessage("My MNS is " + String(model.ModelDeclMNSValueGet()), isMe: false, PSA: false)
     }
     
     //simple sendMessage function isMe: true is the player is the sender false is the model
-    func sendMessage(_ text:String, isMe: Bool){
-        messages.append(Message(text: text, sender: isMe))
+    func sendMessage(_ text:String, isMe: Bool, PSA: Bool){
+        messages.append(Message(text: text, sender: isMe, PSA: PSA))
     }
     
 
-    func playerMakeOffer(value: Float, isFinal: Bool) {
+    func playerMakeOffer(value: Float) {
         /// overwrite the (now-outdated) previous offer
-        if isFinal {
-            self.sendMessage("This is my final offer " + String(Int(value)) , isMe: true)
+        if self.playerIsFinalOffer {
+            self.sendMessage("This is my final offer " + String(Int(value)) , isMe: true, PSA: false)
             // TODO Make model aware of offer and that it is final offer
         } else {
-            self.sendMessage("This is my offer " + String(Int(value)) , isMe: true)
+            self.sendMessage("This is my offer " + String(Int(value)) , isMe: true, PSA: false)
             // TODO Make model aware of offer
         }
         model.playerPreviousOffer = model.playerCurrentOffer
@@ -163,18 +164,21 @@ class NGViewModel: ObservableObject {
     
     // player accepts the model's offer
     func playerAccepts () {
-        self.sendMessage("I accept your offer of " + String(modelNegotiationValue), isMe: true)
+        self.sendMessage("I accept your offer of " + String(modelNegotiationValue), isMe: true, PSA: false)
         /// change the value of the player's offer in accordance to their acceptance of the model's offer
         /// (e.g. the player's "new offer" is whats left of the 9 points)
         //model.playerCurrentOffer = 9 - (Int(modelNegotiationValue) ?? 0)
         //offerHasBeenMade needs to change to offer has been made by model so that the player can only accept when both are willing to accept
+        newRound()
+    }
+    func newRound(){
+        sendMessage("You earned: " + String(model.playerCurrentOffer - model.playerMNS) + " points this round.", isMe: false, PSA: true)
         offerHasBeenMade = false
+        model.playerIsFinalOffer = false
         model.newRound(playerOffered: true)
     }
-    
     func FinalOfferPlayerChanged(){
         model.playerIsFinalOffer.toggle()
-        print(model.playerIsFinalOffer)
     }
     
     func saveModel() {

@@ -67,15 +67,16 @@ struct ContentView: View {
                                 Spacer()
                             }
                         }else{
-                        sliderView(sliderValue: $sliderValue, thresholdValue: viewModel.playerMNS).background(Color.white.opacity(0.5)).cornerRadius(20).padding(.horizontal)
+                        sliderView(sliderValue: $sliderValue, thresholdValue: viewModel.playerMNS).background(Color.white.opacity(0.75)).cornerRadius(20).padding(.horizontal)
                         Spacer()
                         .frame(maxHeight: .infinity)
                         if mnsDeclared {
                             Toggle_box(finalOfferToggle: $finalOfferToggle)        .onChange(of: finalOfferToggle) { value in
                                 viewModel.FinalOfferPlayerChanged()}
                             HStack {
-                                GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(value: sliderValue, isFinal: finalOfferToggle)})
+                                GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(value: sliderValue)})
                                 AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
+                                    finalOfferToggle = false;
                                     round_no = round_no + 1;
                                     if round_no == 10 {
                                         gameOver = true
@@ -97,8 +98,8 @@ struct ContentView: View {
 
                     }
                 }
-            }.background(backgroundImg(image: "secondbackground"))
-                .onAppear{viewModel.sendMessage("Hello " + String(player_name), isMe: false)}
+            }.background(backgroundImg(image: "thirdbackground2"))
+                .onAppear{viewModel.sendMessage("Hello " + String(player_name), isMe: false, PSA: false)}
             .onAppear {
                 UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation") // Forcing the rotation to portrait
                 AppDelegate.orientationLock = .portrait // And making sure it stays that way
@@ -254,7 +255,7 @@ struct sliderView: View{
 struct round_box: View{
     
     var round_no = 1
-    
+    var RBColor =  Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
     var body: some View{
         VStack{
             Text("Round").foregroundColor(Color.white)
@@ -262,11 +263,11 @@ struct round_box: View{
         }.padding(10)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.blue.opacity(0.6), lineWidth: 1)
+                .stroke(RBColor.opacity(0.3), lineWidth: 1)
         )
         .background(
              RoundedRectangle(cornerRadius: 10)
-                 .fill(Color.blue.opacity(0.6))
+                .fill(RBColor.opacity(0.3))
          )
     }
 }
@@ -288,7 +289,7 @@ struct infoButton: View {
         }
         .sheet(isPresented: $showPicker) {
             ZStack{
-                backgroundImg(image: "secondbackground").background()
+                backgroundImg(image: "thirdbackground2").background()
                     .ignoresSafeArea(.all)
                 VStack {
                     GameButton(text: "How to Play") {
@@ -328,7 +329,7 @@ struct infoButton: View {
                             .padding(.all)
                         Text("If the responder rejects the offer, the proposer can make a new offer and the responder can again choose to accept or reject the offer. If the proposer makes a final offer, the responder must accept or reject it, and the round ends regardless of their decision. The game continues for a fixed number of rounds, and the player with the highest total score at the end of the game is the winner.").foregroundColor(.white)
                             .padding(.all)
-                    }
+                    }.background(.black.opacity(0.6))
                     GameButton(text:"Go to Game") {
                         showExplanation = false
                     }
@@ -356,7 +357,7 @@ struct Toggle_box: View{
                     .foregroundColor(finalOfferToggle ? Color.green : Color.gray)
                 Toggle("", isOn: $finalOfferToggle)
                     .foregroundColor(finalOfferToggle ? Color.green : Color.gray).labelsHidden()
-            }.padding(.all, 8).background(Color.white.opacity(0.5)).cornerRadius(20)
+            }.padding(.all, 8).background(Color.white.opacity(0.75)).cornerRadius(20)
             Spacer()
         }
         .scaleEffect(0.8)
@@ -366,7 +367,7 @@ struct Toggle_box: View{
 struct MessageView: View{
     let message: NGViewModel.Message
     var body: some View{
-
+            
             if message.sender{
                 HStack{
                     Spacer()
@@ -376,11 +377,21 @@ struct MessageView: View{
                         .foregroundColor(Color.white)
                         .cornerRadius(20)
                 }
-            } else {
+            } else if !message.PSA{
                 HStack{
                     Text(message.text)
                         .padding()
                         .background(Color.white.opacity(0.6))
+                        .foregroundColor(Color.black.opacity(0.7))
+                        .cornerRadius(20)
+                    Spacer()
+                }
+            } else {
+                HStack{
+                    Spacer()
+                    Text(message.text)
+                        .padding()
+                        .background(Color.gray.opacity(0.6))
                         .foregroundColor(Color.black.opacity(0.7))
                         .cornerRadius(20)
                     Spacer()
