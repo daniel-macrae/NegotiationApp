@@ -42,10 +42,19 @@ struct ContentView: View {
                             Spacer()
                             .frame(maxHeight: .infinity)
                             if mnsDeclared {
-                                Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
-                                    viewModel.FinalOfferPlayerChanged()}
+                                HStack{
+                                    Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
+                                        viewModel.FinalOfferPlayerChanged()}
+                                    GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(playerBid: sliderValue)})
+                                }
                                 HStack {
-                                    GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(value: sliderValue)})
+                                    RejectButton(text: "Reject Offer", action: {viewModel.playerRejectsFinalOffer();
+                                        finalOfferToggle = false;
+                                        round_no = round_no + 1;
+                                        if round_no == viewModel.numberOfRounds {
+                                            gameOver = true
+                                        };
+                                        mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
                                     AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                         finalOfferToggle = false;
                                         round_no = round_no + 1;
@@ -136,6 +145,23 @@ struct GameButton: View{
 }
 
 struct AcceptButton: View{
+    let text: String
+    let action: () -> Void
+    let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
+    var offerHasBeenMade: Bool
+    
+    var body: some View {
+            Button(text, action: action)
+                .frame(width: 160, height:50)
+                .foregroundColor(.white)
+                .background(offerHasBeenMade ? buttonColor : Color.gray)
+                .cornerRadius(50)
+                .buttonStyle(CustomButtonStyle())
+                .disabled(!offerHasBeenMade)
+    }
+}
+
+struct RejectButton: View{
     let text: String
     let action: () -> Void
     let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))

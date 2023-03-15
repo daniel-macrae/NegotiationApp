@@ -152,33 +152,68 @@ class NGViewModel: ObservableObject {
     }
     
 
-    func playerMakeOffer(value: Float) {
+    func playerMakeOffer(playerBid: Float) {
         /// overwrite the (now-outdated) previous offer
         if self.playerIsFinalOffer {
-            self.sendMessage("This is my final offer " + String(Int(value)) , isMe: true, PSA: false)
+            self.sendMessage("This is my final offer " + String(Int(playerBid)) , isMe: true, PSA: false)
             // TODO Make model aware of offer and that it is final offer
         } else {
-            self.sendMessage("This is my offer " + String(Int(value)) , isMe: true, PSA: false)
+            self.sendMessage("This is my offer " + String(Int(playerBid)) , isMe: true, PSA: false)
             // TODO Make model aware of offer
         }
         model.playerPreviousOffer = model.playerCurrentOffer
-        model.playerCurrentOffer = Int(value)
+        model.playerCurrentOffer = Int(playerBid)
+        model.playerMoveType = "Bid"
         
         self.offerHasBeenMade = true
         
         //The code below causes a crash probably due to the rules not being fully implemented or working with a nill value
-        model.modelResponse(playerOffer: Int(value), playerIsFinalOffer: playerIsFinalOffer)
+        model.modelResponse()
         
         // JUST ADD A self.sendMessage HERE !?!
+        //dont know what PSA is
+        if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") && model.modelIsFinalOffer == false {
+            self.sendMessage("This is my offer " + String(model.modelCurrentOffer!), isMe: false, PSA: false)}
+        else if model.modelMoveType == "Bid" {
+            self.sendMessage("This is my final offer " + String(model.modelCurrentOffer!), isMe: false, PSA: false)}
+        else if model.modelMoveType == "Decision" && model.modelDecision == "Accept" {
+            self.sendMessage("I accept your offer of " + String(model.playerCurrentOffer), isMe: false, PSA: false)}
+        else if model.modelMoveType == "Decision" && model.modelDecision == "Reject" {
+            self.sendMessage("I reject your offer of " + String(model.playerCurrentOffer), isMe: false, PSA: false)}
+        else {
+            self.sendMessage("I want to quit this negotiation.", isMe: false, PSA: false)}
+       
     }
     
     // player accepts the model's offer
     func playerAccepts () {
         self.sendMessage("I accept your offer of " + String(modelNegotiationValue), isMe: true, PSA: false)
+        model.playerMoveType = "Decision"
+        model.playerDecision = "Accept"
         /// change the value of the player's offer in accordance to their acceptance of the model's offer
         /// (e.g. the player's "new offer" is whats left of the 9 points)
         //model.playerCurrentOffer = 9 - (Int(modelNegotiationValue) ?? 0)
         //offerHasBeenMade needs to change to offer has been made by model so that the player can only accept when both are willing to accept
+        newRound()
+    }
+    
+    // player accepts the model's offer
+    func playerRejectsFinalOffer() {
+        self.sendMessage("I reject your final offer of " + String(modelNegotiationValue), isMe: true, PSA: false)
+        model.playerMoveType = "Decision"
+        model.playerDecision = "Reject"
+        /// change the value of the player's offer in accordance to their acceptance of the model's offer
+        /// (e.g. the player's "new offer" is whats left of the 9 points)
+        //model.playerCurrentOffer = 9 - (Int(modelNegotiationValue) ?? 0)
+        //offerHasBeenMade needs to change to offer has been made by model so that the player can only accept when both are willing to accept
+        newRound()
+    }
+    
+    func playerQuitsRound() {
+        self.sendMessage("I want to quit this negotiation.",  isMe: true, PSA: false)
+        model.playerMoveType = "Quit"
+        model.playerDecision = "quit"
+        
         newRound()
     }
     func newRound(){
