@@ -217,7 +217,7 @@ struct NGModel {
                 
                 if let modelOffer = chunk?.slotvals["myMove"]?.description {
                     
-                    modelCurrentOffer = Int(modelOffer)!    // This has to be unwrapped!
+                    modelCurrentOffer = Int(modelOffer)!    // This had to be unwrapped
                     print("M: offer should be = " + String(Int(modelOffer)!))
                     
                     //print("M: modelCurrentOffer is = " + String(modelCurrentOffer!))
