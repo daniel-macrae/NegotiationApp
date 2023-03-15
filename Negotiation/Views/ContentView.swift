@@ -65,8 +65,8 @@ struct ContentView: View {
                                     
                                 } .padding()
 
-                            } else{
-                                HStack{
+                            } else {
+                                HStack {
                                     GameButton(text: "Declare MNS", action: {mnsDeclared = true;
                                         viewModel.declarePlayerMNS(value: sliderValue);
                                         
