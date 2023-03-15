@@ -167,13 +167,16 @@ class NGViewModel: ObservableObject {
         
         self.offerHasBeenMade = true
         
-        //The code below causes a crash probably due to the rules not being fully implemented or working with a nill value
+        //The code below causes a crash probably due to the rules not being fully implemented or working with a nil value
         model.modelResponse()
         
         // JUST ADD A self.sendMessage HERE !?!
         //dont know what PSA is
         if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") && model.modelIsFinalOffer == false {
-            self.sendMessage("This is my offer " + String(model.modelCurrentOffer!), isMe: false, PSA: false)}
+            print("VM: model has responded with move type = " + model.modelMoveType)
+            self.sendMessage("This is my offer " + String(model.modelCurrentOffer!), isMe: false, PSA: false)
+            // MARK: This is trying to unwrap model.modelCurrentOffer  ^^^^^  even when the move type is "Opening", I don't think that variable is given a value properly if the model is making an opening bid.
+        }
         else if model.modelMoveType == "Bid" {
             self.sendMessage("This is my final offer " + String(model.modelCurrentOffer!), isMe: false, PSA: false)}
         else if model.modelMoveType == "Decision" && model.modelDecision == "Accept" {
