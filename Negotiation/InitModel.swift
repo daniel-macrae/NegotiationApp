@@ -28,14 +28,14 @@ func initNewModel() -> Model {
     
 
     // add the two strategy chunks
-    let aggresiveStrategy = model.generateNewChunk(string: "agressive")
+    let aggresiveStrategy = model.generateNewChunk(string: "Agressive")
     aggresiveStrategy.setSlot(slot: "isa", value: "strategy")
-    aggresiveStrategy.setSlot(slot: "strategy", value: "agressive")
+    aggresiveStrategy.setSlot(slot: "strategy", value: "Agressive")
     model.dm.addToDM(aggresiveStrategy)
     
-    let cooperativeStrategy = model.generateNewChunk(string: "cooperative")
+    let cooperativeStrategy = model.generateNewChunk(string: "Cooperative")
     cooperativeStrategy.setSlot(slot: "isa", value: "strategy")
-    cooperativeStrategy.setSlot(slot: "strategy", value: "cooperative")
+    cooperativeStrategy.setSlot(slot: "strategy", value: "Cooperative")
     model.dm.addToDM(cooperativeStrategy)
         
     print("MAKING NEW MODEL, number of chunks = " + String(model.dm.chunks.count))
