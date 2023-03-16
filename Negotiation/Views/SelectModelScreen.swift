@@ -23,6 +23,9 @@ struct SelectModelScreen: View {
         
         NavigationStack{
             NavigationLink(destination: ContentView(viewModel: viewModel, player_name : $name), isActive: $StartGame, label: {})
+                .onChange(of: StartGame) { (newValue) in
+                    if newValue { viewModel.resetGame() }
+                }
             ZStack{
                 if showNameField{
                     VStack{

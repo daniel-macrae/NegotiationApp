@@ -14,6 +14,7 @@ struct TitleScreen: View {
         NavigationStack{
             ZStack{
                 NavigationLink(destination: SelectModelScreen(viewModel: viewModel), isActive: $nextPage, label: {})
+                    
                 VStack{
                     Image("text1")
                         .resizable()

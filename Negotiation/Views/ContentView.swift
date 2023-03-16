@@ -19,35 +19,30 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             NavigationLink(destination: TitleScreen(viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
+                
             NavigationLink(destination: gameOverView(viewModel: viewModel, player_name: player_name).navigationBarBackButtonHidden(true), isActive: $finalScreen, label: {})
             
             // main VStack!
             VStack {
                 Spacer().frame(height: 5) // put a little bit of space in between the toolbar and the content
-                ScoresDisplay(playerScore:viewModel.playerScore, modelScore:viewModel.modelMNS, playerMNS:viewModel.playerMNS, modelMNS:viewModel.modelMNS) // MARK: HELLO
+                ScoresDisplay(playerDeclaredMNS: viewModel.playerDeclaredMNS,
+                              modelDeclaredMNS: viewModel.modelDeclaredMNS,
+                              playerScore:viewModel.playerScore, modelScore:viewModel.modelScore, playerMNS:viewModel.playerMNS, modelMNS:viewModel.modelMNS)
                 Spacer()
                 ChatBox(messages: viewModel.messages)
+                    .layoutPriority(1)
                 Divider()
-                VStack {
-                    VStack{
-                        Spacer()
-                        if gameOver {
-                            VStack{
-                                Spacer()
-                                GameButton(text: "Continue", action: { finalScreen = true } )
-                                Spacer()
-                            }
-                        } else {
-                            sliderView(sliderValue: $sliderValue, thresholdValue: Float(viewModel.playerMNS)).background(Color.white.opacity(0.75)).cornerRadius(20).padding(.horizontal)
+                    //Spacer()
+                    if gameOver {
+                        VStack{
                             Spacer()
-                            .frame(maxHeight: .infinity)
-                            if mnsDeclared {
-                                HStack{
-                                    Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
-                                        viewModel.FinalOfferPlayerChanged()}
-                                    GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(playerBid: sliderValue)})
-                                }
+                            GameButton(text: "Continue", action: { finalScreen = true } )
+                            Spacer()
+                        }
+                    } else if mnsDeclared {
+                            VStack {
                                 HStack {
+                                    Spacer()
                                     RejectButton(text: "Reject Offer", action: {viewModel.playerRejectsFinalOffer();
                                         finalOfferToggle = false;
                                         round_no = round_no + 1;
@@ -55,6 +50,7 @@ struct ContentView: View {
                                             gameOver = true
                                         };
                                         mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
+                                    Spacer()
                                     AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                         finalOfferToggle = false;
                                         round_no = round_no + 1;
@@ -62,23 +58,45 @@ struct ContentView: View {
                                             gameOver = true
                                         };
                                         mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
+                                    Spacer()
                                     
-                                } .padding()
-
-                            } else {
-                                HStack {
-                                    GameButton(text: "Declare MNS", action: {mnsDeclared = true;
-                                        viewModel.declarePlayerMNS(value: sliderValue);
-                                        
-                                    }).padding()
+                                }
+                                
+                                sliderView(displayText: "Offer Value:", sliderValue: $sliderValue, thresholdValue: Float(viewModel.playerMNS))
+                                    .padding(.horizontal)
+                                    .background(Color.white.opacity(0.75))
+                                    .cornerRadius(20)
+                                
+                                //Spacer()
+                                //.frame(maxHeight: .infinity)
+                                HStack{
+                                    Spacer()
+                                    Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
+                                        viewModel.FinalOfferPlayerChanged()}
+                                    Spacer()
+                                    GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(playerBid: sliderValue)})
+                                    Spacer()
                                 }
                             }
-                                
+                            
+                        } else {
+                            VStack {
+                            sliderView(displayText: "Declared MNS Value:", sliderValue: $sliderValue, thresholdValue: Float(viewModel.playerMNS))
+                                .padding(.horizontal)
+                                .background(Color.white.opacity(0.75))
+                                .cornerRadius(20)
+                            Spacer()
+                            .frame(maxHeight: .infinity)
+                            HStack {
+                                GameButton(text: "Declare MNS", action: {mnsDeclared = true;
+                                    viewModel.declarePlayerMNS(value: sliderValue);
+                                    
+                                }).padding()
+                            }
                         }
-
-                    }
+    
                 }
-            }.background(backgroundImg(image: "thirdbackground2"))
+            }.background(backgroundImg(image: "SolidBackground"))
                 .onAppear{viewModel.sendMessage("Hello " + String(player_name), isMe: false, PSA: false)}
             .onAppear {
                 UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation") // Forcing the rotation to portrait
@@ -100,6 +118,8 @@ struct ContentView: View {
 
 
 struct ScoresDisplay: View {
+    var playerDeclaredMNS: Int?
+    var modelDeclaredMNS: Int?
     var playerScore: Int
     var modelScore: Int
     var playerMNS: Int
@@ -108,20 +128,27 @@ struct ScoresDisplay: View {
     var body: some View {
         ZStack{
             HStack{
-                HStack{
-                    UserIcon()
-                    VStack{
-                        Text("Score = " + String(playerScore))
-                        // What to display here? We cant just
-                        Text("MNS = " + String(playerMNS))
-                    }
-                }
-                Spacer()
+                
+                ComputerIcon()
                 VStack{
                     Text("Score = " + String(modelScore))
-                    Text("MNS = " + String(modelMNS))
-                }
-                ComputerIcon()
+                    Text("MNS = " + String(modelMNS)) // REMOVE - IN THE LONG RUN
+                    if let modelDecMNS = modelDeclaredMNS {Text("Declared\nMNS = " + String(modelDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body)).lineLimit(2, reservesSpace: true)}
+                    //if let modelDecMNS = modelDeclaredMNS {Text("D MNS = " + String(modelDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body))}
+                }.layoutPriority(2)
+                
+                Spacer()
+                
+                VStack{
+                    Text("Score = " + String(playerScore))
+                    // What to display here? We cant just
+                    Text("MNS = " + String(playerMNS))  // REMOVE - IN THE LONG RUN
+                    // display the declared MNS, seems easier than looking for it
+                    if let playerDecMNS = playerDeclaredMNS {Text("Declared\nMNS = " + String(playerDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body)).lineLimit(2, reservesSpace: true)}  // font size changes dynamically
+                    //if let playerDecMNS = playerDeclaredMNS {Text("D MNS = " + String(playerDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body))}
+                }.layoutPriority(2)
+                UserIcon()
+                
                 }
         }.padding(.all)
             .background(Color.white.opacity(0.5))
@@ -134,10 +161,11 @@ struct GameButton: View{
     let text: String
     let action: () -> Void
     let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76, alpha: 0.75))
+    let screenWidth = UIScreen.main.bounds.size.width
     
     var body: some View {
             Button(text, action: action)
-                .frame(width: 160, height:50)
+            .frame(width: screenWidth * 0.6, height:50)  // width is 60% of screen width
                 .foregroundColor(.white)
                 .background(buttonColor)
                 .buttonStyle(CustomButtonStyle())
@@ -147,7 +175,8 @@ struct GameButton: View{
 struct AcceptButton: View{
     let text: String
     let action: () -> Void
-    let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
+    //let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
+    let buttonColor = Color.green
     var offerHasBeenMade: Bool
     
     var body: some View {
@@ -164,7 +193,8 @@ struct AcceptButton: View{
 struct RejectButton: View{
     let text: String
     let action: () -> Void
-    let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
+    //let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
+    let buttonColor = Color.red
     var offerHasBeenMade: Bool
     
     var body: some View {
@@ -258,6 +288,7 @@ struct ComputerIcon: View {
 }
 
 struct sliderView: View{
+    var displayText : String
     @Binding var sliderValue : Float
     var thresholdValue : Float
 
@@ -265,7 +296,7 @@ struct sliderView: View{
         VStack{
             HStack{
                 Spacer()
-                Text("Offer Value:")
+                Text(displayText)
                     .foregroundColor(Color.black.opacity(0.7))
                 Text(String(Int(sliderValue)))
                     .foregroundColor(sliderValue > thresholdValue ? .green : .orange)
@@ -381,7 +412,7 @@ struct Toggle_box: View{
     var body: some View{
         HStack{
             VStack(alignment: .center){
-                Text("Finale Offer")
+                Text("Final Offer?")
                     .foregroundColor(finalOfferToggle ? Color.green : Color.gray)
                 Toggle("", isOn: $finalOfferToggle)
                     .foregroundColor(finalOfferToggle ? Color.green : Color.gray).labelsHidden()
@@ -394,13 +425,15 @@ struct Toggle_box: View{
 
 struct MessageView: View{
     let message: NGViewModel.Message
+    let screenWidth = UIScreen.main.bounds.size.width
+    //let paddingVal : Int = 13
     var body: some View{
             
             if message.sender{
                 HStack{
                     Spacer()
                     Text(message.text)
-                        .padding()
+                        .padding(13)
                         .background(Color.blue.opacity(0.6))
                         .foregroundColor(Color.white)
                         .cornerRadius(20)
@@ -408,10 +441,13 @@ struct MessageView: View{
             } else if !message.PSA{
                 HStack{
                     Text(message.text)
-                        .padding()
+                        //.frame(minWidth: screenWidth * 0, idealWidth: screenWidth * 0.1 , maxWidth: screenWidth * 0.6, alignment: .leading)
+                        .padding(13)
                         .background(Color.white.opacity(0.6))
                         .foregroundColor(Color.black.opacity(0.7))
                         .cornerRadius(20)
+                        
+                        
                     Spacer()
                 }
             } else {
@@ -431,7 +467,7 @@ struct MessageView: View{
 struct ChatBox: View{
     var messages: [NGViewModel.Message]
     var body: some View{
-        ZStack{
+        ZStack {
             ScrollView{
                 ScrollViewReader { scrollView in
                     VStack{
