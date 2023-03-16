@@ -125,6 +125,14 @@ class NGViewModel: ObservableObject {
     var modelScore: Int {Int(model.modelScore)}
     var playerMNS: Int {Int(model.playerMNS)}
     var modelMNS: Int {Int(model.modelMNS)}
+    var playerDeclaredMNS: Int? {
+        if let val = model.playerDeclaredMNS {return val}
+        else {return nil}
+    }
+    var modelDeclaredMNS: Int? {
+        if let val = model.modelDeclaredMNS {return val}
+        else {return nil}
+    }
     
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}
@@ -155,10 +163,10 @@ class NGViewModel: ObservableObject {
     func playerMakeOffer(playerBid: Float) {
         /// overwrite the (now-outdated) previous offer
         if self.playerIsFinalOffer {
-            self.sendMessage("This is my final offer " + String(Int(playerBid)) , isMe: true, PSA: false)
+            self.sendMessage("This is my final offer, " + String(Int(playerBid)) + " points for me, " + String(9 - Int(playerBid)) + " for you.", isMe: true, PSA: false)
             // TODO Make model aware of offer and that it is final offer
         } else {
-            self.sendMessage("This is my offer " + String(Int(playerBid)) , isMe: true, PSA: false)
+            self.sendMessage("This is my offer, I want " + String(Int(playerBid))  + " points, you'd get " + String(9 - Int(playerBid)) + " points", isMe: true, PSA: false)
             // TODO Make model aware of offer
         }
         model.playerPreviousOffer = model.playerCurrentOffer
@@ -174,11 +182,12 @@ class NGViewModel: ObservableObject {
         //dont know what PSA is
         if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") && model.modelIsFinalOffer == false {
             print("VM: model has responded with move type = " + model.modelMoveType)
-            self.sendMessage("This is my offer " + String(model.modelCurrentOffer!), isMe: false, PSA: false)
+            self.sendMessage("I want " + String(model.modelCurrentOffer!) + " points, you would get " + String(9-model.modelCurrentOffer!) + " points", isMe: false, PSA: false)
             // MARK: This is trying to unwrap model.modelCurrentOffer  ^^^^^  even when the move type is "Opening", I don't think that variable is given a value properly if the model is making an opening bid.
         }
         else if model.modelMoveType == "Bid" {
-            self.sendMessage("This is my final offer " + String(model.modelCurrentOffer!), isMe: false, PSA: false)}
+            let msg = "This is my final offer, I want " + String(model.modelCurrentOffer!) + " points, you would get " + String(9-model.modelCurrentOffer!) + " points"
+            self.sendMessage(msg, isMe: false, PSA: false)}
         else if model.modelMoveType == "Decision" && model.modelDecision == "Accept" {
             self.sendMessage("I accept your offer of " + String(model.playerCurrentOffer), isMe: false, PSA: false)}
         else if model.modelMoveType == "Decision" && model.modelDecision == "Reject" {
@@ -216,6 +225,7 @@ class NGViewModel: ObservableObject {
         self.sendMessage("I want to quit this negotiation.",  isMe: true, PSA: false)
         model.playerMoveType = "Quit"
         model.playerDecision = "quit"
+        model.playerHasQuit = true
         
         newRound()
     }
@@ -223,10 +233,15 @@ class NGViewModel: ObservableObject {
         sendMessage("You earned: " + String(model.playerCurrentOffer - model.playerMNS) + " points this round.", isMe: false, PSA: true)
         offerHasBeenMade = false
         model.playerIsFinalOffer = false
-        model.newRound(playerOffered: true)
+        model.newRound(playerOffered: false)
     }
+    
     func FinalOfferPlayerChanged(){
         model.playerIsFinalOffer.toggle()
+    }
+    
+    func resetGame() {
+        model.resetGameVariables(newGame: true)  // reset the game variables when returning to the ContentView
     }
     
     func saveModel() {

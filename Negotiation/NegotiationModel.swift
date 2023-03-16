@@ -306,7 +306,7 @@ struct NGModel {
             }
             else {
                 // eforcing cause it never retrieves the decision chunks
-                if playerIsFinalOffer == true{
+                if playerIsFinalOffer == true {
                     modelDecision = "Reject"
                     model.addToTrace(string: "Failed retrieval, reject offer")
                 }
@@ -374,11 +374,7 @@ struct NGModel {
         if !(playerHasQuit || modelHasQuit) {
             updateScores(playerOffered: playerOffered)
         }
-        // reset offer history
-        playerPreviousOffer = nil; playerCurrentOffer = 0
-        modelPreviousOffer = nil; modelCurrentOffer  = nil
-        playerIsFinalOffer = false; modelIsFinalOffer = false
-        playerHasQuit = false; modelHasQuit = false
+        resetGameVariables(newGame: false)
         
         // new MNS values for the next round
         pickMNS()
@@ -388,6 +384,19 @@ struct NGModel {
         
         update()
         
+    }
+    
+    mutating func resetGameVariables(newGame: Bool) {
+        // reset offer history
+        playerPreviousOffer = nil; playerCurrentOffer = 0
+        modelPreviousOffer = nil; modelCurrentOffer  = nil
+        playerIsFinalOffer = false; modelIsFinalOffer = false
+        playerHasQuit = false; modelHasQuit = false
+        playerDeclaredMNS = nil; modelDeclaredMNS = nil
+        
+        if newGame {
+            playerScore = 0; modelScore = 0
+        }
     }
     
     
