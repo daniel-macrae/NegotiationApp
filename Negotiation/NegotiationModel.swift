@@ -59,16 +59,13 @@ struct NGModel {
     }
     
     mutating func testLoad(fileName: String) {
-        print("M: Before Load: " + String(model.dm.chunks.count))
+        //print("M: Before Load: " + String(model.dm.chunks.count))
         model = loadModel(name: fileName)  // loading the model
         print("M: Model loaded. Number of chunks: " + String(model.dm.chunks.count))
-        //print(model.time)
-        //model.time += 5.0
-        //print(model.time)
     }
     
     func testSave() {
-        print("M: Number of Chunks in model to save: " + String(model.dm.chunks.count))
+        //print("M: Number of Chunks in model to save: " + String(model.dm.chunks.count))
         saveModel(model: model, filename: "test") // save the model
         print("M: model saved!")
     }
@@ -82,15 +79,14 @@ struct NGModel {
     }
     
     
-    //
+    
     // MARK: CHUNK SLOT NAMES ARE NOW:
     // "myStrategy","myMNS","myBidMNSDifference","opponentMoveType","opponentMove","opponentIsFinal",
     // "myMoveType","myMove","myIsFinal"
-    // - Dan
-    /// (where 'opponentMove' and 'myMove' are the player's and model's change in bid value respectively)
+    
     
     mutating func declareModelMNS(){ // MARK: still to be implemented
-        modelDeclaredMNS = Int(arc4random_uniform(9)) + 1
+        modelDeclaredMNS = Int(arc4random_uniform(5)) + 1
  //think how we want to do this
         // model should probably retrieve a chunk with the right mns to max change of succes
     }
@@ -99,9 +95,11 @@ struct NGModel {
     mutating func detectPlayerStrategy(bidMNSDifference: Int, changePlayerBid: Int){
     
         let query = Chunk(s: "query", m: model)
+        query.setSlot(slot: "isa", value: "negotiation instance")  // added this isa slot, might improve chances of matching a chunk
         query.setSlot(slot: "myMNS", value: runningMNSAverage.description)
         query.setSlot(slot: "myBidMNSDifference", value: bidMNSDifference.description)
         query.setSlot(slot: "myMoveType", value: playerMoveType)
+        query.setSlot(slot: "myIsFinal", value: playerIsFinalOffer.description)
         
         
         if playerMoveType == "Bid" {
@@ -125,7 +123,7 @@ struct NGModel {
         strategyChunk.setSlot(slot: "isa", value: "strategy")
         strategyChunk.setSlot(slot: "strategy", value: playerStrategy)
         let (latencyStrategy, _) = model.dm.retrieve(chunk: strategyChunk)
-        model.time += 1 + latencyStrategy
+        model.time += 0.1 + latencyStrategy
 
     }
     
@@ -145,6 +143,7 @@ struct NGModel {
          
         // "myStrategy","myMNS","myBidMNSDifference","opponentMoveType","opponentMove","opponentIsFinal",
         // "myMoveType","myMove","myIsFinal"
+        newExperience.setSlot(slot: "isa", value: "negotiation instance")
         newExperience.setSlot(slot: "opponentMoveType", value: modelMoveType)
         newExperience.setSlot(slot: "myMoveType", value: playerMoveType)
         if playerMoveType == "Bid" {
@@ -171,7 +170,7 @@ struct NGModel {
         model.dm.addToDM(newExperience)
 
         //add more time?
-        model.time += 1.0
+        model.time += 0.1
         update()
         waitingForAction = true
 
@@ -200,14 +199,19 @@ struct NGModel {
         if verbose {print("M: model is responding/making a new offer")}
         // first offer
         if modelCurrentOffer == nil {
-            print("modelCurrentOffer is nil")
+                print("modelCurrentOffer is nil")
                 let query = Chunk(s: "query", m: model)
                 
+                query.setSlot(slot: "isa", value: "negotiation instance")
                 query.setSlot(slot: "myMNS", value: modelMNS.description)
-                // if the model plays first, both moveTypes are openings, if the player plays first, their moveType here is bid
-                // players move should be used if they mark final offer, but i dont know how yet
-                query.setSlot(slot: "myMoveType", value: modelMoveType)
+            
+                query.setSlot(slot: "myMoveType", value: "Opening")
                 query.setSlot(slot: "myStrategy", value: modelStrategy)
+            
+                query.setSlot(slot: "opponentMove", value: "Opening")
+            print("HELLO")
+            print(playerDeclaredMNS!.description)
+                query.setSlot(slot: "opponentMove", value: playerDeclaredMNS!.description)
                 
                 //if playerIsFinalOffer == true{ // very aggresive, but possible
                 //query.setSlot(slot: "opponentMoveType", value: playerMoveType)
@@ -218,6 +222,8 @@ struct NGModel {
                 model.time +=  latency
                 
                 if let modelOffer = chunk?.slotvals["myMove"]?.description {
+                    print("BYE")
+                    print(modelOffer)
                     modelCurrentOffer = (Int(Float(modelOffer)!))// This is a mess we need to fix it
                     print("M: offer should be = " + String(modelCurrentOffer!))
                     
@@ -226,13 +232,13 @@ struct NGModel {
                     
                     
                     model.addToTrace(string: "First decision: retrieving opening \(chunk!)")
-                    model.time += 1.0
+                    model.time += 0.1
                     
                 } else {
                     
                     modelCurrentOffer = Int.random(in: modelMNS..<10)  /// model makes a completely random offer above their MNS
                     model.addToTrace(string: "Failed retrieval, random offer")
-                    model.time += 1.0
+                    model.time += 0.1
                 }
             modelMoveType = "Bid" // enforce that only makes an opening move once
         }
@@ -267,13 +273,14 @@ struct NGModel {
             if let modelCurrentStrategy = strategyChunk?.slotvals["strategy"]?.description {
                 modelStrategy = modelCurrentStrategy
                 model.addToTrace(string: " Retrieving model's strategy \(strategyChunk!)")
-                model.time += 1.0 + latencyStrategy
+                model.time += 0.1 + latencyStrategy
                 
             } else {
                 model.addToTrace(string: "Failed retrieval, continue with previous strategy")
             }
             // it's not retrieving perfectly, but it does
             let query = Chunk(s: "query", m: model)
+            query.setSlot(slot: "isa", value: "negotiation instance")
             query.setSlot(slot: "myStrategy", value: modelStrategy)
             query.setSlot(slot: "opponentMoveType", value: playerMoveType)
             query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)
@@ -292,27 +299,32 @@ struct NGModel {
             
             if let modelNewMoveType = chunk?.slotvals["myMoveType"]?.description {
                 modelMoveType = modelNewMoveType
-                print(modelMoveType)
+                print("MOVE TYPE IS: ", modelMoveType)
                 if modelNewMoveType == "Bid" {
                     if let modelChangeBid = chunk?.slotvals["myMove"]?.description {
-                        print(modelChangeBid)
                         modelCurrentOffer = modelPreviousOffer! + Int(Float(modelChangeBid)!)// idk why this one is an optional thoug
+                        if let modelIsFinal = chunk?.slotvals["myIsFinal"]?.description {
+                            modelIsFinalOffer = Bool(modelIsFinal)! }
                     }
                     
                 } else {
                     if let modelNewDecision = chunk?.slotvals["myMove"]?.description{
-                        modelDecision = modelNewDecision }
+                        modelDecision = modelNewDecision
+                        modelMadeADecision()
+                    }
                     if let modelIsFinal = chunk?.slotvals["myIsFinal"]?.description {
                         modelIsFinalOffer = Bool(modelIsFinal)! }
-                    model.addToTrace(string: "Retrieving \(chunk!)")
+                    
                     print("the model is actually making a decision")
                 }
+                model.addToTrace(string: "Retrieving \(chunk!)")
             }
             else {
                 // eforcing cause it never retrieves the decision chunks
                 if playerIsFinalOffer == true {
                     modelMoveType = "Decision"
                     modelDecision = "Reject"
+                    modelMadeADecision()
                     model.addToTrace(string: "Failed retrieval, reject offer")
                 }
                 else{
@@ -320,13 +332,14 @@ struct NGModel {
                 
             }
             
-            model.time += 1.0 + latency
+            model.time += 0.1 + latency
             saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
             
         }
     }
     
     mutating func modelMadeADecision(){
+        print("modelMadeADecision func")
         if modelDecision == "Accept" {
             newRound(playerOffered: true)}
         if modelDecision == "Reject" {
@@ -345,7 +358,7 @@ struct NGModel {
             averagedMNS.remove(at: 0)
             averagedMNS.append(modelMNS)
         }
-        print(averagedMNS)
+        //print(averagedMNS)
         
         return Int(averagedMNS.reduce(0,+)/averagedMNS.count)
     }
@@ -360,7 +373,6 @@ struct NGModel {
         if let randomMNS = MNS_combinations.randomElement() {
             playerMNS = randomMNS.0
             modelMNS = randomMNS.1
-            //return randomMNS
         }
         else { /// this should never happen, but swift won't pick a randomElement without it :/
             print("M: MNS error!")

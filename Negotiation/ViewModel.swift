@@ -12,10 +12,16 @@ class NGViewModel: ObservableObject {
     @Published var numberOfRounds: Int = 5
     @Published var offerHasBeenMade: Bool = false
     @Published var currentRound: Int = 1
+    @Published var MNSDeclared: Bool = false
+    
+    var playerScore: Int {Int(model.playerScore)}
+    var modelScore: Int {Int(model.modelScore)}
+    var playerMNS: Int {Int(model.playerMNS)}
+    var modelMNS: Int {Int(model.modelMNS)}
     
     init() {
         model = NGModel()
-        print("new VM")
+        sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
     }
     ///SENTENCES for accepting and declining an offer in a happy/neutral and angry tone
     let acceptingSentencesNeutral = [
@@ -122,10 +128,8 @@ class NGViewModel: ObservableObject {
         else {return "N/A"}
         }
     
-    var playerScore: Int {Int(model.playerScore)}
-    var modelScore: Int {Int(model.modelScore)}
-    var playerMNS: Int {Int(model.playerMNS)}
-    var modelMNS: Int {Int(model.modelMNS)}
+    
+    
     var playerDeclaredMNS: Int? {
         if let val = model.playerDeclaredMNS {return val}
         else {return nil}
@@ -153,6 +157,7 @@ class NGViewModel: ObservableObject {
     
     func SendModelMNS(){
         sendMessage("My MNS is " + String(model.ModelDeclMNSValueGet()), isMe: false, PSA: false)
+        MNSDeclared = true  // if the model has declared its MNS, then so has the player
     }
     
     //simple sendMessage function isMe: true is the player is the sender false is the model
@@ -161,6 +166,7 @@ class NGViewModel: ObservableObject {
     }
     
 
+    // this function deals with processing the player's offer
     func playerMakeOffer(playerBid: Float) {
         /// overwrite the (now-outdated) previous offer
         if self.playerIsFinalOffer {
@@ -176,17 +182,28 @@ class NGViewModel: ObservableObject {
         
         self.offerHasBeenMade = true
         
-        //The code below causes a crash probably due to the rules not being fully implemented or working with a nil value
+        modelResponding()
+        
+    }
+    
+    // this function tells the model file to respond to an offer, and then deals with the message to send
+    func modelResponding() {
+        
+        // make the cognitive model respond
         model.modelResponse()
+        
         // JUST ADD A self.sendMessage HERE !?!
         if model.modelMoveType == "Decision" && model.modelDecision! == "Accept" {
-            modelAccepts()
+            self.sendMessage("I accept your offer", isMe: false, PSA: false)
+            interRoundScoreDisplay(playerDecided:false,decisionAccept:true)
         }
         else if model.modelMoveType == "Decision" && model.modelDecision! == "Reject" {
-            modelRejectsFinalOffer()
+            self.sendMessage("I reject your final offer", isMe: false, PSA: false)
+            interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
         }
         else if model.modelMoveType == "Quit" {
-            modelQuitsRound()
+            self.sendMessage("I want to quit this negotiation.",  isMe: false, PSA: false)
+            interRoundScoreDisplay(playerDecided:false, decisionAccept:false)
         }
         else if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") && model.modelIsFinalOffer == false {
             print("VM: model has responded with move type = " + model.modelMoveType)
@@ -196,56 +213,36 @@ class NGViewModel: ObservableObject {
             let msg = "This is my final offer, I want " + String(model.modelCurrentOffer!) + " points, you would get " + String(9-model.modelCurrentOffer!) + " points"
             self.sendMessage(msg, isMe: false, PSA: false)
         }
-        //model.modelMadeADecision()
     }
     
+    
     // player accepts the model's offer
-    /// change the value of the player's offer in accordance to their acceptance of the model's offer
-    /// (e.g. the player's "new offer" is whats left of the 9 points)
-    //model.playerCurrentOffer = 9 - (Int(modelNegotiationValue) ?? 0)
-    //offerHasBeenMade needs to change to offer has been made by model so that the player can only accept when both are willing to accept
     func playerAccepts () {
         self.sendMessage("I accept your offer", isMe: true, PSA: false)
-        model.playerMoveType = "Decision"
-        model.playerDecision = "Accept"
+        model.playerMoveType = "Decision";     model.playerDecision = "Accept"
  
-        newRound(playerDecided:true,decisionAccept:true)
+        interRoundScoreDisplay(playerDecided:true, decisionAccept:true)
     }
     
     // player rejects the model's offer
     func playerRejectsFinalOffer() {
         self.sendMessage("I reject your final offer", isMe: true, PSA: false)
-        model.playerMoveType = "Decision"
-        model.playerDecision = "Reject"
+        model.playerMoveType = "Decision";     model.playerDecision = "Reject"
       
-        newRound(playerDecided:true,decisionAccept:false)
+        interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
     }
     
     func playerQuitsRound() {
         self.sendMessage("I want to quit this negotiation.",  isMe: true, PSA: false)
-        model.playerMoveType = "Quit"
-        model.playerDecision = "quit"
+        model.playerMoveType = "Quit";     model.playerDecision = "Quit"
         model.playerHasQuit = true
-        newRound(playerDecided:true, decisionAccept:false)
+        
+        interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
     }
-    
-    // model accepts players offer
-    func modelAccepts () { //Edit to match the strategy
-        self.sendMessage("I accept your offer", isMe: false, PSA: false)
-        newRound(playerDecided:false,decisionAccept:true)
-    }
-    // model rejects the model's offer
-    func modelRejectsFinalOffer() {
-        self.sendMessage("I reject your final offer", isMe: false, PSA: false)
-        newRound(playerDecided:false,decisionAccept:false)
-    }
-    func modelQuitsRound() {
-        self.sendMessage("I want to quit this negotiation.",  isMe: false, PSA: false)
-        newRound(playerDecided:false, decisionAccept:false)
-    }
-    
-    
-    func newRound(playerDecided: Bool, decisionAccept: Bool){
+   
+
+    // function to display the grey messages about score changes and the player MNS value for a new round
+    func interRoundScoreDisplay(playerDecided: Bool, decisionAccept: Bool){
         if decisionAccept == true {
             if playerDecided == true{
                 sendMessage("You earned " + String((9 - model.modelCurrentOffer!) - model.playerMNS) + " points this round.", isMe: false, PSA: true)}
@@ -256,6 +253,9 @@ class NGViewModel: ObservableObject {
         model.playerIsFinalOffer = !playerDecided
         currentRound += 1
         model.newRound(playerOffered: !playerDecided)
+        
+        MNSDeclared = false // new round, neither player has declared their MNS
+        sendMessage("Your MNS for the next round is " + String(playerMNS), isMe: false, PSA: true)
     }
     
     func FinalOfferPlayerChanged(){
@@ -266,10 +266,11 @@ class NGViewModel: ObservableObject {
         model.resetGameVariables(newGame: true)  // reset the game variables when returning to the ContentView
     }
     
-    func saveModel() {
+    
+    func saveModel() {    // this button will be removed, so delete this later. it should be done automatically between rounds anyway, in my opinion
         model.testSave()
     }
-    func loadModel(name: String) {
+    func loadModel(name: String) {   // this function gets used when picking a model
         model.testLoad(fileName: name)
     }
     

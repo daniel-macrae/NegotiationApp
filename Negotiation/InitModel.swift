@@ -16,7 +16,8 @@ func initNewModel() -> Model {
             
             let Experience = model.generateNewChunk(string: "instance")
             let dataRow = df.rows[rowNum]
-            
+            Experience.setSlot(slot: "isa", value: "negotiation instance")
+        
             for colNum in 0..<df.shape.1 {
                 //print(slotNames[colNum])
                 let val = dataRow[colNum, String.self]!

@@ -10,7 +10,6 @@ struct ContentView: View {
     @State private var finalOfferToggle : Bool = false
     @State private var OfferAccepted: Bool = false
     @State private var round_no: Int = 1
-    @State private var mnsDeclared: Bool = false
     @State private var isQuitting: Bool = false
     @State private var gameOver: Bool = false
     @State private var finalScreen: Bool = false
@@ -39,7 +38,7 @@ struct ContentView: View {
                             GameButton(text: "Continue", action: { finalScreen = true } )
                             Spacer()
                         }
-                    } else if mnsDeclared {
+                    } else if viewModel.MNSDeclared {
                             VStack {
                                 HStack {
                                     Spacer()
@@ -49,8 +48,9 @@ struct ContentView: View {
                                         round_no = viewModel.currentRound;
                                         if round_no == viewModel.numberOfRounds {
                                             gameOver = true
-                                        };
-                                        mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
+                                        }
+                                        
+                                    }, offerHasBeenMade: viewModel.offerHasBeenMade)
                                     Spacer()
                                     AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                         finalOfferToggle = false;
@@ -58,8 +58,9 @@ struct ContentView: View {
                                         round_no = viewModel.currentRound;
                                         if round_no == viewModel.numberOfRounds {
                                             gameOver = true
-                                        };
-                                        mnsDeclared = false}, offerHasBeenMade: viewModel.offerHasBeenMade)
+                                        }
+                                        
+                                    }, offerHasBeenMade: viewModel.offerHasBeenMade)
                                     Spacer()
                                     
                                 }
@@ -90,9 +91,8 @@ struct ContentView: View {
                             Spacer()
                             .frame(maxHeight: .infinity)
                             HStack {
-                                GameButton(text: "Declare MNS", action: {mnsDeclared = true;
-                                    viewModel.declarePlayerMNS(value: sliderValue);
-                                    
+                                GameButton(text: "Declare MNS", action: {
+                                    viewModel.declarePlayerMNS(value: sliderValue)
                                 }).padding()
                             }
                         }
