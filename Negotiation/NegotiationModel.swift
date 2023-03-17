@@ -18,8 +18,8 @@ struct NGModel {
     /// Player's total score
     var playerScore = 0
     /// Player's MNS, score and reward
-    var playerMNS = 3 // the first round is always the same:(
-    var modelMNS = 4
+    var playerMNS: Int = 0  // these now get randomly chosen before each round
+    var modelMNS: Int = 0
     var averagedMNS: [Int] = []
     
     var playerDeclaredMNS: Int?
@@ -119,7 +119,7 @@ struct NGModel {
             model.addToTrace(string: "Retrieving strategy \(chunk!)")
             
         } else {
-            model.addToTrace(string: "detectPlayerStrategy() strategy chunk retrieval failed!")
+            model.addToTrace(string: "detectPlayerStrategy() strategy chunk retrieval failed!")  // this still happens a few times
         }
         //reinforce strategy chunk
         let strategyChunk = Chunk(s: "stategyChunk", m: model )  // check s
@@ -201,8 +201,7 @@ struct NGModel {
         
         if verbose {print("M: model is responding/making a new offer")}
         // first offer
-        if modelCurrentOffer == nil {
-                print("modelCurrentOffer is nil")
+        if modelCurrentOffer == nil { // make an opening bid
                 let query = Chunk(s: "query", m: model)
             
                 
@@ -213,14 +212,9 @@ struct NGModel {
                 query.setSlot(slot: "myStrategy", value: modelStrategy)
                 query.setSlot(slot: "opponentMoveType", value: "Opening")
                 query.setSlot(slot: "opponentMove", value: playerDeclaredMNS!.description)
-                query.setSlot(slot: "opponentIsFinal", value: false.description)
-                print("Opening offer query chunk;")
-                print(query)
+                
+                query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)  // possible that the player makes their first bid 'final'
             
-                //if playerIsFinalOffer == true{ // very aggresive, but possible
-                //query.setSlot(slot: "opponentMoveType", value: playerMoveType)
-                // query.setSlot(slot: "opponentMove", value: pla)
-                //}
                 
                 let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
                 model.time +=  latency
@@ -250,13 +244,11 @@ struct NGModel {
             changePlayerBid = playerCurrentOffer - playerPreviousOffer!
             if playerDecision == "Accept" {
                 saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
-                //newRound(playerOffered: false) ALREADY DONE IN VIEWMODEL
             }
             else {
                 changePlayerBid = playerCurrentOffer - playerPreviousOffer!
                 saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
                 playerHasQuit = true
-                //newRound(playerOffered: false)
             }
             
         }
@@ -264,8 +256,6 @@ struct NGModel {
             changePlayerBid = playerCurrentOffer - playerPreviousOffer!
             saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
             playerHasQuit = true
-            //newRound(playerOffered: false)
-            
         }
 
         else  { // normal bidding
@@ -300,8 +290,7 @@ struct NGModel {
             
             if let modelNewMoveType = chunk?.slotvals["myMoveType"]?.description {
                 modelMoveType = modelNewMoveType
-                print("MOVE TYPE IS: ", modelMoveType)
-                if modelNewMoveType == "Bid" {
+                if modelMoveType == "Bid" {
                     if let modelChangeBid = chunk?.slotvals["myMove"]?.description {
                         modelCurrentOffer = modelPreviousOffer! + Int(Float(modelChangeBid)!)// idk why this one is an optional thoug
                         if let modelIsFinal = chunk?.slotvals["myIsFinal"]?.description {
@@ -363,22 +352,15 @@ struct NGModel {
         
         return Int(averagedMNS.reduce(0,+)/averagedMNS.count)
     }
+
     
-    func ModelDeclMNSValueGet() -> Int{
-        return self.modelDeclaredMNS!
-    }
             
     // select new MNSs for both players (call this once a round finishes)
-    mutating func pickMNS() { //-> (Int,Int)
+    mutating func pickMNS() {
         if verbose {print("M: picking new MNS values")}
-        if let randomMNS = MNS_combinations.randomElement() {
-            playerMNS = randomMNS.0
-            modelMNS = randomMNS.1
-        }
-        else { /// this should never happen, but swift won't pick a randomElement without it :/
-            print("M: MNS error!")
-            //return (3,3)
-        }
+        let randomMNS = MNS_combinations.randomElement()!
+        playerMNS = randomMNS.0
+        modelMNS = randomMNS.1
     }
 
     

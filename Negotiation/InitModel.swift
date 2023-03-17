@@ -68,32 +68,36 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
     // similarity score
     var M_li: Double? = nil
     
+    // this one should be covered in the Declarative memory already, but put it here for completeness' sake
+    if x.isEqual(value: y) { M_li = 0 }
+    
     // in the case that both slot values are numbers, compute a similarity score
     // as in the equation at the top of page 7 of the paper
-    if let l = x.number(), let i = y.number() {
+    else if let l = x.number(), let i = y.number() {
         
         let fraq = pow((l-i),2) / 2
         M_li = (1 / (fraq + 1)) - 1
         
     // if both slots are strings, check to see if they are similar strategy values
     } else if let string1 = x.text(), let string2 = y.text() {
+        if string1 == string2 { M_li = 0 }
         if string1 == "Cooperative" {
             if string2 == "Cooperative" { M_li = 0 }
             else if string1 == "Aggressive" { M_li = -1 }
             else if string1 == "Neutral" { M_li =  -0.1 }
-            else { M_li = -1 }
+            else { M_li = -0.4 }
         }
         else if string1 == "Aggressive" {
             if string2 == "Cooperative" { M_li =  -1}
             else if string1 == "Aggressive" { M_li = 0 }
             else if string1 == "Neutral" { M_li =  -0.1 }
-            else { M_li = -1 }
+            else { M_li = -0.4 }
         }
         else if string1 == "Neutral" {
             if string2 == "Cooperative" { M_li =  -0.1 }
             else if string1 == "Aggressive" { M_li =  -0.1 }
             else if string1 == "Neutral" { M_li = 0 }
-            else { M_li = -1 }
+            else { M_li = -0.4 }
         }
         else { M_li =  -0.4 }  // paper does -1 here, but we have more slots so that would cause those additional slots to contribute to a very high mismatch penalty
         
