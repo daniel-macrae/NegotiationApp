@@ -46,7 +46,7 @@ struct ContentView: View {
                                         finalOfferToggle = false;
                                         //round_no = round_no + 1;
                                         round_no = viewModel.currentRound;
-                                        if round_no == viewModel.numberOfRounds {
+                                        if round_no >= viewModel.numberOfRounds {
                                             gameOver = true
                                         }
                                         
@@ -77,7 +77,7 @@ struct ContentView: View {
                                     Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
                                         viewModel.FinalOfferPlayerChanged()}
                                     Spacer()
-                                    GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(playerBid: sliderValue)})
+                                    GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false})
                                     Spacer()
                                 }
                             }

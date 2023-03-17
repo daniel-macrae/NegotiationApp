@@ -9,6 +9,9 @@ struct NGModel {
     var verbose = true
     
     // MARK: Game state management
+    var currentRoundNumber: Int = 1
+    var maxRoundNumber: Int = 5
+    
     var MNS_combinations: Array<(Int, Int)> = [(2,2),(1,3),(3,1),(2,2),(3,3),(2,3),(3,2),(3,4),(4,3),(2,4),(4,4)]
     /// Model's total score
     var modelScore = 0
@@ -134,6 +137,7 @@ struct NGModel {
         
         if let ModelsLastOffer = modelPreviousOffer {
             changeModelBid = modelCurrentOffer! - ModelsLastOffer
+            print("change = " + String(changeModelBid))
         }
         else {
             changeModelBid = 0 // this is probably not good practice. ERROR if the model starts!!
@@ -173,20 +177,19 @@ struct NGModel {
         model.time += 0.1
         update()
         waitingForAction = true
-
- }
+    }
  
     // MARK: The running average is not implemented yet
     mutating func modelResponse() {
         var changePlayerBid = 0 // it needs to be defined even if its useless ??optinonal?/
-        /*var changePlayerBid: Int
+        //var changePlayerBid: Int
         
         if let playersLastOffer = playerPreviousOffer {
             changePlayerBid = playerCurrentOffer - playersLastOffer
         }
         else {
             changePlayerBid = 0 // it's never used (this is probably not good practice)
-        }*/
+        }
         
         //assume players MNS as the running average
         
@@ -201,18 +204,19 @@ struct NGModel {
         if modelCurrentOffer == nil {
                 print("modelCurrentOffer is nil")
                 let query = Chunk(s: "query", m: model)
+            
                 
                 query.setSlot(slot: "isa", value: "negotiation instance")
                 query.setSlot(slot: "myMNS", value: modelMNS.description)
             
                 query.setSlot(slot: "myMoveType", value: "Opening")
                 query.setSlot(slot: "myStrategy", value: modelStrategy)
-            
-                query.setSlot(slot: "opponentMove", value: "Opening")
-            print("HELLO")
-            print(playerDeclaredMNS!.description)
+                query.setSlot(slot: "opponentMoveType", value: "Opening")
                 query.setSlot(slot: "opponentMove", value: playerDeclaredMNS!.description)
-                
+                query.setSlot(slot: "opponentIsFinal", value: false.description)
+                print("Opening offer query chunk;")
+                print(query)
+            
                 //if playerIsFinalOffer == true{ // very aggresive, but possible
                 //query.setSlot(slot: "opponentMoveType", value: playerMoveType)
                 // query.setSlot(slot: "opponentMove", value: pla)
@@ -284,9 +288,7 @@ struct NGModel {
             query.setSlot(slot: "myStrategy", value: modelStrategy)
             query.setSlot(slot: "opponentMoveType", value: playerMoveType)
             query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)
-            if playerIsFinalOffer == true{
-                query.setSlot(slot: "myMoveType", value: "Decision")
-            }
+            if playerIsFinalOffer == true{ query.setSlot(slot: "myMoveType", value: "Decision") }
             changePlayerBid = playerCurrentOffer - playerPreviousOffer! //This works
             if playerPreviousOffer != nil { //if model plays first, playerPreviousffer is still nil after one play from the model
                 //I leave this condition for now but we should enforce this, otherwise the saving of the chunks has to change too
@@ -406,15 +408,13 @@ struct NGModel {
             updateScores(playerOffered: playerOffered)
         }
         resetGameVariables(newGame: false)
-        // new MNS values for the next round
-        pickMNS()
-        runningMNSAverage = runningAverageMNS(modelMNS: modelMNS)
-        // start next round, player makes move
-        model.waitingForAction = true
+        currentRoundNumber += 1
+        
+        runningMNSAverage = runningAverageMNS(modelMNS: modelMNS) // MARK: I think this should be somewhere in the model's response function
         
         update()
-        
     }
+    
     
     mutating func resetGameVariables(newGame: Bool) {
         // reset offer history
@@ -426,7 +426,11 @@ struct NGModel {
         
         if newGame {
             playerScore = 0; modelScore = 0
+            currentRoundNumber = 1
         }
+        
+        pickMNS()  // new MNS values for the next round
+        model.waitingForAction = true
     }
     
     
@@ -458,10 +462,4 @@ struct NGModel {
             waitingForAction = true
         }
 
-    
-    
-    
-    
 }
-    
-     

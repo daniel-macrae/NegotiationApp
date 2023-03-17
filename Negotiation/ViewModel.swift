@@ -9,9 +9,10 @@ class NGViewModel: ObservableObject {
     @Published var messages: [Message] = []
     var verbose: Bool {model.verbose}
     
-    @Published var numberOfRounds: Int = 5
+    var currentRound: Int  {model.currentRoundNumber}
+    var numberOfRounds: Int  {model.maxRoundNumber}
     @Published var offerHasBeenMade: Bool = false
-    @Published var currentRound: Int = 1
+    
     @Published var MNSDeclared: Bool = false
     
     var playerScore: Int {Int(model.playerScore)}
@@ -101,14 +102,7 @@ class NGViewModel: ObservableObject {
         "I'm not even going to dignify that with a response.",
         "Don't even bother asking."
     ]
-
     
-    
-    // MARK: ########  Acess to the Model   ########
-    /// We need to make vars for:
-    /// - player and model score
-    /// - player and model MSE
-
     struct Message: Identifiable, Equatable{
         let id = UUID()
         let text:String
@@ -131,7 +125,7 @@ class NGViewModel: ObservableObject {
     
     
     var playerDeclaredMNS: Int? {
-        if let val = model.playerDeclaredMNS {return val}
+        if let val = model.playerDeclaredMNS {print("player decl" + String(val)); return val}
         else {return nil}
     }
     var modelDeclaredMNS: Int? {
@@ -141,29 +135,43 @@ class NGViewModel: ObservableObject {
     
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}
+
     
     
-    // MARK: ##########     Intents     ############
+    // MARK: ########  MESSAGING FUNCTIONS  ########
     
-    /// a function when the player declares their MNS
-    func declarePlayerMNS(value: Float){
-        model.playerDeclaredMNS = Int(value)
-        self.sendMessage("My MNS is " + String(Int(value)), isMe: true, PSA : false)
-        model.declareModelMNS()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { //makes it more lifelike i guess when adding a wait
-            self.SendModelMNS()
-        }
-    }
-    
-    func SendModelMNS(){
-        sendMessage("My MNS is " + String(model.ModelDeclMNSValueGet()), isMe: false, PSA: false)
-        MNSDeclared = true  // if the model has declared its MNS, then so has the player
-    }
     
     //simple sendMessage function isMe: true is the player is the sender false is the model
     func sendMessage(_ text:String, isMe: Bool, PSA: Bool){
         messages.append(Message(text: text, sender: isMe, PSA: PSA))
     }
+    
+
+    
+    
+    
+    
+    // MARK: ########  THE PLAYER'S INTENETS  ########
+
+
+    /// a function when the player declares their MNS
+    func declarePlayerMNS(value: Float){
+        model.playerDeclaredMNS = Int(value)
+        self.sendMessage("My MNS is " + String(Int(value)), isMe: true, PSA : false)
+        
+        //DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { //makes it more lifelike i guess when adding a wait
+        //
+        //}
+        
+        // Now the model responds
+        model.declareModelMNS()
+        
+        sendMessage("My MNS is " + String(model.ModelDeclMNSValueGet()), isMe: false, PSA: false)
+        MNSDeclared = true  // if the model has declared its MNS, then so has the player
+    }
+    
+    
+    
     
 
     // this function deals with processing the player's offer
@@ -182,12 +190,11 @@ class NGViewModel: ObservableObject {
         
         self.offerHasBeenMade = true
         
-        modelResponding()
+        modelResponseMessage()
         
     }
     
-    // this function tells the model file to respond to an offer, and then deals with the message to send
-    func modelResponding() {
+    func modelResponseMessage() {
         
         // make the cognitive model respond
         model.modelResponse()
@@ -228,6 +235,7 @@ class NGViewModel: ObservableObject {
     func playerRejectsFinalOffer() {
         self.sendMessage("I reject your final offer", isMe: true, PSA: false)
         model.playerMoveType = "Decision";     model.playerDecision = "Reject"
+        model.playerHasQuit = true
       
         interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
     }
@@ -237,21 +245,26 @@ class NGViewModel: ObservableObject {
         model.playerMoveType = "Quit";     model.playerDecision = "Quit"
         model.playerHasQuit = true
         
+        //model.newRound(playerOffered: false)
         interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
     }
    
 
-    // function to display the grey messages about score changes and the player MNS value for a new round
+    // function to display the grey messages (PSAs) about score changes and the player MNS value for a new round
     func interRoundScoreDisplay(playerDecided: Bool, decisionAccept: Bool){
+        print("     VM:  interRoundScoreDisplay")
+
         if decisionAccept == true {
-            if playerDecided == true{
+            if playerDecided == true {
                 sendMessage("You earned " + String((9 - model.modelCurrentOffer!) - model.playerMNS) + " points this round.", isMe: false, PSA: true)}
             else{
                 sendMessage("You earned " + String((9 - model.playerCurrentOffer) - model.modelMNS) + " points this round.", isMe: false, PSA: true)}}
         else{sendMessage("No points were earned this round.", isMe: false, PSA: true)}
         offerHasBeenMade = false
         model.playerIsFinalOffer = !playerDecided
-        currentRound += 1
+        
+        
+        // make a new round, once the PSAs have been sent
         model.newRound(playerOffered: !playerDecided)
         
         MNSDeclared = false // new round, neither player has declared their MNS
@@ -264,6 +277,7 @@ class NGViewModel: ObservableObject {
     
     func resetGame() {
         model.resetGameVariables(newGame: true)  // reset the game variables when returning to the ContentView
+        MNSDeclared = false
     }
     
     

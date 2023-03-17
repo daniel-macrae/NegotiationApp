@@ -16,6 +16,9 @@ struct gameOverView: View {
         NavigationStack{
             NavigationLink(destination: TitleScreen(viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
             NavigationLink(destination: ContentView(viewModel: viewModel, player_name : $player_name).navigationBarBackButtonHidden(true), isActive: $newGame, label: {})
+                .onChange(of: newGame) { (newValue) in
+                    if newValue { viewModel.resetGame() }
+                }
             VStack{
                 if viewModel.playerScore > viewModel.modelScore{
                     Spacer()
@@ -32,7 +35,7 @@ struct gameOverView: View {
                     
                 } else if viewModel.playerScore == viewModel.modelScore {
                     Spacer()
-                    Image("tie")
+                    Image("Tie")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .padding([.top, .leading, .trailing], 20)
