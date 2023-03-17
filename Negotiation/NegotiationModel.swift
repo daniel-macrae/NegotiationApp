@@ -15,8 +15,9 @@ struct NGModel {
     /// Player's total score
     var playerScore = 0
     /// Player's MNS, score and reward
-    var playerMNS: Int = 2
-    var modelMNS: Int = 3  /// CHANGE
+    var playerMNS = 3 // the first round is always the same:(
+    var modelMNS = 4
+    var averagedMNS: [Int] = []
     
     var playerDeclaredMNS: Int?
     var modelDeclaredMNS: Int?
@@ -98,7 +99,7 @@ struct NGModel {
     mutating func detectPlayerStrategy(bidMNSDifference: Int, changePlayerBid: Int){
     
         let query = Chunk(s: "query", m: model)
-        
+        query.setSlot(slot: "myMNS", value: runningMNSAverage.description)
         query.setSlot(slot: "myBidMNSDifference", value: bidMNSDifference.description)
         query.setSlot(slot: "myMoveType", value: playerMoveType)
         
@@ -189,6 +190,7 @@ struct NGModel {
         }*/
         
         //assume players MNS as the running average
+        
         let bidMNSDifference = runningMNSAverage - playerCurrentOffer
         modelPreviousOffer = modelCurrentOffer
         
@@ -234,17 +236,18 @@ struct NGModel {
                 }
             modelMoveType = "Bid" // enforce that only makes an opening move once
         }
+
         else if playerMoveType == "Decision" {
             changePlayerBid = playerCurrentOffer - playerPreviousOffer!
             if playerDecision == "Accept" {
                 saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
-                newRound(playerOffered: false)
+                //newRound(playerOffered: false) ALREADY DONE IN VIEWMODEL
             }
             else {
                 changePlayerBid = playerCurrentOffer - playerPreviousOffer!
                 saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
                 playerHasQuit = true
-                newRound(playerOffered: false)
+                //newRound(playerOffered: false)
             }
             
         }
@@ -252,11 +255,11 @@ struct NGModel {
             changePlayerBid = playerCurrentOffer - playerPreviousOffer!
             saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
             playerHasQuit = true
-            newRound(playerOffered: false)
+            //newRound(playerOffered: false)
             
         }
-    
-        else { // normal bidding
+
+        else  { // normal bidding
             // retrieve strategy chunk with highest activation:
             let strategyQuery = Chunk(s: "strategyChunk", m: model )
             strategyQuery.setSlot(slot: "isa", value: "strategy")
@@ -285,7 +288,7 @@ struct NGModel {
             print(" Query chunk \(query)")
             let (latency, chunk) = model.dm.retrieve(chunk: query)
             
-            
+            // MARK: this is  not working, especially the decisions
             
             if let modelNewMoveType = chunk?.slotvals["myMoveType"]?.description {
                 modelMoveType = modelNewMoveType
@@ -302,11 +305,13 @@ struct NGModel {
                     if let modelIsFinal = chunk?.slotvals["myIsFinal"]?.description {
                         modelIsFinalOffer = Bool(modelIsFinal)! }
                     model.addToTrace(string: "Retrieving \(chunk!)")
+                    print("the model is actually making a decision")
                 }
             }
             else {
                 // eforcing cause it never retrieves the decision chunks
                 if playerIsFinalOffer == true {
+                    modelMoveType = "Decision"
                     modelDecision = "Reject"
                     model.addToTrace(string: "Failed retrieval, reject offer")
                 }
@@ -319,11 +324,13 @@ struct NGModel {
             saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
             
         }
-        
-        // I think all this can be out of the other conditions
+    }
+    
+    mutating func modelMadeADecision(){
         if modelDecision == "Accept" {
             newRound(playerOffered: true)}
         if modelDecision == "Reject" {
+            print("its doing this")
             modelHasQuit = true
             newRound(playerOffered: true)}
         if modelMoveType == "Quit" {
@@ -331,21 +338,33 @@ struct NGModel {
             newRound(playerOffered: true)}
     }
     
-    mutating func runningAvergaeMNS(){}
+    mutating func runningAverageMNS(modelMNS: Int) -> Int{
+        if averagedMNS.count < 5 {
+            averagedMNS.append(modelMNS)
+        } else{
+            averagedMNS.remove(at: 0)
+            averagedMNS.append(modelMNS)
+        }
+        print(averagedMNS)
+        
+        return Int(averagedMNS.reduce(0,+)/averagedMNS.count)
+    }
     
     func ModelDeclMNSValueGet() -> Int{
         return self.modelDeclaredMNS!
     }
             
     // select new MNSs for both players (call this once a round finishes)
-    mutating func pickMNS() {
+    mutating func pickMNS() { //-> (Int,Int)
         if verbose {print("M: picking new MNS values")}
         if let randomMNS = MNS_combinations.randomElement() {
             playerMNS = randomMNS.0
             modelMNS = randomMNS.1
+            //return randomMNS
         }
         else { /// this should never happen, but swift won't pick a randomElement without it :/
             print("M: MNS error!")
+            //return (3,3)
         }
     }
 
@@ -375,10 +394,9 @@ struct NGModel {
             updateScores(playerOffered: playerOffered)
         }
         resetGameVariables(newGame: false)
-        
         // new MNS values for the next round
         pickMNS()
-        
+        runningMNSAverage = runningAverageMNS(modelMNS: modelMNS)
         // start next round, player makes move
         model.waitingForAction = true
         

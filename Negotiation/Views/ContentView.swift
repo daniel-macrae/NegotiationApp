@@ -45,7 +45,8 @@ struct ContentView: View {
                                     Spacer()
                                     RejectButton(text: "Reject Offer", action: {viewModel.playerRejectsFinalOffer();
                                         finalOfferToggle = false;
-                                        round_no = round_no + 1;
+                                        //round_no = round_no + 1;
+                                        round_no = viewModel.currentRound;
                                         if round_no == viewModel.numberOfRounds {
                                             gameOver = true
                                         };
@@ -53,7 +54,8 @@ struct ContentView: View {
                                     Spacer()
                                     AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                         finalOfferToggle = false;
-                                        round_no = round_no + 1;
+                                        //round_no = round_no + 1;
+                                        round_no = viewModel.currentRound;
                                         if round_no == viewModel.numberOfRounds {
                                             gameOver = true
                                         };
