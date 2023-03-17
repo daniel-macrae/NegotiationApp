@@ -111,7 +111,7 @@ struct NGModel {
             query.setSlot(slot: "myMove", value: playerDecision!)}
         // If opening you cant have any more chunks
         
-        let (latency, chunk) = model.dm.retrieve(chunk: query)
+        let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
         model.time +=  latency
         
         if let playerCurrentStrategy = chunk?.slotvals["myStrategy"]?.description {
@@ -125,7 +125,7 @@ struct NGModel {
         let strategyChunk = Chunk(s: "stategyChunk", m: model )  // check s
         strategyChunk.setSlot(slot: "isa", value: "strategy")
         strategyChunk.setSlot(slot: "strategy", value: playerStrategy)
-        let (latencyStrategy, _) = model.dm.retrieve(chunk: strategyChunk)
+        let (latencyStrategy, _) = model.dm.partialRetrieve(chunk: strategyChunk, mismatchFunction: chunkMismatchFunction)
         model.time += 0.1 + latencyStrategy
 
     }
@@ -151,18 +151,18 @@ struct NGModel {
         newExperience.setSlot(slot: "opponentMoveType", value: modelMoveType)
         newExperience.setSlot(slot: "myMoveType", value: playerMoveType)
         if playerMoveType == "Bid" {
-         newExperience.setSlot(slot: "myMove", value: changePlayerBid.description)}
+            newExperience.setSlot(slot: "myMove", value: changePlayerBid.description)}
         else if playerMoveType == "Decision" || playerMoveType == "Quit" {// if quit the only point to find the strategy is to reinforce the chunk
-         newExperience.setSlot(slot: "myMove", value: playerDecision!)}
+            newExperience.setSlot(slot: "myMove", value: playerDecision!)}
         else if playerMoveType == "Opening"{
-         newExperience.setSlot(slot: "myMove", value: playerCurrentOffer.description)}
+            newExperience.setSlot(slot: "myMove", value: playerCurrentOffer.description)}
 
         if modelMoveType == "Bid" {
-         newExperience.setSlot(slot: "opponentMove", value: changeModelBid.description)}
+            newExperience.setSlot(slot: "opponentMove", value: changeModelBid.description)}
         else if modelMoveType == "Decision" || playerMoveType == "Quit" {// if quit the only point to find the strategy is to reinforce the chunk
-         newExperience.setSlot(slot: "opponentMove", value: modelDecision!)}
+            newExperience.setSlot(slot: "opponentMove", value: modelDecision!)}
         else if modelMoveType == "Opening"{
-         newExperience.setSlot(slot: "opponentMove", value: modelCurrentOffer!.description)}
+            newExperience.setSlot(slot: "opponentMove", value: modelCurrentOffer!.description)}
 
         newExperience.setSlot(slot: "myStrategy", value: playerStrategy)
         newExperience.setSlot(slot: "myMNS", value: runningMNSAverage.description)
@@ -222,14 +222,13 @@ struct NGModel {
                 // query.setSlot(slot: "opponentMove", value: pla)
                 //}
                 
-                let (latency, chunk) = model.dm.retrieve(chunk: query)
+                let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
                 model.time +=  latency
                 
                 if let modelOffer = chunk?.slotvals["myMove"]?.description {
-                    print("BYE")
-                    print(modelOffer)
+                    
+                    // MARK: We might have to check first if the retrieved chunk is actually an opening bid chunk (sometimes it got a decision chunk here, which causes the next line to crash because the myMove is a string)
                     modelCurrentOffer = (Int(Float(modelOffer)!))// This is a mess we need to fix it
-                    print("M: offer should be = " + String(modelCurrentOffer!))
                     
                     if let modelNewMoveType = chunk?.slotvals["myMoveType"]?.description { // It only lets me unwrap like this, check options
                         modelMoveType = modelNewMoveType}
@@ -273,7 +272,7 @@ struct NGModel {
             // retrieve strategy chunk with highest activation:
             let strategyQuery = Chunk(s: "strategyChunk", m: model )
             strategyQuery.setSlot(slot: "isa", value: "strategy")
-            let (latencyStrategy, strategyChunk) = model.dm.retrieve(chunk: strategyQuery)
+            let (latencyStrategy, strategyChunk) = model.dm.partialRetrieve(chunk: strategyQuery, mismatchFunction: chunkMismatchFunction)
             if let modelCurrentStrategy = strategyChunk?.slotvals["strategy"]?.description {
                 modelStrategy = modelCurrentStrategy
                 model.addToTrace(string: " Retrieving model's strategy \(strategyChunk!)")
@@ -295,7 +294,7 @@ struct NGModel {
                 query.setSlot(slot: "opponentMove", value: changePlayerBid.description)// this also works
             }
             print(" Query chunk \(query)")
-            let (latency, chunk) = model.dm.retrieve(chunk: query)
+            let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
             
             // MARK: this is  not working, especially the decisions
             
@@ -463,3 +462,4 @@ struct NGModel {
         }
 
 }
+

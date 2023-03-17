@@ -25,13 +25,11 @@ func initNewModel() -> Model {
             }
             model.dm.addToDM(Experience)
         }
-                
-    
 
     // add the two strategy chunks
-    let aggresiveStrategy = model.generateNewChunk(string: "Agressive")
+    let aggresiveStrategy = model.generateNewChunk(string: "Aggressive")
     aggresiveStrategy.setSlot(slot: "isa", value: "strategy")
-    aggresiveStrategy.setSlot(slot: "strategy", value: "Agressive")
+    aggresiveStrategy.setSlot(slot: "strategy", value: "Aggressive")
     model.dm.addToDM(aggresiveStrategy)
     
     let cooperativeStrategy = model.generateNewChunk(string: "Cooperative")
@@ -60,65 +58,48 @@ func readCSV() -> DataFrame? {
     // this is cursed, but the only way to get around the CSV containing different types (integers...)
     let df = try! DataFrame(contentsOfCSVFile: fileUrl, types:["myStrategy":CSVType.string, "myMNS":CSVType.string, "myBidMNSDifference":CSVType.string, "opponentMoveType":CSVType.string, "opponentMove":CSVType.string, "opponentIsFinal":CSVType.string, "myMoveType":CSVType.string, "myMove":CSVType.string, "myIsFinal":CSVType.string], options: options)
     
-    //"myStrategy","myMNS","myBidMNSDifference","opponentMoveType","opponentMove","opponentIsFinal","myMoveType","myMove","myIsFinal"
-    
-    //for columnNum in 0...df.shape.1 {
-    //    let temp = df[columnNum].map(to: String)
-    //    df[columnNum] = temp
-    
-    
-    //print("\(df)")
-    //print("HELLO")
-    //print(df[row: 0])
-    //print("HELLO")
-    //var temp = df.rows[0]["modelMNS", String.self]!
-    //let temp2 = String(temp)
-    //print(temp2)
-    
-    //print("ROWS " + String(df.shape.0))
     return df
 }
 
 
 
 
-
-///"modelMoveType" = "move-type"
-///"Strategy" = "Strategy"
-///"modelMNS" = "Model-MNS"
-///"bidMNSDifference" = "Bid-diff"  // NEW
-
-
-///"changePlayer" = "Opponent-move"
-///"playerIsFinal" = "NA - opponent-move (final)"
-
-
-
-///"playerMoveType" = "NA - opponent-move (opening, final)"
-
-
-
-
-// response
-///"changeModel" = "My-move"
-
-///"modelIsFinal" = "NA - "
-
-
-//slot: "changePlayer", value: changePlayerBid.description  // STRING
-//slot: "changeModel", value: changeModelBid.description)  // STRING
-///slot: "playerMoveType", value: playerMoveType!)  // STRING
-///slot: "modelMoveType", value: modelMoveType!)   // STRING
-///slot: "playerIsFinal", value: playerIsFinalOffer)  // BOOL
-///slot: "modelIsFinal", value: modelIsFinalOffer)    // BOOL
-//slot: "Strategy", value: playerStrategy!)        // STRING
-
-// let newExperience = model.generateNewChunk(string: "instance")
-// newExperience.setSlot(slot: "model", value: lastModel!.description)
-// newExperience.setSlot(slot: "player", value: lastPlayer!.description)
-// newExperience.setSlot(slot: "new-player", value: playerAction)
-// model.dm.addToDM(newExperience)
-
-
-
-
+func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
+    // similarity score
+    var M_li: Double? = nil
+    
+    // in the case that both slot values are numbers, compute a similarity score
+    // as in the equation at the top of page 7 of the paper
+    if let l = x.number(), let i = y.number() {
+        
+        let fraq = pow((l-i),2) / 2
+        M_li = (1 / (fraq + 1)) - 1
+        
+    // if both slots are strings, check to see if they are similar strategy values
+    } else if let string1 = x.text(), let string2 = y.text() {
+        if string1 == "Cooperative" {
+            if string2 == "Cooperative" { M_li = 0 }
+            else if string1 == "Aggressive" { M_li = -1 }
+            else if string1 == "Neutral" { M_li =  -0.1 }
+            else { M_li = -1 }
+        }
+        else if string1 == "Aggressive" {
+            if string2 == "Cooperative" { M_li =  -1}
+            else if string1 == "Aggressive" { M_li = 0 }
+            else if string1 == "Neutral" { M_li =  -0.1 }
+            else { M_li = -1 }
+        }
+        else if string1 == "Neutral" {
+            if string2 == "Cooperative" { M_li =  -0.1 }
+            else if string1 == "Aggressive" { M_li =  -0.1 }
+            else if string1 == "Neutral" { M_li = 0 }
+            else { M_li = -1 }
+        }
+        else { M_li =  -0.4 }  // paper does -1 here, but we have more slots so that would cause those additional slots to contribute to a very high mismatch penalty
+        
+    // else, the slots values don't match, they are dissimilar
+    } else { M_li = -0.4 }
+    
+    //if M_li == 0 {print("MATCH!")}
+    return M_li
+}

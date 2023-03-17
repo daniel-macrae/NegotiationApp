@@ -189,7 +189,7 @@ class Declarative: Codable  {
      */
     func partialRetrieve(chunk: Chunk, mismatchFunction: (_ x: Value, _ y: Value) -> Double? ) -> (Double, Chunk?) {
         retrieveError = false
-       var bestMatch: Chunk? = nil
+        var bestMatch: Chunk? = nil
         var bestActivation: Double = retrievalThreshold
         chunkloop: for (_,ch1) in chunks {
             var mismatch = 0.0
