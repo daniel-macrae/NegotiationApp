@@ -171,7 +171,7 @@ class NGViewModel: ObservableObject {
     
     // player rejects the model's offer
     func playerRejectsFinalOffer() {
-        self.sendMessage("I reject your final offer", isMe: true, PSA: false)
+        self.sendMessage("I reject your offer", isMe: true, PSA: false)
         model.playerMoveType = "Decision";     model.playerDecision = "Reject"
         model.playerHasQuit = true
         

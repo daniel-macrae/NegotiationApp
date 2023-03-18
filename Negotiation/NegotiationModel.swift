@@ -3,7 +3,6 @@
 import Foundation
 
 
-
 struct NGModel {
     // for printing of errors and function calls
     var verbose = true
@@ -59,22 +58,21 @@ struct NGModel {
     
     internal var model: Model = initNewModel() // just load an empty model
     
-    // functions to save and load the model (calls functions from JSONManger.swift file)
-    mutating func makeNewModel() {
-        model = initNewModel()
-    }
-
     
     mutating func loadPlayerModel(fileName: String) {
-        //print("M: Before Load: " + String(model.dm.chunks.count))
-        model = loadModel(name: fileName)  // loading the model
+        let new: Bool // boolean to see if a new model was created
         
-        //model.loadModel(fileName: fileName)
-        moveToTop(player: fileName)
+        (model, new) = loadModel(name: fileName)  // loading the model
+        
+        moveToTop(player: fileName) // put this player at the top of the player selection menu
         printV("M: Model loaded. Number of chunks = " + String(model.dm.chunks.count))
+        
+        if new {modelStrategy = "Neutral"}  // if a new model was made, make it's strategy neutral
+        else {decideModelStrategy()}        // if a previous model was loaded, use the memory it has to decide the strategy
         
         model.softReset()
         update()
+        
     }
  
     
@@ -382,11 +380,6 @@ struct NGModel {
     }
 
     
-    
-    
-    
-    
-    
     // MARK: GAME MANAGEMENT FUNCTIONS
     
             
@@ -427,7 +420,7 @@ struct NGModel {
         resetGameVariables(newGame: false)
         currentRoundNumber += 1
         
-        runningMNSAverage = runningAverageMNS(modelMNS: modelMNS) // MARK: I think this should be somewhere in the model's response function
+        runningMNSAverage = runningAverageMNS(modelMNS: modelMNS) // the location fo this function is good
         
         update()
     }
@@ -444,7 +437,6 @@ struct NGModel {
         if newGame {
             playerScore = 0; modelScore = 0
             currentRoundNumber = 1
-            
         }
         savePlayerModel()
         
@@ -454,6 +446,12 @@ struct NGModel {
     
     
 
+    
+    
+    
+    
+    
+    
     /// The trace from the model
     var traceText: String = ""
     /// The model code

@@ -35,7 +35,7 @@ func saveModel(model: Model, filename: String) {
 }
 
 
-func loadModel(name: String) -> Model {
+func loadModel(name: String) -> (Model, Bool) {
     do {
         let filename = name + ".json"
         
@@ -51,12 +51,12 @@ func loadModel(name: String) -> Model {
             chunk.value.model = model
         }
         
-        return model
+        return (model, false)
  
     } catch {
         print("JSON: error while loading model (or filename not found)")
         let model = initNewModel()
-        return model // just return an new model
+        return (model, true) // just return an new model
     }
     
 }
