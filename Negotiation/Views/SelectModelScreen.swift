@@ -68,6 +68,10 @@ struct SelectModelScreen: View {
                             nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name); selectedOption = 0})
                             Spacer()
                         }
+                        removePlayerButton(action: {
+                            viewModel.removePlayer(name: name);
+                            if !names.isEmpty {name = names[0]} else {loadNames=false}
+                        })
                         Spacer()
                     }
                 } else {
@@ -129,7 +133,15 @@ struct backButton: View{
     }
 }
 
-struct textFieldView: View{
+struct removePlayerButton: View {
+    var action: () -> Void
+    
+    var body: some View {
+        Button(String("Remove Player"), action: action)
+    }
+}
+
+struct textFieldView: View {
     @Binding var name: String
     
     var body: some View{

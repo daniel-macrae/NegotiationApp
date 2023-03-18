@@ -25,7 +25,7 @@ class NGViewModel: ObservableObject {
     init() {
         model = NGModel()
         //self.playerNames = model.playerNames
-        sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
+        //sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
     }
     
     
@@ -238,6 +238,17 @@ class NGViewModel: ObservableObject {
         model.currentPlayerName = newName
         model.playerNames.insert(newName, at: 0)  // insert new player to start of playerNames list, means they become the first option on the selection page
     }
+    
+    func removePlayer(name: String) -> Void {
+        print(name)
+        print(model.playerNames)
+        if let index = model.playerNames.firstIndex(of: name) {
+            model.playerNames.remove(at: index)
+        } else {
+            print("VM: Can't remove player, name not found")
+        }
+    }
+    
     
     
     

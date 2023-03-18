@@ -10,7 +10,9 @@ Things to work on:
 - Maybe break the modelResponse() into more sub-functions? I think the retrieval of an opening big could be its own function, because modelResponse() is not a short function...
 - We can make the initialisation of the playerStrategy and modelStrategy (i.e. making the variables at the top of the Model file) be based off of the model's memory by adding an init() function, like in the viewModel. Inside of the init, we can call a function that does something like retrieve the strategy chunk with the highest activation, and then assign the result to the layerStrategy and modelStrategy variables. The idea would be that the model is picking up from the strategy it was probably using the last time it played against this person. 
 - There are cases where the model makes the exact same splitting of 9 points bid as the player, so maybe we should add a condition where if the model makes the same split offer as the player, just accept the player's offer. (i.e., the player bids "I want 5, you get 4", then the model says "I want 4, you get 5", which is the same thing...)
-
+- For some reason, if you press "Load Session" or "New Player", the background moves slightly?
+- I still need to add that it deletes the JSON file if you delete the player from the list of names
+- When all players are deleted, then it goes back to the "SelectModelScreen", which is great, but on this page the back button disappears?
 
 
 Things changed over the weeked:
@@ -26,4 +28,5 @@ Things changed over the weeked:
     - Whichever user was selected previously get moved to the top of the user name list (and thus the selection as well)
     - Models get saved at the end of every round (so 5 times per 'game')
     - On loading models from json files (JSONManager file), each chunk value has to be reassigned to the new 'model', or else the chunk retrieval causes the whole thing to crash (I think maybe when initialising/loading a new model, the chunks need a key to find the main model)
+    - Ability to delete players from the list of names, and if all players are deleted, then the view goes back to the main SelectModelScreen, where you can only press "newPlayer"
 
