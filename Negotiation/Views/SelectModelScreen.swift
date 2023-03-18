@@ -37,7 +37,10 @@ struct SelectModelScreen: View {
                             HStack{
                                 Spacer()
                                 textFieldView(name: $name)
-                                nextPageButton(action: {StartGame = true; viewModel.createNewPlayer(newName: name)})
+                                nextPageButton(action: {
+                                    StartGame = true;
+                                    viewModel.createNewPlayer(newName: name);
+                                    showNameField = false})
                                 Spacer()
                             }
                             Spacer()
@@ -54,9 +57,8 @@ struct SelectModelScreen: View {
                             Picker("", selection: $selectedOption){
                                 ForEach(0..<names.count, id: \.self){
                                     index in
-                                    Text(names[index]).foregroundColor(Color.black)          .onAppear{
-                                        name = names[index]
-                                    }
+                                    Text(names[index]).foregroundColor(Color.black)
+                                        .onAppear{  name = names[index]  }
                                 }
                             }.pickerStyle(MenuPickerStyle())
                                 .frame(width:200)
