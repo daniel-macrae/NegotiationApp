@@ -190,6 +190,9 @@ class NGViewModel: ObservableObject {
         interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
     }
     
+    func openingNewGame() {
+        sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
+    }
     
     // function to display the grey messages (PSAs) about score changes and the player MNS value for a new round
     func interRoundScoreDisplay(playerDecided: Bool, decisionAccept: Bool){
@@ -216,6 +219,7 @@ class NGViewModel: ObservableObject {
     
     func resetGame() {
         model.resetGameVariables(newGame: true)  // reset the game variables when returning to the ContentView
+        openingNewGame()
         MNSDeclared = false
     }
     
@@ -232,7 +236,7 @@ class NGViewModel: ObservableObject {
     //Needs proper implementation
     func createNewPlayer(newName: String){
         model.currentPlayerName = newName
-        model.playerNames.append(newName)
+        model.playerNames.insert(newName, at: 0)  // insert new player to start of playerNames list, means they become the first option on the selection page
     }
     
     

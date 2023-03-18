@@ -321,6 +321,7 @@ struct NGModel {
                 if playerIsFinalOffer == true {
                     modelMoveType = "Decision"
                     modelDecision = "Reject"
+                    modelHasQuit = true
                     modelMadeADecision()
                     model.addToTrace(string: "Failed retrieval, reject offer")
                 }
@@ -338,14 +339,15 @@ struct NGModel {
     mutating func modelMadeADecision(){
         print("modelMadeADecision func")
         if modelDecision == "Accept" {
-            newRound(playerOffered: true)}
-        if modelDecision == "Reject" {
+            modelHasQuit = false}
+        else if modelDecision == "Reject" {
             print("its doing this")
-            modelHasQuit = true
-            newRound(playerOffered: true)}
-        if modelMoveType == "Quit" {
-            modelHasQuit = true
-            newRound(playerOffered: true)}
+            modelHasQuit = true}
+        else if modelMoveType == "Quit" {
+            modelHasQuit = true    }
+        print("hi")
+        print(modelHasQuit)
+        //newRound(playerOffered: true)
     }
     
     mutating func runningAverageMNS(modelMNS: Int) -> Int{
@@ -391,10 +393,15 @@ struct NGModel {
     // the round has ended, clean up and start a new one
     mutating func newRound(playerOffered: Bool) {
         if verbose {print("M: preparing new negotiation round")}
+        print(modelHasQuit)
+        print(playerHasQuit)
+
         // if neither player has quit, an agreement was made and their scores should be updated
         if !(playerHasQuit || modelHasQuit) {
+            print("should not reach this")
             updateScores(playerOffered: playerOffered)
         }
+        
         resetGameVariables(newGame: false)
         currentRoundNumber += 1
         
