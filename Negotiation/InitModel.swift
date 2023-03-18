@@ -68,6 +68,8 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
     // similarity score
     var M_li: Double? = nil
     
+    let defaultMli = -0.3
+    
     // this one should be covered in the Declarative memory already, but put it here for completeness' sake
     if x.isEqual(value: y) { M_li = 0 }
     
@@ -85,24 +87,24 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
             if string2 == "Cooperative" { M_li = 0 }
             else if string1 == "Aggressive" { M_li = -1 }
             else if string1 == "Neutral" { M_li =  -0.1 }
-            else { M_li = -0.4 }
+            else { M_li = defaultMli }
         }
         else if string1 == "Aggressive" {
             if string2 == "Cooperative" { M_li =  -1}
             else if string1 == "Aggressive" { M_li = 0 }
             else if string1 == "Neutral" { M_li =  -0.1 }
-            else { M_li = -0.4 }
+            else { M_li = defaultMli }
         }
         else if string1 == "Neutral" {
             if string2 == "Cooperative" { M_li =  -0.1 }
             else if string1 == "Aggressive" { M_li =  -0.1 }
             else if string1 == "Neutral" { M_li = 0 }
-            else { M_li = -0.4 }
+            else { M_li = defaultMli }
         }
-        else { M_li =  -0.4 }  // paper does -1 here, but we have more slots so that would cause those additional slots to contribute to a very high mismatch penalty
+        else { M_li =  defaultMli }  // paper does -1 here, but we have more slots so that would cause those additional slots to contribute to a very high mismatch penalty
         
     // else, the slots values don't match, they are dissimilar
-    } else { M_li = -0.4 }
+    } else { M_li = defaultMli }
     
     //if M_li == 0 {print("MATCH!")}
     return M_li

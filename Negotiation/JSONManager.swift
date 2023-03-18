@@ -46,6 +46,11 @@ func loadModel(name: String) -> Model {
         let data = try Data(contentsOf: fileURL)
         //print(data)
         let model = try JSONDecoder().decode(Model.self, from: data)
+        
+        for chunk in model.dm.chunks {  // assign the new model to each chunk...
+            chunk.value.model = model
+        }
+        
         return model
  
     } catch {

@@ -13,11 +13,11 @@ struct SelectModelScreen: View {
     @State private var StartGame = false
     @State private var goBack = false
     @State private var loadNames = false
-    @State private var selectedOption = 0
     
-    //works for now but needs to be changed
-    //@State private var names = NGViewModel().getLoadFilesNames()
-    var names = ["name1","name2"]
+    var names: [String] {viewModel.playerNames}  // get the names to display here
+    
+    @State var selectedOption: Int = 0
+    
     
     var body: some View {
         
@@ -28,15 +28,16 @@ struct SelectModelScreen: View {
                 }
             ZStack{
                 if showNameField{
+                    
                     VStack{
                         backButton(action: {showNameField=false
-                            goBack=false})
+                            goBack=false; selectedOption = 0})
                         VStack{
                             Spacer()
                             HStack{
                                 Spacer()
                                 textFieldView(name: $name)
-                                nextPageButton(action: {StartGame = true; viewModel.createNewLoadFile(fileName: name)})
+                                nextPageButton(action: {StartGame = true; viewModel.createNewPlayer(newName: name)})
                                 Spacer()
                             }
                             Spacer()
@@ -62,7 +63,7 @@ struct SelectModelScreen: View {
                                 .background(Color.white.opacity(0.4))
                                 .cornerRadius(20)
                     
-                            nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name)})
+                            nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name); selectedOption = 0})
                             Spacer()
                         }
                         Spacer()
@@ -106,6 +107,8 @@ extension View{
             }
         }
 }
+
+
 
 struct backButton: View{
     let action: ()->Void

@@ -48,38 +48,44 @@ struct NGModel {
     //MNS runnig average
     var runningMNSAverage = 4
     //Need some function to get these from JSONManager
-    var loadFilesNames: [String] = ["loadfile1", "loadfile2", "thisNeedsImplementation"]
+    var playerNames: [String] = ["Daniel", "Sara", "Luka"]
+    var currentPlayerName: String?
     
     /// Boolean that states whether the model is waiting for an action.
     var waitingForAction = true
     
     
-    internal var model = Model()
+    internal var model: Model = initNewModel() // just load an empty model
     
     // functions to save and load the model (calls functions from JSONManger.swift file)
     mutating func makeNewModel() {
         model = initNewModel()
     }
     
-    mutating func testLoad(fileName: String) {
+    mutating func loadPlayerModel(fileName: String) {
         //print("M: Before Load: " + String(model.dm.chunks.count))
         model = loadModel(name: fileName)  // loading the model
+        
+        //model.loadModel(fileName: fileName)
+        moveToTop(player: fileName)
         print("M: Model loaded. Number of chunks: " + String(model.dm.chunks.count))
+        
+        model.softReset()
+        update()
+    }
+ 
+    
+    mutating func moveToTop(player: String) {
+        let index = playerNames.firstIndex(of: player)
+        playerNames.move(fromOffsets: IndexSet(integer: index!), toOffset: 0)
     }
     
-    func testSave() {
+    func savePlayerModel() {
         //print("M: Number of Chunks in model to save: " + String(model.dm.chunks.count))
-        saveModel(model: model, filename: "test") // save the model
+        saveModel(model: model, filename: currentPlayerName!) // save the model
         print("M: model saved!")
     }
     
-    
-    /// Here we do not actually load in anything: we just reset the model
-    /// - Parameter filename: filename to be loaded (extension .actr is added by the function)
-    mutating func resetModel() {
-        model.reset()
-        model.waitingForAction = true
-    }
     
     
     
@@ -181,6 +187,7 @@ struct NGModel {
  
     // MARK: The running average is not implemented yet
     mutating func modelResponse() {
+        print("M: Model Responding. Number of chunks: " + String(model.dm.chunks.count))
         var changePlayerBid = 0 // it needs to be defined even if its useless ??optinonal?/
         //var changePlayerBid: Int
         
@@ -213,7 +220,7 @@ struct NGModel {
                 query.setSlot(slot: "opponentMoveType", value: "Opening")
                 query.setSlot(slot: "opponentMove", value: playerDeclaredMNS!.description)
                 
-                query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)  // possible that the player makes their first bid 'final'
+                query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)  // possible (but unlikely) that the player makes their first bid 'final'
             
                 
                 let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
@@ -408,7 +415,9 @@ struct NGModel {
         if newGame {
             playerScore = 0; modelScore = 0
             currentRoundNumber = 1
+            
         }
+        savePlayerModel()
         
         pickMNS()  // new MNS values for the next round
         model.waitingForAction = true
