@@ -61,3 +61,27 @@ func loadModel(name: String) -> Model {
     
 }
 
+
+
+func deletePlayerFile(name: String) {
+    do {
+        let filename = name + ".json"
+        let fileURL = try FileManager.default
+            .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            .appendingPathComponent(filename)
+        
+        do {
+            try FileManager.default.removeItem(at: fileURL)
+            print("User " + name + " file deleted")
+        } catch {
+            print("User file not found, can't delete")
+        }
+        //try FileManager.removeItem(fileURL)
+    }
+    catch {
+        print("Player file could not be found, and was not deleted")
+    }
+    
+    
+    
+}

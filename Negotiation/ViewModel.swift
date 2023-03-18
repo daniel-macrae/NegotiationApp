@@ -23,13 +23,10 @@ class NGViewModel: ObservableObject {
     var currentPlayerName: String {model.currentPlayerName!}
     
     init() {
-        model = NGModel()
-        //self.playerNames = model.playerNames
-        //sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
+        model = NGModel() // make just one active model file
     }
-    
-    
-    
+        
+        
     struct Message: Identifiable, Equatable{
         let id = UUID()
         let text:String
@@ -78,14 +75,13 @@ class NGViewModel: ObservableObject {
         model.declareModelMNS()
         sendMessage("My MNS is " + String(model.modelDeclaredMNS!), isMe: false, PSA: false)
         MNSDeclared = true  // if the model has declared its MNS, then so has the player
-    
+        
         /// seemed to cause problems
         //DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { //makes it more lifelike i guess when adding a wait
         //    }
         
         
     }
-    
     
     // this function deals with processing the player's offer
     func playerMakeOffer(playerBid: Float) {
@@ -112,20 +108,19 @@ class NGViewModel: ObservableObject {
         
         // make the cognitive model respond
         model.modelResponse()
-        print("MODEL MOOD = ", model.modelStrategy)
         
         // JUST ADD A self.sendMessage HERE !?!
         if model.modelMoveType == "Decision" && model.modelDecision! == "Accept" {
             
             switch model.modelStrategy {
-                case "Cooperative":
-                    self.sendMessage(acceptingSentencesHappy.randomElement()!, isMe: false, PSA: false)
-                case "Aggressive":
-                    self.sendMessage(acceptingSentencesAngry.randomElement()!, isMe: false, PSA: false)
-                case "Neutral":
-                    self.sendMessage(acceptingSentencesNeutral.randomElement()!, isMe: false, PSA: false)
-                default:
-                    self.sendMessage("I accept your offer", isMe: false, PSA: false)
+            case "Cooperative":
+                self.sendMessage(acceptingSentencesHappy.randomElement()!, isMe: false, PSA: false)
+            case "Aggressive":
+                self.sendMessage(acceptingSentencesAngry.randomElement()!, isMe: false, PSA: false)
+            case "Neutral":
+                self.sendMessage(acceptingSentencesNeutral.randomElement()!, isMe: false, PSA: false)
+            default:
+                self.sendMessage("I accept your offer", isMe: false, PSA: false)
             }
             
             interRoundScoreDisplay(playerDecided:false,decisionAccept:true)
@@ -133,16 +128,16 @@ class NGViewModel: ObservableObject {
         }
         else if model.modelMoveType == "Decision" && model.modelDecision! == "Reject" {
             switch model.modelStrategy {
-                case "Cooperative":
-                    self.sendMessage(decliningSentencesHappy.randomElement()!, isMe: false, PSA: false)
-                case "Aggressive":
-                    self.sendMessage(decliningSentencesAngry.randomElement()!, isMe: false, PSA: false)
-                case "Neutral":
-                    self.sendMessage(decliningSentencesNeutral.randomElement()!, isMe: false, PSA: false)
-                default:
-                    self.sendMessage("I reject your final offer.", isMe: false, PSA: false)
+            case "Cooperative":
+                self.sendMessage(decliningSentencesHappy.randomElement()!, isMe: false, PSA: false)
+            case "Aggressive":
+                self.sendMessage(decliningSentencesAngry.randomElement()!, isMe: false, PSA: false)
+            case "Neutral":
+                self.sendMessage(decliningSentencesNeutral.randomElement()!, isMe: false, PSA: false)
+            default:
+                self.sendMessage("I reject your final offer.", isMe: false, PSA: false)
             }
-   
+            
             interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
             
         }
@@ -169,6 +164,8 @@ class NGViewModel: ObservableObject {
         self.sendMessage("I accept your offer", isMe: true, PSA: false)
         model.playerMoveType = "Decision";     model.playerDecision = "Accept"
         
+        model.modelResponse() // model has to save this experience
+        
         interRoundScoreDisplay(playerDecided:true, decisionAccept:true)
     }
     
@@ -178,6 +175,8 @@ class NGViewModel: ObservableObject {
         model.playerMoveType = "Decision";     model.playerDecision = "Reject"
         model.playerHasQuit = true
         
+        model.modelResponse() // model has to save this experience
+        
         interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
     }
     
@@ -185,6 +184,8 @@ class NGViewModel: ObservableObject {
         self.sendMessage("I want to quit this negotiation.",  isMe: true, PSA: false)
         model.playerMoveType = "Quit";     model.playerDecision = "Quit"
         model.playerHasQuit = true
+        
+        model.modelResponse() // model has to save this experience
         
         //model.newRound(playerOffered: false)
         interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
@@ -210,7 +211,11 @@ class NGViewModel: ObservableObject {
         model.newRound(playerOffered: !playerDecided)
         
         MNSDeclared = false // new round, neither player has declared their MNS
-        sendMessage("Your MNS for the next round is " + String(playerMNS), isMe: false, PSA: true)
+        
+        if currentRound < numberOfRounds {
+            sendMessage("Your MNS for the next round is " + String(playerMNS), isMe: false, PSA: true)
+        }
+        
     }
     
     func FinalOfferPlayerChanged(){
@@ -224,7 +229,7 @@ class NGViewModel: ObservableObject {
     }
     
     
-    func saveModel() {    // this button will be removed, so delete this later. it should be done automatically between rounds anyway, in my opinion
+    func saveModel() {    // MARK: this button will be removed, so delete this later. it should be done automatically between rounds anyway, in my opinion
         model.savePlayerModel()
     }
     func loadModel(name: String) {   // this function gets used when picking a model
@@ -232,7 +237,6 @@ class NGViewModel: ObservableObject {
         model.loadPlayerModel(fileName: name)
     }
     
-
     //Needs proper implementation
     func createNewPlayer(newName: String){
         model.currentPlayerName = newName
@@ -240,10 +244,9 @@ class NGViewModel: ObservableObject {
     }
     
     func removePlayer(name: String) -> Void {
-        print(name)
-        print(model.playerNames)
         if let index = model.playerNames.firstIndex(of: name) {
-            model.playerNames.remove(at: index)
+            model.playerNames.remove(at: index)  // removes the player from the list of names in the Model file
+            deletePlayerFile(name: name)         // removes the ACT-R model json file (this function is defined in JSONManager.swift)
         } else {
             print("VM: Can't remove player, name not found")
         }
@@ -259,9 +262,6 @@ class NGViewModel: ObservableObject {
     func sendMessage(_ text:String, isMe: Bool, PSA: Bool){
         messages.append(Message(text: text, sender: isMe, PSA: PSA))
     }
-    
-    
-    
-    
+        
     
 }

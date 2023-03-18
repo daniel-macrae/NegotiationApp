@@ -68,7 +68,7 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
     // similarity score
     var M_li: Double? = nil
     
-    let defaultMli = -0.3
+    let defaultMli = -0.2
     
     // this one should be covered in the Declarative memory already, but put it here for completeness' sake
     if x.isEqual(value: y) { M_li = 0 }

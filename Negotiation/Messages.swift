@@ -17,7 +17,6 @@ let bidMSGs = [
     "What about %d points for me, and %d points for you?",
     "I'd like to do this; %d points for me, %d for you. How does that sound?",
     "We can split the 9 points like this; %d to me, %d for you."
-    
 ]
 
 let acceptingSentencesNeutral = [
