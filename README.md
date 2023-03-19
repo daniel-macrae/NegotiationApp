@@ -12,7 +12,7 @@ Things changed over the weeked:
 - UI now gives a PSA to tell the player what their MNS is on the start of a new round.
 - Implemented more dynamic messaging. Used the lists if accept/reject messages Luka wrote, for the model's accept/reject messages, where the models mood corresponds to its strategy (cooperative=happy, and so on). Also, added a few message templates for 'normal' bid messages, which could use more examples, and maybe even also be split into different moods.
 - The lists of messages were pulled out of the viewModel file, and put into a new "Messages" file, which makes the viewModel quite a bit shorter.
-- Added an app icon! Subject to change of course. Which is just dragging a 1024x1024 pixel image into the AppIcon thing in the Assets.xcassets file thing. Quite easy to just find an image online, crop it, use a website to get it to the right size (it has to be exact) and drag it onto the box. Doesn't always seem to show on the simulator though...
+- Added an app icon! Subject to change of course. Which is just dragging a 1024x1024 pixel image into the AppIcon thing in the Assets.xcassets file thing.
 - Beginnings of user management:
     - Added the three of us as users
     - Whichever user was selected previously get moved to the top of the user name list (and thus the selection as well)
@@ -23,14 +23,13 @@ Things changed over the weeked:
 
 
 
-Things to work on:
+Bugs & Things to work on:
 - The retrieval of the opening offer still isn't great, it seems to just generate a random offer fairly often, which sometimes puts the model in a terrible starting place because it asks for just 1 or 2 points. Needs some work to get the retrievals to succeed.
 - Maybe we change the chunk-retrieval failure cases to bid for a number from 9 to its MNS.
 - Make the reject button say "quit round" unless the model has made a final offer (and make sure the function it calls it working right, in the case it's "quit round").
 - There are cases where the model makes the exact same splitting of 9 points bid as the player (i.e., the player bids "I want 5, you get 4", then the model says "I want 4, you get 5", which is the same thing...). So maybe we should add a condition where if the model makes the same split offer as the player, just accept the player's offer. 
-- For some reason, if you press "Load Session" or "New Player", the background moves slightly, but I don't know why as only the view Stacks change...
-- When all players are deleted, then it goes back to the "SelectModelScreen", which is great, but on this page the back button disappears? I've also seen two back buttons at once somewhere on these screens, so that should probably be checked out.
-- I've added a button to remove a user, but its just white text under the dropdown menu for now. It should probably be red text anyway, but I also don't know where to put it exactly. Also, it might be good if a pop-up menu came up after that asking the user if they're sure they want to delete this user.
+- I fixed a weird thing if you press "Load Session" or "New Player", the background moves slightly, but now its more clear that the "Back" buttons are changing, but I can't work out how to fix this. Perhaps the player selection pages just need to be split up into 3 different views. But I think maybe we ask Luka about this first, because the navigation links are messy.
+- I've added a button to remove a user, but for now its just white text under the dropdown menu . It should probably be red text anyway, but I also don't know where to put it exactly. Also, it might be good if a pop-up menu came up after that asking the user if they're sure they want to delete this user.
 
 
 

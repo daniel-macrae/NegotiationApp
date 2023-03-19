@@ -21,13 +21,15 @@ struct SelectModelScreen: View {
     
     var body: some View {
         
-        NavigationStack{
-            NavigationLink(destination: ContentView(viewModel: viewModel, player_name : $name), isActive: $StartGame, label: {})
-                .onChange(of: StartGame) { (newValue) in
-                    if newValue { viewModel.resetGame() }
-                }
-            ZStack{
-                if showNameField{
+        NavigationStack {
+            VStack {
+                NavigationLink(destination: ContentView(viewModel: viewModel, player_name : $name), isActive: $StartGame, label: {})
+                    // when we enter the contentview, reset the game variables
+                    .onChange(of: StartGame) { (newValue) in
+                        if newValue { viewModel.resetGame() }
+                    }
+                
+                if showNameField {
                     
                     VStack{
                         backButton(action: {showNameField=false
@@ -47,6 +49,7 @@ struct SelectModelScreen: View {
                         }
                         Spacer()
                     }
+                    
                 } else if loadNames {
                     VStack{
                         backButton(action: {loadNames=false
@@ -70,12 +73,12 @@ struct SelectModelScreen: View {
                         }
                         removePlayerButton(action: {
                             viewModel.removePlayer(name: name);
-                            if !names.isEmpty {name = names[0]} else {loadNames=false}
+                            if !names.isEmpty {name = names[0]} else {loadNames=false; goBack = false}
                         })
                         Spacer()
                     }
                 } else {
-                    VStack{
+                    VStack {
                         Spacer()
                         HStack{
                             Spacer()
@@ -96,8 +99,11 @@ struct SelectModelScreen: View {
                         Spacer()
                     }
                 }
-            }.background(backgroundImg(image:"secondbackground"))
-        }.navigationBarBackButtonHidden(goBack)
+            }            
+
+        }
+        .background(backgroundImg(image:"secondbackground")).ignoresSafeArea(.all)
+        .navigationBarBackButtonHidden(goBack)
     }
 }
 
@@ -132,6 +138,10 @@ struct backButton: View{
         }
     }
 }
+
+
+
+
 
 struct removePlayerButton: View {
     var action: () -> Void

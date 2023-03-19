@@ -98,8 +98,7 @@ struct ContentView: View {
                         }
     
                 }
-            }.background(backgroundImg(image: "SolidBackground"))
-                .onAppear{viewModel.sendMessage("Hello " + String(player_name), isMe: false, PSA: false)}
+            }
             .onAppear {
                 UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation") // Forcing the rotation to portrait
                 AppDelegate.orientationLock = .portrait // And making sure it stays that way
@@ -108,8 +107,11 @@ struct ContentView: View {
                 ;
                 viewModel.messages = [] //Emptying the message log
             }
-        }.toolbar {
-            // middle of top toolbad: show round #
+        }
+        .background(backgroundImg(image: "SolidBackground"))
+            .onAppear{viewModel.sendMessage("Hello " + String(player_name), isMe: false, PSA: false)}
+        .toolbar {
+            // middle of top toolbar: show the round # out of 5
             ToolbarItem(placement: .principal) { round_box(round_no: round_no, maxRoundNumber: viewModel.numberOfRounds) }
             // right side, show infoButton
             ToolbarItem(placement: .primaryAction) { infoButton(viewModel: viewModel, isQuitting: $isQuitting) }
