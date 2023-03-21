@@ -45,7 +45,7 @@ struct NGModel {
     var modelDecision: String?
     
     //MNS runnig average
-    var runningMNSAverage = 4
+    var assumedPlayerMNS = 0
     //Need some function to get these from JSONManager
     var playerNames: [String] = ["Daniel", "Sara", "Luka"]
     var currentPlayerName: String?
@@ -95,10 +95,13 @@ struct NGModel {
     // "myMoveType","myMove","myIsFinal"
     
     
-    mutating func declareModelMNS(){ // MARK: still to be implemented
-        modelDeclaredMNS = Int(arc4random_uniform(5)) + 1
- //think how we want to do this
-        // model should probably retrieve a chunk with the right mns to max change of succes
+    mutating func declareModelMNS(){
+        decideModelStrategy()
+        if modelStrategy == "Aggressive"{
+            modelDeclaredMNS = modelMNS + 1
+        }else{
+            modelDeclaredMNS = modelMNS
+        }
     }
 
     
@@ -106,7 +109,7 @@ struct NGModel {
     
         let query = Chunk(s: "query", m: model)
         query.setSlot(slot: "isa", value: "negotiation instance")  // added this isa slot, might improve chances of matching a chunk
-        query.setSlot(slot: "myMNS", value: runningMNSAverage.description)
+        query.setSlot(slot: "myMNS", value: assumedPlayerMNS.description)
         query.setSlot(slot: "myBidMNSDifference", value: bidMNSDifference.description)
         query.setSlot(slot: "myMoveType", value: playerMoveType)
         query.setSlot(slot: "myIsFinal", value: playerIsFinalOffer.description)
@@ -180,7 +183,7 @@ struct NGModel {
         newExperience.setSlot(slot: "opponentMoveType", value: modelMoveType)
         newExperience.setSlot(slot: "myMoveType", value: playerMoveType)
         newExperience.setSlot(slot: "myStrategy", value: playerStrategy)
-        newExperience.setSlot(slot: "myMNS", value: runningMNSAverage.description)
+        newExperience.setSlot(slot: "myMNS", value: assumedPlayerMNS.description)
         newExperience.setSlot(slot: "myBidMNSDifference", value: bidMNSDifference.description)
         newExperience.setSlot(slot: "myIsFinal", value: playerIsFinalOffer.description)
         newExperience.setSlot(slot: "opponentIsFinal", value: modelIsFinalOffer.description)
@@ -196,13 +199,13 @@ struct NGModel {
             newExperience.setSlot(slot: "opponentMove", value: changeModelBid.description)}
         else if modelMoveType == "Decision" || playerMoveType == "Quit" {// if quit the only point to find the strategy is to reinforce the chunk
             newExperience.setSlot(slot: "opponentMove", value: modelDecision!)}
-        else if modelMoveType == "Opening"{
-            if modelCurrentOffer != nil {
-                newExperience.setSlot(slot: "opponentMove", value: modelCurrentOffer!.description)}
-            else {
-                newExperience.setSlot(slot: "opponentMove", value: "N/A")
-            }
-        }
+        //else if modelMoveType == "Opening"{
+        //    if modelCurrentOffer != nil {
+        //      newExperience.setSlot(slot: "opponentMove", value: modelCurrentOffer!.description)}
+        //    else {
+        //        newExperience.setSlot(slot: "opponentMove", value: "N/A")
+        //    }
+        //}
 
         
         print("M: New experience chunk is:")
@@ -216,14 +219,16 @@ struct NGModel {
  
     
     
-    // MARK: The running average is not implemented yet
     mutating func modelResponse() {
+        print("                     HELLO                     ")
         print("M: Model Responding. Number of chunks: " + String(model.dm.chunks.count))
+        print("M: assumed player MNS is = " + assumedPlayerMNS.description)
+        
         
         var changePlayerBid = 0 // it needs to be defined even if its useless ??optinonal?/
         
         // MARK: this next line is a problem; at the start of each game the runningMNSAverage is 0 (I think), maybe replace by using blended retrieval and just storing chunks that contain only the MNS?
-        let bidMNSDifference = playerCurrentOffer - runningMNSAverage  // find the player's "myBidMNSDifference" slot value
+        let bidMNSDifference = playerCurrentOffer - assumedPlayerMNS  // find the player's "myBidMNSDifference" slot value
         
         // detect player strategy
         detectPlayerStrategy(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
@@ -261,6 +266,7 @@ struct NGModel {
             query.setSlot(slot: "myStrategy", value: modelStrategy)
             query.setSlot(slot: "opponentMoveType", value: playerMoveType)
             query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)
+            query.setSlot(slot: "myBidMNSDifference", value: bidMNSDifference.description)
             if playerIsFinalOffer == true{ query.setSlot(slot: "myMoveType", value: "Decision") }
 
             if playerPreviousOffer != nil { //if model plays first, playerPreviousffer is still nil after one play from the model
@@ -322,9 +328,9 @@ struct NGModel {
         query.setSlot(slot: "myMNS", value: modelMNS.description)
         query.setSlot(slot: "myMoveType", value: "Opening")
         query.setSlot(slot: "myStrategy", value: modelStrategy)
-        query.setSlot(slot: "opponentMoveType", value: "Opening")
-        query.setSlot(slot: "opponentMove", value: playerCurrentOffer.description)
-        query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)  // possible (but unlikely) that the player makes their first bid 'final'
+        //query.setSlot(slot: "opponentMoveType", value: "Opening")
+        //query.setSlot(slot: "opponentMove", value: playerCurrentOffer.description)
+        //query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)  // possible (but unlikely) that the player makes their first bid 'final'
     
         print("Model move query chunk:")
         print(query)
@@ -346,7 +352,7 @@ struct NGModel {
             
         } else {
             
-            modelCurrentOffer = Int.random(in: modelMNS..<10)  /// model makes a completely random offer above their MNS
+            modelCurrentOffer = Int.random(in: modelDeclaredMNS!..<10)  /// model makes a completely random offer above their declared MNS
             model.addToTrace(string: "Failed retrieval, random offer")
             modelMoveType = "Bid"
             
@@ -420,7 +426,7 @@ struct NGModel {
         resetGameVariables(newGame: false)
         currentRoundNumber += 1
         
-        runningMNSAverage = runningAverageMNS(modelMNS: modelMNS) // the location fo this function is good
+        assumedPlayerMNS = runningAverageMNS(modelMNS: modelMNS) // the location fo this function is good
         
         update()
     }
@@ -434,6 +440,7 @@ struct NGModel {
         playerHasQuit = false; modelHasQuit = false
         playerDeclaredMNS = nil; modelDeclaredMNS = nil
         
+        
         if newGame {
             playerScore = 0; modelScore = 0
             currentRoundNumber = 1
@@ -441,6 +448,7 @@ struct NGModel {
         savePlayerModel()
         
         pickMNS()  // new MNS values for the next round
+        assumedPlayerMNS = runningAverageMNS(modelMNS: modelMNS)
         model.waitingForAction = true
     }
     

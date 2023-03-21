@@ -13,8 +13,7 @@ struct ContentView: View {
     @State private var isQuitting: Bool = false
     @State private var gameOver: Bool = false
     @State private var finalScreen: Bool = false
-    
-    
+ 
     var body: some View {
         NavigationStack {
             NavigationLink(destination: TitleScreen(viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
@@ -42,7 +41,7 @@ struct ContentView: View {
                             VStack {
                                 HStack {
                                     Spacer()
-                                    RejectButton(text: "Reject Offer", action: {viewModel.playerRejectsFinalOffer();
+                                    RejectButton(text: viewModel.quitButtonText, action: {viewModel.playerRejectsFinalOffer();
                                         finalOfferToggle = false;
                                         //round_no = round_no + 1;
                                         round_no = viewModel.currentRound;

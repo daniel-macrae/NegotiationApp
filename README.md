@@ -21,16 +21,18 @@ Things changed over the weeked:
     - Ability to delete players from the list of names (the corresponding json file also gets deleted), and if all players are deleted, then the view goes back to the main SelectModelScreen, where you can only press "newPlayer".
 - The initial value of modelStrategy is now dealt with on init(), where the strategy is decided by whichever strategy chunk it can retrieve. In a sense, it's picking up with the strategy that it left off with.
 
+- Changed the chunk-retrieval (opening) failure cases to bid for a number from 9 to its declared MNS.
 
+- Made the reject button say "quit round" unless the model has made a final offer (and make sure the function it calls it working right, in the case it's "quit round").
 
 Bugs & Things to work on:
 - The retrieval of the opening offer still isn't great, it seems to just generate a random offer fairly often, which sometimes puts the model in a terrible starting place because it asks for just 1 or 2 points. Needs some work to get the retrievals to succeed.
-- Maybe we change the chunk-retrieval failure cases to bid for a number from 9 to its MNS.
-- Make the reject button say "quit round" unless the model has made a final offer (and make sure the function it calls it working right, in the case it's "quit round").
+
 - There are cases where the model makes the exact same splitting of 9 points bid as the player (i.e., the player bids "I want 5, you get 4", then the model says "I want 4, you get 5", which is the same thing...). So maybe we should add a condition where if the model makes the same split offer as the player, just accept the player's offer. 
 - I fixed a weird thing if you press "Load Session" or "New Player", the background moves slightly, but now its more clear that the "Back" buttons are changing, but I can't work out how to fix this. Perhaps the player selection pages just need to be split up into 3 different views. But I think maybe we ask Luka about this first, because the navigation links are messy.
 - I've added a button to remove a user, but for now its just white text under the dropdown menu . It should probably be red text anyway, but I also don't know where to put it exactly. Also, it might be good if a pop-up menu came up after that asking the user if they're sure they want to delete this user.
-
+- Change sentences when the model/player insist onthe same offer
+-Increase set of messages
 
 
 

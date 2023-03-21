@@ -21,6 +21,10 @@ class NGViewModel: ObservableObject {
     
     var playerNames: [String] {model.playerNames}
     var currentPlayerName: String {model.currentPlayerName!}
+    var quitButtonText: String {
+        if model.modelIsFinalOffer==true{
+        return "Reject Offer"}
+        else{ return "Quit Round"}}
     
     init() {
         model = NGModel() // make just one active model file
@@ -224,6 +228,7 @@ class NGViewModel: ObservableObject {
     
     func resetGame() {
         model.resetGameVariables(newGame: true)  // reset the game variables when returning to the ContentView
+        
         openingNewGame()
         MNSDeclared = false
     }
