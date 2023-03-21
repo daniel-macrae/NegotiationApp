@@ -225,7 +225,6 @@ class Declarative: Codable  {
      - returns: A Tuple consisting of the retrieval time and the retrieved Chunk (or the maximum retrieval time and nil if the retrieval fails
      */
     func blendedRetrieve(chunk: Chunk) -> (Double, Chunk?) {
-        //print("hello")
         retrieveError = false
        let bestMatch = chunk.copy()
         var currentReturn: [String:Double] = [:]

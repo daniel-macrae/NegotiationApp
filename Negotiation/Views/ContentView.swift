@@ -133,7 +133,7 @@ struct ScoresDisplay: View {
                 ComputerIcon()
                 VStack{
                     Text("Score = " + String(modelScore))
-                    Text("MNS = " + String(modelMNS)) // REMOVE - IN THE LONG RUN
+                    Text("MNS = " + String(modelMNS)) //  MARK: REMOVE - IN THE LONG RUN
                     if let modelDecMNS = modelDeclaredMNS {Text("Declared\nMNS = " + String(modelDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body)).lineLimit(2, reservesSpace: true)}
                     //if let modelDecMNS = modelDeclaredMNS {Text("D MNS = " + String(modelDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body))}
                 }.layoutPriority(2)
@@ -143,7 +143,7 @@ struct ScoresDisplay: View {
                 VStack{
                     Text("Score = " + String(playerScore))
                     // What to display here? We cant just
-                    Text("MNS = " + String(playerMNS))  // REMOVE - IN THE LONG RUN
+                    Text("MNS = " + String(playerMNS))  // MARK: REMOVE - IN THE LONG RUN
                     // display the declared MNS, seems easier than looking for it
                     if let playerDecMNS = playerDeclaredMNS {Text("Declared\nMNS = " + String(playerDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body)).lineLimit(2, reservesSpace: true)}  // font size changes dynamically
                     //if let playerDecMNS = playerDeclaredMNS {Text("D MNS = " + String(playerDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body))}
@@ -336,41 +336,41 @@ struct round_box: View{
 
 struct infoButton: View {
     var viewModel: NGViewModel
-    @State private var showPicker = false
+    @State private var showMenu = false
     @State private var showExplanation = false
     @Binding var isQuitting: Bool
 
     var body: some View {
         VStack {
-            Button(action: { showPicker = true } ) {
+            Button(action: { showMenu = true } ) {
                 Image(systemName: "questionmark.circle")
                     .foregroundColor(.white)
             }.scaleEffect(1.6)
         }
-        .sheet(isPresented: $showPicker) {
+        .sheet(isPresented: $showMenu) {
             ZStack{
                 backgroundImg(image: "thirdbackground2").background()
                     .ignoresSafeArea(.all)
                 VStack {
                     GameButton(text: "How to Play") {
                         showExplanation = true
-                        showPicker = false
+                        showMenu = false
                     }
                     GameButton(text: "Save Model") {
                         viewModel.saveModel()
                         //Some animation for the model being save
-                        showPicker = false
+                        showMenu = false
                     }
                     GameButton(text: "Load Model") {
                         //Some animation for the model being loaded
                         viewModel.loadModel(name:"test")
-                        showPicker = false
+                        showMenu = false
                     }
                     GameButton(text: "Return to Game") {
-                        showPicker = false
+                        showMenu = false
                     }
                     QuitButton(text: "Quit Game") {
-                        showPicker = false
+                        showMenu = false
                         isQuitting = true
                     }.foregroundColor(Color.red)
                     
@@ -394,7 +394,7 @@ struct infoButton: View {
                         showExplanation = false
                     }
                     GameButton(text:"Go to Options") {
-                        showPicker = true
+                        showMenu = true
                         showExplanation = false
                     }
                     

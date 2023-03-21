@@ -25,6 +25,7 @@ Tuesday:
 - Changed the chunk-retrieval (opening) failure cases to bid for a number from its declared MNS to 9.
 - Made the reject button say "quit round" unless the model has made a final offer (and make sure the function it calls it working right, in the case it's "quit round").
 - Fixed the bug where the accept/reject offer buttons were always active if you changed which user was playing.
+- Moved reinforcement of strategy chunks so that it only reinforces after successfully retrieving the player's strategy
 
 Bugs & Things to work on:
 - The retrieval of the opening offer still isn't great, it seems to just generate a random offer fairly often, which sometimes puts the model in a terrible starting place because it asks for just 1 or 2 points. Needs some work to get the retrievals to succeed.
@@ -35,7 +36,7 @@ Bugs & Things to work on:
 Tuesday:
 - Change sentences when the model/player insists on the same offer.
 - Increase set of messages.
-- The back button on the contentView disappears if you finish a game, then press "new game" on the end-game screen (ask Luka because the back buttons are driving me insane).
-
+- The back button on the contentView disappears if you finish a game, then press "new game" on the end-game screen (ask Luka to look at because the back buttons are driving me insane, idk where this one is defined at all).
+- The options menu (question mark button on contentView) should have most of the buttons removed, and this screen should just show the "how to play the game" text
 
 
