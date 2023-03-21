@@ -99,7 +99,7 @@ struct SelectModelScreen: View {
                         Spacer()
                     }
                 }
-            }            
+            }
 
         }
         .background(backgroundImg(image:"secondbackground")).ignoresSafeArea(.all)

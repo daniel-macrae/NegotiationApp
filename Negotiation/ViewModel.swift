@@ -102,7 +102,7 @@ class NGViewModel: ObservableObject {
         model.playerMoveType = "Bid"
         // playerIsFinal is toggled with the button anyway, so no need to have it here as well
         
-        self.offerHasBeenMade = true
+        offerHasBeenMade = true
         
         modelResponseMessage()
         
@@ -230,7 +230,7 @@ class NGViewModel: ObservableObject {
         model.resetGameVariables(newGame: true)  // reset the game variables when returning to the ContentView
         
         openingNewGame()
-        MNSDeclared = false
+        offerHasBeenMade = false;     MNSDeclared = false
     }
     
     

@@ -103,7 +103,6 @@ struct ContentView: View {
                 AppDelegate.orientationLock = .portrait // And making sure it stays that way
             }.onDisappear {
                 AppDelegate.orientationLock = .all // Unlocking the rotation when leaving the view
-                ;
                 viewModel.messages = [] //Emptying the message log
             }
         }
@@ -114,7 +113,6 @@ struct ContentView: View {
             ToolbarItem(placement: .principal) { round_box(round_no: round_no, maxRoundNumber: viewModel.numberOfRounds) }
             // right side, show infoButton
             ToolbarItem(placement: .primaryAction) { infoButton(viewModel: viewModel, isQuitting: $isQuitting) }
-            //ToolbarItem(placement: .navigationBarLeading) { Text("hiya") }
         }
     }
 }

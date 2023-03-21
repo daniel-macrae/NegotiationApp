@@ -332,14 +332,14 @@ struct NGModel {
         //query.setSlot(slot: "opponentMove", value: playerCurrentOffer.description)
         //query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)  // possible (but unlikely) that the player makes their first bid 'final'
     
-        print("Model move query chunk:")
+        print("Model opening offer query chunk:")
         print(query)
         
         let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
         
         
         if let modelOffer = chunk?.slotvals["myMove"]?.description {
-            print("M: successfully retreived opening offer!")
+            model.addToTrace(string: "Retrieved As Opening Offer: \(chunk!)")
             // MARK: We might have to check first if the retrieved chunk is actually an opening bid chunk (sometimes it got a decision chunk here, which causes the next line to crash because the myMove is a string)
             modelCurrentOffer = (Int(Float(modelOffer)!))// This is a mess we need to fix it
             
@@ -348,7 +348,7 @@ struct NGModel {
                 print(modelMoveType)
             }
             
-            model.addToTrace(string: "First decision: retrieving opening \(chunk!)")
+            
             
         } else {
             
