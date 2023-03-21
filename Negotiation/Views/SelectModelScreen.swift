@@ -141,14 +141,22 @@ struct backButton: View{
 
 
 
-
-
 struct removePlayerButton: View {
     var action: () -> Void
+    @State private var showingAlert = false
     
     var body: some View {
-        Button(String("Remove Player"), action: action)
-    }
+        Button(String("Remove Player")) {showingAlert = true}//.foregroundColor(Color.orange)   // looks better as white?
+            .font(.subheadline)
+            .alert(isPresented: $showingAlert) {
+                Alert(title: Text("Are you sure you would like to delete this user?"),
+                      message: Text("There is no undoing this action. All of the user's data will be deleted."),
+                      primaryButton: .destructive(
+                        Text("Confirm"),
+                        action: action
+                      ), secondaryButton: .cancel())
+            }
+        }
 }
 
 struct textFieldView: View {
@@ -194,6 +202,8 @@ struct SelectModelScreenButton: View{
                 .cornerRadius(50)
     }
 }
+
+
 
 
 struct SelectModelScreen_Previews: PreviewProvider {

@@ -26,7 +26,7 @@ struct NGModel {
     
     // MARK: Player and Model offer management
     var playerPreviousOffer: Int?
-    var playerCurrentOffer: Int = 0 // work on how to display this if it has no value?
+    var playerCurrentOffer: Int? // = 0 // work on how to display this if it has no value?
     var modelPreviousOffer: Int?
     var modelCurrentOffer: Int?  // same here
     var playerIsFinalOffer = false
@@ -113,16 +113,20 @@ struct NGModel {
         query.setSlot(slot: "myBidMNSDifference", value: bidMNSDifference.description)
         query.setSlot(slot: "myMoveType", value: playerMoveType)
         query.setSlot(slot: "myIsFinal", value: playerIsFinalOffer.description)
-        print("M: player strategy query chunk")
-        print(query)
         
         
         if playerMoveType == "Bid" {
-            query.setSlot(slot: "myMove", value: changePlayerBid.description)}
-        else if playerMoveType == "Decision" || playerMoveType == "Quit" {// if quit the only point to find the strategy is to reinforce the chunk
-            query.setSlot(slot: "myMove", value: playerDecision!)}
-        // If opening you cant have any more chunks
+            query.setSlot(slot: "myMove", value: changePlayerBid.description)
+        } else if playerMoveType == "Opening" {
+            query.setSlot(slot: "myMove", value: playerCurrentOffer!.description)
+            query.setSlot(slot: "myBidMNSDifference", value: "N/A")  // overwrites the previously assigned slot value
+        } else if playerMoveType == "Decision" || playerMoveType == "Quit" {// if quit the only point to find the strategy is to reinforce the chunk
+            query.setSlot(slot: "myMove", value: playerDecision!)
+        }
         
+        
+        print("M: player strategy query chunk")
+        print(query)
         
         let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
         model.time +=  latency
@@ -167,13 +171,11 @@ struct NGModel {
     
     mutating func saveNewExperience(bidMNSDifference: Int, changePlayerBid: Int) {
      
-        let changeModelBid: Int
+        var changeModelBid: Int
         
         if let ModelsLastOffer = modelPreviousOffer {
             changeModelBid = modelCurrentOffer! - ModelsLastOffer
-            print("change = " + String(changeModelBid))
-        }
-        else {
+        } else {
             changeModelBid = 0 // this is probably not good practice. ERROR if the model starts!!
         }
         
@@ -190,12 +192,15 @@ struct NGModel {
         newExperience.setSlot(slot: "myIsFinal", value: playerIsFinalOffer.description)
         newExperience.setSlot(slot: "opponentIsFinal", value: modelIsFinalOffer.description)
         
+        
         if playerMoveType == "Bid" {
             newExperience.setSlot(slot: "myMove", value: changePlayerBid.description)}
         else if playerMoveType == "Decision" || playerMoveType == "Quit" {// if quit the only point to find the strategy is to reinforce the chunk
             newExperience.setSlot(slot: "myMove", value: playerDecision!)}
-        else if playerMoveType == "Opening"{
-            newExperience.setSlot(slot: "myMove", value: playerCurrentOffer.description)}
+        else if playerMoveType == "Opening" {
+            newExperience.setSlot(slot: "myMove", value: playerCurrentOffer!.description)
+            newExperience.setSlot(slot: "myBidMNSDifference", value: "N/A")
+        }
 
         if modelMoveType == "Bid" {
             newExperience.setSlot(slot: "opponentMove", value: changeModelBid.description)}
@@ -220,30 +225,28 @@ struct NGModel {
     
     
     mutating func modelResponse() {
-        if verbose {print("MODEL IS RESPONDING TO PLAYER. Number of chunks: " + String(model.dm.chunks.count))}
-        
+        if verbose {print("\n \nMODEL IS RESPONDING TO PLAYER. Number of chunks: " + String(model.dm.chunks.count))}
         var changePlayerBid = 0
         
         // MARK: this next line is a problem; at the start of each game the runningMNSAverage is 0 (I think), maybe replace by using blended retrieval and just storing chunks that contain only the MNS?
-        let bidMNSDifference = playerCurrentOffer - assumedPlayerMNS  // find the player's "myBidMNSDifference" slot value
+        let bidMNSDifference = playerCurrentOffer! - assumedPlayerMNS  // find the player's "myBidMNSDifference" slot value
         
-        // detect player strategy
-        detectPlayerStrategy(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
-        
-        
+        print(playerMoveType)
         // do the saving of a new experience, learning what the opponent just did
         if playerPreviousOffer != nil {
-            changePlayerBid = playerCurrentOffer - playerPreviousOffer!
-            saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)
-        }
-        else {
+            changePlayerBid = playerCurrentOffer! - playerPreviousOffer!
+            
+            detectPlayerStrategy(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)  // detect player strategy
+            saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)    // then save a new memory
+        }  else {
             changePlayerBid = 0 // it's never used (this is probably not good practice)
-            saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: playerCurrentOffer)
+            
+            detectPlayerStrategy(bidMNSDifference: bidMNSDifference, changePlayerBid: changePlayerBid)   // detect player strategy
+            saveNewExperience(bidMNSDifference: bidMNSDifference, changePlayerBid: playerCurrentOffer!)  // then save a new memory
         }
         
-        // admin
+        // some admin work
         modelPreviousOffer = modelCurrentOffer
-        printV("M: model is responding/making a new offer")
     
         // first offer
         if modelCurrentOffer == nil { // make an opening bid
@@ -298,7 +301,7 @@ struct NGModel {
                         modelMadeADecision()
                     }
                 }
-                model.addToTrace(string: "Successfully Retrieved Bid \(chunk!)")
+                model.addToTrace(string: "modelResponse() Successfully Retrieved Bid \(chunk!)")
             }
             else {
                 // eforcing cause it never retrieves the decision chunks
@@ -306,10 +309,10 @@ struct NGModel {
                     modelMoveType = "Decision"
                     modelDecision = "Reject"
                     modelMadeADecision()
-                    model.addToTrace(string: "Failed bid retrieval, reject offer")
+                    model.addToTrace(string: "modelResponse() Failed bid retrieval, reject offer")
                 }
                 else {
-                    model.addToTrace(string: "Failed bid retrieval, insist on previous offer") }
+                    model.addToTrace(string: "modelResponse() Failed bid retrieval, insist on previous offer") }
                 
             }
             
@@ -393,8 +396,8 @@ struct NGModel {
         var modelCurrentScoreGain: Int = 0
         //Added this to see who made last offer
         if playerOffered {
-            modelCurrentScoreGain = (9 - playerCurrentOffer)-modelMNS
-            playerCurrentScoreGain = playerCurrentOffer - playerMNS
+            modelCurrentScoreGain = (9 - playerCurrentOffer!)-modelMNS
+            playerCurrentScoreGain = playerCurrentOffer! - playerMNS
         } else { // model made accepted offer
             playerCurrentScoreGain = (9 - modelCurrentOffer!)-playerMNS
             modelCurrentScoreGain = modelCurrentOffer!-modelMNS
@@ -423,7 +426,7 @@ struct NGModel {
     
     mutating func resetGameVariables(newGame: Bool) {
         // reset offer history
-        playerPreviousOffer = nil; playerCurrentOffer = 0
+        playerPreviousOffer = nil; playerCurrentOffer = nil
         modelPreviousOffer = nil; modelCurrentOffer  = nil
         playerIsFinalOffer = false; modelIsFinalOffer = false
         playerHasQuit = false; modelHasQuit = false
