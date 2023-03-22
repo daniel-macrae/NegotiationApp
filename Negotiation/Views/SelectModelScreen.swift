@@ -32,8 +32,8 @@ struct SelectModelScreen: View {
                 if showNameField {
                     
                     VStack{
-                        backButton(action: {showNameField=false
-                            goBack=false; selectedOption = 0})
+                        //backButton(action: {showNameField=false
+                            //goBack=false; selectedOption = 0})
                         VStack{
                             Spacer()
                             HStack{
@@ -52,29 +52,29 @@ struct SelectModelScreen: View {
                     
                 } else if loadNames {
                     VStack{
-                        backButton(action: {loadNames=false
-                            goBack=false})
+                        //backButton(action: {loadNames=false
+                            //goBack=false})
                         Spacer()
                         HStack{
-                            Spacer()
-                            Picker("", selection: $selectedOption){
-                                ForEach(0..<names.count, id: \.self){
-                                    index in
-                                    Text(names[index]).foregroundColor(Color.black)
-                                        .onAppear{  name = names[index]  }
-                                }
-                            }.pickerStyle(MenuPickerStyle())
-                                .frame(width:200)
-                                .background(Color.white.opacity(0.4))
-                                .cornerRadius(20)
-                    
+                            VStack{
+                                Picker("", selection: $selectedOption){
+                                    ForEach(0..<names.count, id: \.self){
+                                        index in
+                                        Text(names[index]).foregroundColor(Color.black)
+                                            .onAppear{  name = names[index]  }
+                                    }
+                                }.pickerStyle(MenuPickerStyle())
+                                    .frame(width:200)
+                                    .background(Color.white.opacity(0.4))
+                                    .cornerRadius(20)
+                                
+                                removePlayerButton(action: {
+                                    viewModel.removePlayer(name: name);
+                                    if !names.isEmpty {name = names[0]} else {loadNames=false; goBack = false}
+                                })
+                            }
                             nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name); selectedOption = 0})
-                            Spacer()
                         }
-                        removePlayerButton(action: {
-                            viewModel.removePlayer(name: name);
-                            if !names.isEmpty {name = names[0]} else {loadNames=false; goBack = false}
-                        })
                         Spacer()
                     }
                 } else {
@@ -103,7 +103,7 @@ struct SelectModelScreen: View {
 
         }
         .background(backgroundImg(image:"secondbackground")).ignoresSafeArea(.all)
-        .navigationBarBackButtonHidden(goBack)
+        //.navigationBarBackButtonHidden(goBack)
     }
 }
 
@@ -148,6 +148,8 @@ struct removePlayerButton: View {
     var body: some View {
         Button(String("Remove Player")) {showingAlert = true}//.foregroundColor(Color.orange)   // looks better as white?
             .font(.subheadline)
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
             .alert(isPresented: $showingAlert) {
                 Alert(title: Text("Are you sure you would like to delete this user?"),
                       message: Text("There is no undoing this action. All of the user's data will be deleted."),

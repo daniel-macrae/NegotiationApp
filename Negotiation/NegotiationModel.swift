@@ -44,6 +44,9 @@ struct NGModel {
     var playerDecision: String?
     var modelDecision: String?
     
+    var modelInsists = false
+    var playerInsists = false
+    
     //MNS runnig average
     var assumedPlayerMNS = 0
     //Need some function to get these from JSONManager
@@ -223,11 +226,25 @@ struct NGModel {
     }
  
     
+    mutating func isItTheSameOffer(){
+        //This should be called too in case the player offers the same as the model just did instead of just accepting
+        // For now it seems enough as it is
+        if let playerOffer = playerCurrentOffer{
+            if modelCurrentOffer == (9 - playerOffer){
+                modelMoveType = "Decision"
+                modelDecision = "Accept"
+                
+                modelMadeADecision()
+            }
+        }
+    }
+    
     
     mutating func modelResponse() {
         if verbose {print("\n \nMODEL IS RESPONDING TO PLAYER. Number of chunks: " + String(model.dm.chunks.count))}
         var changePlayerBid = 0
-        
+        modelInsists = false // I only wrote the conditions for true, we can add for false or leave it like this
+      
         // MARK: this next line is a problem; at the start of each game the runningMNSAverage is 0 (I think), maybe replace by using blended retrieval and just storing chunks that contain only the MNS?
         let bidMNSDifference = playerCurrentOffer! - assumedPlayerMNS  // find the player's "myBidMNSDifference" slot value
         
@@ -281,8 +298,6 @@ struct NGModel {
             
             let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
             
-            // MARK: this is  not working, especially the decisions
-            
             if let modelNewMoveType = chunk?.slotvals["myMoveType"]?.description {
                 // get myMoveType and myIsFinal values
                 modelMoveType = modelNewMoveType
@@ -291,9 +306,9 @@ struct NGModel {
                 
                 if modelMoveType == "Bid" {
                     if let modelChangeBid = chunk?.slotvals["myMove"]?.description {
-                        modelCurrentOffer = modelPreviousOffer! + Int(Float(modelChangeBid)!)// idk why this one is an optional thoug
+                        modelCurrentOffer = modelPreviousOffer! + Int(Float(modelChangeBid)!)
+                        if modelCurrentOffer == modelPreviousOffer { modelInsists = true}
                     }
-                
                 // any non-bids (accept, reject, quit) fall into this else condition
                 } else {
                     if let modelNewDecision = chunk?.slotvals["myMove"]?.description{
@@ -312,10 +327,13 @@ struct NGModel {
                     model.addToTrace(string: "modelResponse() Failed bid retrieval, reject offer")
                 }
                 else {
-                    model.addToTrace(string: "modelResponse() Failed bid retrieval, insist on previous offer") }
+                    model.addToTrace(string: "modelResponse() Failed bid retrieval, insist on previous offer")
+                    modelInsists = true
+                }
                 
             }
             
+            isItTheSameOffer()
             model.time += 0.1 + latency
             
         }
@@ -431,6 +449,7 @@ struct NGModel {
         playerIsFinalOffer = false; modelIsFinalOffer = false
         playerHasQuit = false; modelHasQuit = false
         playerDeclaredMNS = nil; modelDeclaredMNS = nil
+        modelInsists = false; playerInsists = false
         
         
         if newGame {

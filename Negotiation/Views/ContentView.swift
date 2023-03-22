@@ -352,37 +352,8 @@ struct infoButton: View {
                 backgroundImg(image: "thirdbackground2").background()
                     .ignoresSafeArea(.all)
                 VStack {
-                    GameButton(text: "How to Play") {
-                        showExplanation = true
-                        showMenu = false
-                    }
-                    GameButton(text: "Save Model") {
-                        viewModel.saveModel()
-                        //Some animation for the model being save
-                        showMenu = false
-                    }
-                    GameButton(text: "Load Model") {
-                        //Some animation for the model being loaded
-                        viewModel.loadModel(name:"test")
-                        showMenu = false
-                    }
-                    GameButton(text: "Return to Game") {
-                        showMenu = false
-                    }
-                    QuitButton(text: "Quit Game") {
-                        showMenu = false
-                        isQuitting = true
-                    }.foregroundColor(Color.red)
-                    
-                        .padding(.bottom)
-                }
-            }
-        }
-        .sheet(isPresented: $showExplanation){
-            ZStack{
-                backgroundImg(image: "secondbackground").background()
-                    .ignoresSafeArea(.all)
-                VStack{
+                    Text("How to play")
+                        .font(.largeTitle)
                     ScrollView{
                         Text("The game of nines is a negotiation game played between two players, the proposer (you) and the responder (model). The game is played over several rounds, and in each round, the proposer makes an offer, and the responder can either accept or reject the offer. The goal of the game is to maximize the total score over all rounds, where the score is calculated by subtracting the proposer's offer from the number nine.").padding(.all).foregroundColor(.white)
                         Text("At the start of each round, both players declare their minimum acceptable score (MNS), which is the minimum score they are willing to accept. The proposer makes the first offer, which must be a number between 0 and 9, and the responder can either accept or reject the offer. If the responder accepts the offer, the round ends, and both players receive a score equal to the difference between nine and the offer.").foregroundColor(.white)
@@ -390,19 +361,13 @@ struct infoButton: View {
                         Text("If the responder rejects the offer, the proposer can make a new offer and the responder can again choose to accept or reject the offer. If the proposer makes a final offer, the responder must accept or reject it, and the round ends regardless of their decision. The game continues for a fixed number of rounds, and the player with the highest total score at the end of the game is the winner.").foregroundColor(.white)
                             .padding(.all)
                     }.background(.black.opacity(0.6))
-                    GameButton(text:"Go to Game") {
-                        showExplanation = false
-                    }
-                    GameButton(text:"Go to Options") {
-                        showMenu = true
-                        showExplanation = false
-                    }
-                    
                 }
             }
         }
-    }
-}
+                    }
+                    
+                }
+    
 
 
 

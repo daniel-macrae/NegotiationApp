@@ -27,16 +27,25 @@ Tuesday:
 - Fixed the bug where the accept/reject offer buttons were always active if you changed which user was playing.
 - Moved reinforcement of strategy chunks so that it only reinforces after successfully retrieving the player's strategy
 
+Wednesday:
+- Fixed naviagtion links, now can easily go back from any screen (on the first game). Once in new player/ load player goes back to title screen instead of Select Model screen, but I think it is not a big deal.
+- The model now accepts the player's offer if it was gonna make the same one (could still check to correct that it accepts if the player makes the same one as the model just did, which should't happen because of the accept button)
+-Changed colour and position of removePlayer Button
+- Added insist messages for the model and player
+-Fixed How To Play options button
+
 Bugs & Things to work on:
+Weekend:
 - The retrieval of the opening offer still isn't great, it seems to just generate a random offer fairly often, which sometimes puts the model in a terrible starting place because it asks for just 1 or 2 points. Needs some work to get the retrievals to succeed.
 
-- There are cases where the model makes the exact same splitting of 9 points bid as the player (i.e., the player bids "I want 5, you get 4", then the model says "I want 4, you get 5", which is the same thing...). So maybe we should add a condition where if the model makes the same split offer as the player, just accept the player's offer. 
-- I fixed a weird thing if you press "Load Session" or "New Player", the background moves slightly, but now its more clear that the "Back" buttons are changing, but I can't work out how to fix this. Perhaps the player selection pages just need to be split up into 3 different views. But I think maybe we ask Luka about this first, because the navigation links are messy.
-- I've added a button to remove a user, but for now its just white text under the dropdown menu . It should probably be red text anyway, but I also don't know where to put it exactly. Also, it might be good if a pop-up menu came up after that asking the user if they're sure they want to delete this user.
+- //(done but maybe needs some adjustments)I fixed a weird thing if you press "Load Session" or "New Player", the background moves slightly, but now its more clear that the "Back" buttons are changing, but I can't work out how to fix this. Perhaps the player selection pages just need to be split up into 3 different views. But I think maybe we ask Luka about this first, because the navigation links are messy.
+
 Tuesday:
-- Change sentences when the model/player insists on the same offer.
-- Increase set of messages.
+- Increase set of messages. 
 - The back button on the contentView disappears if you finish a game, then press "new game" on the end-game screen (ask Luka to look at because the back buttons are driving me insane, idk where this one is defined at all).
-- The options menu (question mark button on contentView) should have most of the buttons removed, and this screen should just show the "how to play the game" text
 
 
+Wednesday:
+- model sometimes bids 0 in opening bid even when it declared higher MNS (I only saw it twice)
+- Increase the insist messages (only two now)
+- The final offer doesnt really work, the model doesnt retrieve a decision (even though it's suppoused to be enforced)

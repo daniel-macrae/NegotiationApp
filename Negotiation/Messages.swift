@@ -19,6 +19,11 @@ let bidMSGs = [
     "We can split the 9 points like this; %d to me, %d for you."
 ]
 
+let insistMSGs = [
+"I insist, I want %d points, which leaves %d for you.",
+"No, thank you. My offer still stands: %d points for me and %d for you."
+]
+
 let acceptingSentencesNeutral = [
     "I accept your offer.",
     "That's acceptable, I'm in.",

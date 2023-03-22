@@ -89,9 +89,23 @@ class NGViewModel: ObservableObject {
         if self.playerIsFinalOffer {
             self.sendMessage("This is my final offer: " + String(Int(playerBid)) + " points for me, " + String(9 - Int(playerBid)) + " for you.", isMe: true, PSA: false)
         } else {
-            let string = String(format: bidMSGs.randomElement()!, Int(playerBid), Int(9-playerBid))
-            self.sendMessage(string, isMe: true, PSA: false)
-            
+            // check if the player is insisting
+            if let playerLastOffer = model.playerCurrentOffer{
+                if Int(playerBid) == playerLastOffer{
+                    model.playerInsists = true
+                }
+                else{model.playerInsists = false}
+            }
+            //send message
+            if model.playerInsists == true{
+                let string = String(format: insistMSGs.randomElement()!, Int(playerBid), Int(9-playerBid))
+                self.sendMessage(string, isMe: true, PSA: false)
+            }
+            else{
+                let string = String(format: bidMSGs.randomElement()!, Int(playerBid), Int(9-playerBid))
+                self.sendMessage(string, isMe: true, PSA: false)
+            }
+        
             //self.sendMessage("This is my offer: I want " + String(Int(playerBid))  + " points, you'd get " + String(9 - Int(playerBid)) + " points", isMe: true, PSA: false)
         }
         model.playerPreviousOffer = model.playerCurrentOffer
@@ -111,7 +125,7 @@ class NGViewModel: ObservableObject {
     
     // player accepts the model's offer
     func playerAccepts () {
-        self.sendMessage("I accept your offer", isMe: true, PSA: false)
+        self.sendMessage(acceptingSentencesNeutral.randomElement()!, isMe: true, PSA: false)
         model.playerMoveType = "Decision";     model.playerDecision = "Accept"
         model.playerPreviousOffer = model.playerCurrentOffer
         
@@ -122,7 +136,7 @@ class NGViewModel: ObservableObject {
     
     // player rejects the model's offer
     func playerRejectsFinalOffer() {
-        self.sendMessage("I reject your offer", isMe: true, PSA: false)
+        self.sendMessage(decliningSentencesNeutral.randomElement()!, isMe: true, PSA: false)
         model.playerMoveType = "Decision";     model.playerDecision = "Reject"
         model.playerHasQuit = true
         model.playerPreviousOffer = model.playerCurrentOffer
@@ -191,8 +205,14 @@ class NGViewModel: ObservableObject {
             interRoundScoreDisplay(playerDecided:false, decisionAccept:false)
         }
         else if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") && model.modelIsFinalOffer == false {
-            let string = String(format: bidMSGs.randomElement()!, model.modelCurrentOffer!, 9-model.modelCurrentOffer!)
-            self.sendMessage(string, isMe: false, PSA: false)
+            if model.modelInsists == true{
+                let string = String(format: insistMSGs.randomElement()!, model.modelCurrentOffer!, 9-model.modelCurrentOffer!)
+                self.sendMessage(string, isMe: false, PSA: false)
+            }
+            else{
+                let string = String(format: bidMSGs.randomElement()!, model.modelCurrentOffer!, 9-model.modelCurrentOffer!)
+                self.sendMessage(string, isMe: false, PSA: false)
+            }
             
             //self.sendMessage("I want " + String(model.modelCurrentOffer!) + " points, you would get " + String(9-model.modelCurrentOffer!) + " points", isMe: false, PSA: false)
         }
