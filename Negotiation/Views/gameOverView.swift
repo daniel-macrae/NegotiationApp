@@ -11,6 +11,14 @@ struct gameOverView: View {
     @State var isQuitting :Bool = false
     @State var newGame : Bool = false
     @State var player_name: String = ""
+    
+    var displayImg: String {
+        if viewModel.playerScore > viewModel.modelScore {
+            return "win"
+        } else if viewModel.playerScore == viewModel.modelScore {
+            return "tie"
+        } else { return "lose" }
+    }
 
     var body: some View {
         NavigationStack{
@@ -20,9 +28,8 @@ struct gameOverView: View {
                     if newValue { viewModel.resetGame() }
                 }
             VStack{
-                if viewModel.playerScore > viewModel.modelScore{
                     Spacer()
-                    Image("win")
+                    Image(displayImg)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .padding([.top, .leading, .trailing], 20)
@@ -32,32 +39,7 @@ struct gameOverView: View {
                     Spacer()
                     FinalButtons(isQuitting: $isQuitting, newGame: $newGame)
                     Spacer()
-                    
-                } else if viewModel.playerScore == viewModel.modelScore {
-                    Spacer()
-                    Image("Tie")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding([.top, .leading, .trailing], 20)
-                        .scaleEffect(0.7)
-                    statsView(playerPoints: Int(viewModel.playerScore), modelPoints: Int(viewModel.modelScore))
-                    Spacer()
-                    FinalButtons(isQuitting: $isQuitting, newGame: $newGame)
-                    Spacer()
-                    
-                } else {
-                    Spacer()
-                    Image("lose")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding([.top, .leading, .trailing], 20)
-                        .scaleEffect(0.7)
-                    statsView(playerPoints: Int(viewModel.playerScore), modelPoints: Int(viewModel.modelScore))
-                    Spacer()
-                    FinalButtons(isQuitting: $isQuitting, newGame: $newGame)
-                    Spacer()
-                    
-                }
+                
             }.background(backgroundImg(image: "secondbackground"))
         }
     }
