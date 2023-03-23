@@ -116,7 +116,7 @@ struct NGModel {
     
         let query = Chunk(s: "query", m: model)
         query.setSlot(slot: "isa", value: "negotiation instance")
-        query.setSlot(slot: "myMNS", value: assumedPlayerMNS.description)
+        //query.setSlot(slot: "myMNS", value: assumedPlayerMNS.description)
         query.setSlot(slot: "myBidMNSDifference", value: bidMNSDifference.description)
         query.setSlot(slot: "myMoveType", value: playerMoveType)
         query.setSlot(slot: "myIsFinal", value: playerIsFinalOffer.description)
@@ -124,11 +124,14 @@ struct NGModel {
         
         if playerMoveType == "Bid" {
             query.setSlot(slot: "myMove", value: changePlayerBid.description)
+            query.setSlot(slot: "myMNS", value: "N/A")
         } else if playerMoveType == "Opening" {
             query.setSlot(slot: "myMove", value: playerCurrentOffer!.description)
             query.setSlot(slot: "myBidMNSDifference", value: "N/A")
+            query.setSlot(slot: "myMNS", value: assumedPlayerMNS.description)
         } else if playerMoveType == "Decision" || playerMoveType == "Quit" {
             query.setSlot(slot: "myMove", value: playerDecision!)
+            query.setSlot(slot: "myMNS", value: "N/A")
         }
         
         print("M: player strategy query chunk")

@@ -41,6 +41,9 @@ class NGViewModel: ObservableObject {
         else {return nil}    }
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}
+    var isPlayerTurn: Bool = false
+    var playerIsNext: Bool = false // this is a temporary vairable, used to make isPlayerTurn true after animations have finished
+    var animDuration: Double = 0.5
     
     
     init() {
@@ -62,13 +65,25 @@ class NGViewModel: ObservableObject {
         self.sendMessage("My MNS is " + String(Int(value)), isMe: true, PSA : false)
         
         // Now the model responds
+        
+        /// seemed to cause problems
+        /*
+         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { //makes it more lifelike i guess when adding a wait
+            self.model.declareModelMNS()
+            self.sendMessage("My MNS is " + String(self.model.modelDeclaredMNS!), isMe: false, PSA: false)
+            self.MNSDeclared = true  // if the model has declared its MNS, then so has the player
+        }
+         */
+        
+        isPlayerTurn = false
         model.declareModelMNS()
         sendMessage("My MNS is " + String(model.modelDeclaredMNS!), isMe: false, PSA: false)
         MNSDeclared = true  // if the model has declared its MNS, then so has the player
         
-        /// seemed to cause problems
-        //DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { //makes it more lifelike i guess when adding a wait
-        //    }
+        playerIsNext = true
+        
+        
+        
         
         
     }
@@ -97,6 +112,10 @@ class NGViewModel: ObservableObject {
         
             //self.sendMessage("This is my offer: I want " + String(Int(playerBid))  + " points, you'd get " + String(9 - Int(playerBid)) + " points", isMe: true, PSA: false)
         }
+        
+        isPlayerTurn = false
+        
+        
         model.playerPreviousOffer = model.playerCurrentOffer
         model.playerCurrentOffer = Int(playerBid)
         
@@ -108,6 +127,9 @@ class NGViewModel: ObservableObject {
         offerHasBeenMade = true
         
         modelResponseMessage()
+        playerIsNext = true
+        
+        
         
     }
     
@@ -231,15 +253,10 @@ class NGViewModel: ObservableObject {
         offerHasBeenMade = false;     MNSDeclared = false
     }
     
-    
-    func saveModel() {    // MARK: this button will be removed, so delete this later. It does not get called, other than that one button in the options menu
-        model.savePlayerModel()
-    }
     func loadModel(name: String) {   // this function gets used when picking a model
         model.currentPlayerName = name
         model.loadPlayerModel(playerName: name)
     }
-    
     
     func createNewPlayer(newName: String){
         model.currentPlayerName = newName
@@ -268,12 +285,25 @@ class NGViewModel: ObservableObject {
     
     // simple sendMessage function isMe: true if the player is the sender false is the model. PSA is the grey messages about MNSs and score changes
     func sendMessage(_ text:String, isMe: Bool, PSA: Bool){
-        messages.append(Message(text: text, sender: isMe, PSA: PSA))
+        
+        // MARK: This allows the model and the game to take 1 second before the message animation starts
+        var delay: Double {if isMe {return 0.0} else {return 1.0}}
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            self.messages.append(Message(text: text, sender: isMe, PSA: PSA))
+        }
+        
+        // MARK: This is to delay the player's buttons becoming active while animations are running
+        DispatchQueue.main.asyncAfter(deadline: .now() + animDuration) {
+            if self.playerIsNext {self.isPlayerTurn=true; self.playerIsNext = false}
+        }
+    
     }
     
     
     func openingNewGame() {
         sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
+        //isPlayerTurn = true
+        playerIsNext = true
     }
     
     // function to display the grey messages (PSAs) about score changes and the player MNS value for a new round
@@ -290,11 +320,14 @@ class NGViewModel: ObservableObject {
         model.newRound(playerOffered: !playerDecided)
         MNSDeclared = false
         offerHasBeenMade = false
+        playerIsNext = true
         
         
         if currentRound < numberOfRounds {
             sendMessage("Your MNS for the next round is " + String(playerMNS), isMe: false, PSA: true)
         }
+        
+        
         
     }
         

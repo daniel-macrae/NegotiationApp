@@ -26,74 +26,74 @@ struct ContentView: View {
                               modelDeclaredMNS: viewModel.modelDeclaredMNS,
                               playerScore:viewModel.playerScore, modelScore:viewModel.modelScore, playerMNS:viewModel.playerMNS, modelMNS:viewModel.modelMNS)
                 Spacer()
-                ChatBox(messages: viewModel.messages)
+                ChatBox(viewModel: viewModel, messages: viewModel.messages)
                     .layoutPriority(1)
                 Divider()
                     //Spacer()
                     if gameOver {
                         VStack{
                             Spacer()
-                            GameButton(text: "Continue", action: { finalScreen = true } )
+                            BidButton(text: "Continue", isPlayerTurn: viewModel.isPlayerTurn, action: { finalScreen = true } )
                             Spacer()
                         }
                     } else if viewModel.MNSDeclared {
-                            VStack {
-                                HStack {
-                                    Spacer()
-                                    RejectButton(text: viewModel.quitButtonText, action: {viewModel.playerRejectsFinalOffer();
-                                        finalOfferToggle = false;
-                                        //round_no = round_no + 1;
-                                        //round_no = viewModel.currentRound;
-                                        if viewModel.currentRound >= viewModel.numberOfRounds {
-                                            gameOver = true
-                                        }
-                                        
-                                    }, offerHasBeenMade: viewModel.offerHasBeenMade)
-                                    Spacer()
-                                    AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
-                                        finalOfferToggle = false;
-                                        //round_no = round_no + 1;
-                                        //round_no = viewModel.currentRound;
-                                        if viewModel.currentRound == viewModel.numberOfRounds {
-                                            gameOver = true
-                                        }
-                                        
-                                    }, offerHasBeenMade: viewModel.offerHasBeenMade)
-                                    Spacer()
+                        VStack {
+                            HStack {
+                                Spacer()
+                                RejectButton(text: viewModel.quitButtonText, action: {viewModel.playerRejectsFinalOffer();
+                                    finalOfferToggle = false;
+                                    //round_no = round_no + 1;
+                                    //round_no = viewModel.currentRound;
+                                    if viewModel.currentRound >= viewModel.numberOfRounds {
+                                        gameOver = true
+                                    }
                                     
-                                }
+                                }, offerHasBeenMade: viewModel.offerHasBeenMade, isPlayerTurn: viewModel.isPlayerTurn)
+                                Spacer()
+                                AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
+                                    finalOfferToggle = false;
+                                    //round_no = round_no + 1;
+                                    //round_no = viewModel.currentRound;
+                                    if viewModel.currentRound == viewModel.numberOfRounds {
+                                        gameOver = true
+                                    }
+                                    
+                                }, offerHasBeenMade: viewModel.offerHasBeenMade, isPlayerTurn: viewModel.isPlayerTurn)
+                                Spacer()
                                 
-                                sliderView(displayText: "Offer Value:", sliderValue: $sliderValue, thresholdValue: Float(viewModel.playerMNS))
-                                    .padding(.horizontal)
-                                    .background(Color.white.opacity(0.75))
-                                    .cornerRadius(20)
-                                
-                                //Spacer()
-                                //.frame(maxHeight: .infinity)
-                                HStack{
-                                    Spacer()
-                                    Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
-                                        viewModel.FinalOfferPlayerChanged()}
-                                    Spacer()
-                                    GameButton(text: "Send Offer", action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false})
-                                    Spacer()
-                                }
                             }
                             
-                        } else {
-                            VStack {
-                            sliderView(displayText: "Declared MNS Value:", sliderValue: $sliderValue, thresholdValue: Float(viewModel.playerMNS))
+                            sliderView(displayText: "Offer Value:", sliderValue: $sliderValue, thresholdValue: Float(viewModel.playerMNS))
                                 .padding(.horizontal)
                                 .background(Color.white.opacity(0.75))
                                 .cornerRadius(20)
-                            Spacer()
-                            .frame(maxHeight: .infinity)
-                            HStack {
-                                GameButton(text: "Declare MNS", action: {
-                                    viewModel.declarePlayerMNS(value: sliderValue)
-                                }).padding()
+                            
+                            //Spacer()
+                            //.frame(maxHeight: .infinity)
+                            HStack{
+                                Spacer()
+                                Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
+                                    viewModel.FinalOfferPlayerChanged()}
+                                Spacer()
+                                BidButton(text: "Send Offer", isPlayerTurn: viewModel.isPlayerTurn, action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false})
+                                Spacer()
                             }
                         }
+                        
+                    } else {
+                        VStack {
+                        sliderView(displayText: "Declared MNS Value:", sliderValue: $sliderValue, thresholdValue: Float(viewModel.playerMNS))
+                            .padding(.horizontal)
+                            .background(Color.white.opacity(0.75))
+                            .cornerRadius(20)
+                        Spacer()
+                        .frame(maxHeight: .infinity)
+                        HStack {
+                            BidButton(text: "Declare MNS", isPlayerTurn: viewModel.isPlayerTurn, action: {
+                                viewModel.declarePlayerMNS(value: sliderValue)
+                            }).padding()
+                        }
+                    }
     
                 }
             }
@@ -171,21 +171,49 @@ struct GameButton: View{
                 .cornerRadius(50)    }
 }
 
+
+
+struct BidButton: View {
+    let text: String
+    let isPlayerTurn: Bool
+    let action: () -> Void
+    let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76, alpha: 0.75))
+    let screenWidth = UIScreen.main.bounds.size.width
+    
+    var body: some View {
+        withAnimation(.easeInOut) {
+            Button(text, action: action)
+                .frame(width: screenWidth * 0.6, height:50)  // width is 60% of screen width
+                .foregroundColor(.white)
+                .background(isPlayerTurn ? buttonColor : Color.gray)//.animation(.easeInOut)
+                .buttonStyle(CustomButtonStyle())
+                .cornerRadius(50)
+                .disabled(!isPlayerTurn)
+        }
+    }
+}
+
+
+
+
 struct AcceptButton: View{
     let text: String
     let action: () -> Void
     //let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
     let buttonColor = Color.green
-    var offerHasBeenMade: Bool
+    let offerHasBeenMade: Bool
+    let isPlayerTurn: Bool
     
     var body: some View {
+        withAnimation(.easeInOut) {
             Button(text, action: action)
                 .frame(width: 160, height:50)
                 .foregroundColor(.white)
-                .background(offerHasBeenMade ? buttonColor : Color.gray)
+                .background(offerHasBeenMade&&isPlayerTurn ? buttonColor : Color.gray)
                 .cornerRadius(50)
                 .buttonStyle(CustomButtonStyle())
                 .disabled(!offerHasBeenMade)
+        }
     }
 }
 
@@ -194,16 +222,19 @@ struct RejectButton: View{
     let action: () -> Void
     //let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
     let buttonColor = Color.red
-    var offerHasBeenMade: Bool
+    let offerHasBeenMade: Bool
+    let isPlayerTurn: Bool
     
     var body: some View {
+        withAnimation(.easeInOut) {
             Button(text, action: action)
                 .frame(width: 160, height:50)
                 .foregroundColor(.white)
-                .background(offerHasBeenMade ? buttonColor : Color.gray)
+                .background(offerHasBeenMade&&isPlayerTurn ? buttonColor : Color.gray)
                 .cornerRadius(50)
                 .buttonStyle(CustomButtonStyle())
                 .disabled(!offerHasBeenMade)
+        }
     }
 }
 
@@ -361,13 +392,13 @@ struct infoButton: View {
                             .padding(.all)
                         Text("If the responder rejects the offer, the proposer can make a new offer and the responder can again choose to accept or reject the offer. If the proposer makes a final offer, the responder must accept or reject it, and the round ends regardless of their decision. The game continues for a fixed number of rounds, and the player with the highest total score at the end of the game is the winner.").foregroundColor(.white)
                             .padding(.all)
-                    }.background(.black.opacity(0.6))
+                    }.background(.black.opacity(0.3))
                 }
             }
         }
-                    }
-                    
-                }
+    }
+            
+}
     
 
 
@@ -394,7 +425,7 @@ struct MessageView: View{
     let message: NGViewModel.Message
     let screenWidth = UIScreen.main.bounds.size.width
     //let paddingVal : Int = 13
-    var body: some View{
+    var body: some View {
             
             if message.sender{
                 HStack{
@@ -428,11 +459,13 @@ struct MessageView: View{
                     Spacer()
                 }
             }
-        }
+    }
 }
 
 struct ChatBox: View{
+    var viewModel: NGViewModel
     var messages: [NGViewModel.Message]
+    //let animationDuration: Double = 0.5
     var body: some View{
         ZStack {
             ScrollView{
@@ -445,12 +478,17 @@ struct ChatBox: View{
                             Spacer()
                         }.id("Empty")
                     }.onChange(of: messages.count){ _ in
-                        withAnimation(.easeOut(duration: 0.5)){
+                        withAnimation(.easeOut(duration: viewModel.animDuration)){
                             scrollView.scrollTo("Empty", anchor: .bottom)
-            
                         }
+                        
+                        
                     }
+                    
                 }
+                //.transition(.slide.animation(.easeInOut(duration: 1.0)))
+                //.transition(.slide)
+                .animation(.linear(duration: viewModel.animDuration))
             }
         }.background(Color.white.opacity(0.8))
 

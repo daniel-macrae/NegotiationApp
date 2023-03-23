@@ -39,11 +39,18 @@ Wednesday:
 - Dan: fixed bug where the PSA of how many points the player got was incorrect, in cases where the model was accepting the player's offer.
 - Dan: refactoring of gameOverView screen by pulling the if conditions out of the view body, its much shorter now
 
+Thursday:
+- Tried adding new chunks, didn't seem to change much, some erratic behaviour. Maybe we should use a goal chunk to use spreading activation to encourage getting certain types of chunks at different points? (e.g. a goal chunk with "Opening", "Bid", "Decision"...)
+- Once we get very close to finishing, maybe remove our names from the name list?
+- Added animations of the messages appearing
+- the player's buttons are disabled while the model is responding
+
+
 Bugs & Things to work on:
 Weekend:
-- The retrieval of the opening offer still isn't great, it seems to just generate a random offer fairly often, which sometimes puts the model in a terrible starting place because it asks for just 1 or 2 points. Needs some work to get the retrievals to succeed.
+- // (seems fine now?) The retrieval of the opening offer still isn't great, it seems to just generate a random offer fairly often, which sometimes puts the model in a terrible starting place because it asks for just 1 or 2 points. Needs some work to get the retrievals to succeed.
 
-- //(done but maybe needs some adjustments)I fixed a weird thing if you press "Load Session" or "New Player", the background moves slightly, but now its more clear that the "Back" buttons are changing, but I can't work out how to fix this. Perhaps the player selection pages just need to be split up into 3 different views. But I think maybe we ask Luka about this first, because the navigation links are messy.
+- // (done but maybe needs some adjustments) I fixed a weird thing if you press "Load Session" or "New Player", the background moves slightly, but now its more clear that the "Back" buttons are changing, but I can't work out how to fix this. Perhaps the player selection pages just need to be split up into 3 different views. But I think maybe we ask Luka about this first, because the navigation links are messy.
 
 Tuesday:
 - Increase set of messages. 
@@ -53,5 +60,5 @@ Tuesday:
 Wednesday:
 - model sometimes bids 0 in opening bid even when it declared higher MNS (I only saw it twice)
 - Increase the insist messages (only two now)
-- The final offer doesnt really work, the model doesnt retrieve a decision (even though it's suppoused to be enforced)
-- Buttons on the gameOverView should be lower I think, they look awkward.
+- The final offer doesn't really work, the model doesn't retrieve a decision (even though it's supposed to be enforced)
+- Buttons on the gameOverView should be lower? I think they look a little awkward. maybe they should be on top of each other as well.
