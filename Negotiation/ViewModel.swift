@@ -7,59 +7,48 @@ import SwiftUI
 class NGViewModel: ObservableObject {
     @Published private var model : NGModel
     @Published var messages: [Message] = []
-    var verbose: Bool {model.verbose}
     
+    // variables relating to the game state and game management
     var currentRound: Int  {model.currentRoundNumber}
     var numberOfRounds: Int  {model.maxRoundNumber}
     @Published var offerHasBeenMade: Bool = false
     @Published var MNSDeclared: Bool = false
-    
-    var playerScore: Int {Int(model.playerScore)}
-    var modelScore: Int {Int(model.modelScore)}
-    var playerMNS: Int {Int(model.playerMNS)}
-    var modelMNS: Int {Int(model.modelMNS)}
-    
-    var playerNames: [String] {model.playerNames}
-    var currentPlayerName: String {model.currentPlayerName!}
     var quitButtonText: String {
         if model.modelIsFinalOffer==true{
         return "Reject Offer"}
         else{ return "Quit Round"}}
     
-    init() {
-        model = NGModel() // make just one active model file
-    }
-        
-        
-    struct Message: Identifiable, Equatable{
-        let id = UUID()
-        let text:String
-        let sender: Bool //true is the player flase is the model
-        let PSA: Bool
-    }
+    var playerNames: [String] {model.playerNames}
+    var currentPlayerName: String {model.currentPlayerName!}
     
+    // player and model states
+    var playerScore: Int {Int(model.playerScore)}
+    var modelScore: Int {Int(model.modelScore)}
+    var playerMNS: Int {Int(model.playerMNS)}
+    var modelMNS: Int {Int(model.modelMNS)}
+    /// dealing with model variables that are optionals
     var playerNegotiationValue: String {
         if let val = model.playerCurrentOffer {return String(val)}
-        else {return "N/A"}
-    }
-    
+        else {return "N/A"}    }
     var modelNegotiationValue: String {
-        let val = model.modelCurrentOffer
-        if val != nil {return String(val!)}
-        else {return "N/A"}
-    }
-    
+        if let val = model.modelCurrentOffer {return String(val)}
+        else {return "N/A"}    }
     var playerDeclaredMNS: Int? {
         if let val = model.playerDeclaredMNS {return val}
-        else {return nil}
-    }
+        else {return nil}    }
     var modelDeclaredMNS: Int? {
         if let val = model.modelDeclaredMNS {return val}
-        else {return nil}
-    }
-    
+        else {return nil}    }
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}
+    
+    
+    init() {
+        model = NGModel() // make just one active model file
+        model.pickMNS()
+    }
+    
+    
     
     
     
@@ -154,7 +143,6 @@ class NGViewModel: ObservableObject {
         
         model.modelResponse() // model has to save this experience
         
-        //model.newRound(playerOffered: false)
         interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
     }
     
@@ -167,7 +155,7 @@ class NGViewModel: ObservableObject {
         // make the cognitive model respond
         model.modelResponse()
         
-        // JUST ADD A self.sendMessage HERE !?!
+        // if the model accepts the player's bid
         if model.modelMoveType == "Decision" && model.modelDecision! == "Accept" {
             
             switch model.modelStrategy {
@@ -182,8 +170,8 @@ class NGViewModel: ObservableObject {
             }
             
             interRoundScoreDisplay(playerDecided:false,decisionAccept:true)
-            
         }
+        // if the model rejects the player's bid
         else if model.modelMoveType == "Decision" && model.modelDecision! == "Reject" {
             switch model.modelStrategy {
             case "Cooperative":
@@ -200,12 +188,20 @@ class NGViewModel: ObservableObject {
             
         }
         
+        // if the model quits the game
         else if model.modelMoveType == "Quit" {
             self.sendMessage("I want to quit this negotiation.",  isMe: false, PSA: false)
             interRoundScoreDisplay(playerDecided:false, decisionAccept:false)
         }
+        
+        // The model makes a new bid
         else if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") && model.modelIsFinalOffer == false {
-            if model.modelInsists == true{
+            
+            if model.modelIsFinalOffer == true {
+                let msg = "This is my final offer, I want " + String(model.modelCurrentOffer!) + " points, you would get " + String(9-model.modelCurrentOffer!) + " points"
+                self.sendMessage(msg, isMe: false, PSA: false)
+            }
+            else if model.modelInsists == true {
                 let string = String(format: insistMSGs.randomElement()!, model.modelCurrentOffer!, 9-model.modelCurrentOffer!)
                 self.sendMessage(string, isMe: false, PSA: false)
             }
@@ -214,12 +210,9 @@ class NGViewModel: ObservableObject {
                 self.sendMessage(string, isMe: false, PSA: false)
             }
             
-            //self.sendMessage("I want " + String(model.modelCurrentOffer!) + " points, you would get " + String(9-model.modelCurrentOffer!) + " points", isMe: false, PSA: false)
         }
-        else if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") {
-            let msg = "This is my final offer, I want " + String(model.modelCurrentOffer!) + " points, you would get " + String(9-model.modelCurrentOffer!) + " points"
-            self.sendMessage(msg, isMe: false, PSA: false)
-        }
+        
+
     }
     
     
@@ -244,7 +237,7 @@ class NGViewModel: ObservableObject {
     }
     func loadModel(name: String) {   // this function gets used when picking a model
         model.currentPlayerName = name
-        model.loadPlayerModel(fileName: name)
+        model.loadPlayerModel(playerName: name)
     }
     
     
@@ -263,16 +256,20 @@ class NGViewModel: ObservableObject {
     }
     
     
-    
-    
     // MARK: ########  MESSAGING FUNCTIONS  ########
     
+    struct Message: Identifiable, Equatable {
+        let id = UUID()
+        let text:String
+        let sender: Bool //true is the player flase is the model
+        let PSA: Bool
+    }
     
-    //simple sendMessage function isMe: true is the player is the sender false is the model
+    
+    // simple sendMessage function isMe: true if the player is the sender false is the model. PSA is the grey messages about MNSs and score changes
     func sendMessage(_ text:String, isMe: Bool, PSA: Bool){
         messages.append(Message(text: text, sender: isMe, PSA: PSA))
     }
-    
     
     
     func openingNewGame() {
@@ -281,20 +278,19 @@ class NGViewModel: ObservableObject {
     
     // function to display the grey messages (PSAs) about score changes and the player MNS value for a new round
     func interRoundScoreDisplay(playerDecided: Bool, decisionAccept: Bool){
+        
         if decisionAccept == true {
             if playerDecided == true {
-                sendMessage("You earned " + String((9 - model.modelCurrentOffer!) - model.playerMNS) + " points this round.", isMe: false, PSA: true)}
+                sendMessage("You earned " + String((9 - model.modelCurrentOffer!) - playerMNS) + " points this round.", isMe: false, PSA: true)}
             else{
-                sendMessage("You earned " + String((9 - model.playerCurrentOffer!) - model.modelMNS) + " points this round.", isMe: false, PSA: true)}}
+                sendMessage("You earned " + String((9 - model.playerCurrentOffer!) - playerMNS) + " points this round.", isMe: false, PSA: true)}}
         else{sendMessage("No points were earned this round.", isMe: false, PSA: true)}
-        offerHasBeenMade = false
-        model.playerIsFinalOffer = !playerDecided
-        
         
         // make a new round, once the PSAs have been sent
         model.newRound(playerOffered: !playerDecided)
+        MNSDeclared = false
+        offerHasBeenMade = false
         
-        MNSDeclared = false // new round, neither player has declared their MNS
         
         if currentRound < numberOfRounds {
             sendMessage("Your MNS for the next round is " + String(playerMNS), isMe: false, PSA: true)

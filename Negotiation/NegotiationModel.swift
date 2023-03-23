@@ -59,37 +59,40 @@ struct NGModel {
     func printV(_ text: String) {if verbose {print(text)}}
     
     
-    internal var model: Model = initNewModel() // just load an empty model
+    internal var model: Model // = initNewModel() // just load an empty model
     
+    init() {
+        if !playerNames.isEmpty {
+            (model, _) = loadModel(name: playerNames.first!)
+        } else {
+            model = initNewModel()
+        }
+    }
     
-    mutating func loadPlayerModel(fileName: String) {
+    mutating func loadPlayerModel(playerName: String) {
         let new: Bool // boolean to see if a new model was created
         
-        (model, new) = loadModel(name: fileName)  // loading the model
-        
-        moveToTop(player: fileName) // put this player at the top of the player selection menu
+        (model, new) = loadModel(name: playerName)  // loading the model
         printV("M: Model loaded. Number of chunks = " + String(model.dm.chunks.count))
         
-        if new {modelStrategy = "Neutral"}  // if a new model was made, make it's strategy neutral
-        else {decideModelStrategy()}        // if a previous model was loaded, use the memory it has to decide the strategy
+        // move this player to the top of the list of player names, makes it quicker to select the same user next time
+        let index = playerNames.firstIndex(of: playerName)
+        playerNames.move(fromOffsets: IndexSet(integer: index!), toOffset: 0)
+        
+        // decide the model's strategy, Neutral if the model is newly initalised
+        if new {modelStrategy = "Neutral"}
+        else {decideModelStrategy()}
         
         model.softReset()
         update()
-        
     }
- 
     
-    mutating func moveToTop(player: String) {
-        let index = playerNames.firstIndex(of: player)
-        playerNames.move(fromOffsets: IndexSet(integer: index!), toOffset: 0)
-    }
+    
     
     func savePlayerModel() {
-        //print("M: Number of Chunks in model to save: " + String(model.dm.chunks.count))
         saveModel(model: model, filename: currentPlayerName!) // save the model
         printV("M: model saved!")
     }
-    
     
     
     
@@ -98,6 +101,7 @@ struct NGModel {
     // "myMoveType","myMove","myIsFinal"
     
     
+    // function for the model to declare its MNS
     mutating func declareModelMNS(){
         decideModelStrategy()
         if modelStrategy == "Aggressive"{
@@ -107,11 +111,11 @@ struct NGModel {
         }
     }
 
-    
+    // function that allows the model to infer the player's strategy
     mutating func detectPlayerStrategy(bidMNSDifference: Int, changePlayerBid: Int){
     
         let query = Chunk(s: "query", m: model)
-        query.setSlot(slot: "isa", value: "negotiation instance")  // added this isa slot, might improve chances of matching a chunk
+        query.setSlot(slot: "isa", value: "negotiation instance")
         query.setSlot(slot: "myMNS", value: assumedPlayerMNS.description)
         query.setSlot(slot: "myBidMNSDifference", value: bidMNSDifference.description)
         query.setSlot(slot: "myMoveType", value: playerMoveType)
@@ -122,11 +126,10 @@ struct NGModel {
             query.setSlot(slot: "myMove", value: changePlayerBid.description)
         } else if playerMoveType == "Opening" {
             query.setSlot(slot: "myMove", value: playerCurrentOffer!.description)
-            query.setSlot(slot: "myBidMNSDifference", value: "N/A")  // overwrites the previously assigned slot value
-        } else if playerMoveType == "Decision" || playerMoveType == "Quit" {// if quit the only point to find the strategy is to reinforce the chunk
+            query.setSlot(slot: "myBidMNSDifference", value: "N/A")
+        } else if playerMoveType == "Decision" || playerMoveType == "Quit" {
             query.setSlot(slot: "myMove", value: playerDecision!)
         }
-        
         
         print("M: player strategy query chunk")
         print(query)
@@ -138,17 +141,18 @@ struct NGModel {
             playerStrategy = playerCurrentStrategy
             model.addToTrace(string: "Retrieved detectPlayerStrategy() chunk: \(chunk!)")
             
-            // reinforce strategy chunk, by adding to DM (not retrieval)
-            printV("M: Reinforcing: " + playerStrategy)
-            let strategyChunk = Chunk(s: "stategyChunk", m: model )  // check s
-            strategyChunk.setSlot(slot: "isa", value: "strategy")
-            strategyChunk.setSlot(slot: "strategy", value: playerStrategy)
-            model.dm.addToDM(strategyChunk)
+            if playerCurrentStrategy != "Neutral" {
+                // reinforce strategy chunk, by adding to DM (not retrieval)
+                printV("M: Reinforcing: " + playerStrategy)
+                let strategyChunk = Chunk(s: "stategyChunk", m: model )  // check s
+                strategyChunk.setSlot(slot: "isa", value: "strategy")
+                strategyChunk.setSlot(slot: "strategy", value: playerStrategy)
+                model.dm.addToDM(strategyChunk)
+            }
             
         } else {
             model.addToTrace(string: "detectPlayerStrategy() strategy chunk retrieval failed!")  // this still happens a few times
         }
-        
         
         model.time += 0.1
 
@@ -226,11 +230,11 @@ struct NGModel {
     }
  
     
-    mutating func isItTheSameOffer(){
+    mutating func isItTheSameOffer() {
         //This should be called too in case the player offers the same as the model just did instead of just accepting
         // For now it seems enough as it is
         if let playerOffer = playerCurrentOffer{
-            if modelCurrentOffer == (9 - playerOffer){
+            if modelCurrentOffer == (9 - playerOffer) {
                 modelMoveType = "Decision"
                 modelDecision = "Accept"
                 
@@ -245,8 +249,7 @@ struct NGModel {
         var changePlayerBid = 0
         modelInsists = false // I only wrote the conditions for true, we can add for false or leave it like this
       
-        // MARK: this next line is a problem; at the start of each game the runningMNSAverage is 0 (I think), maybe replace by using blended retrieval and just storing chunks that contain only the MNS?
-        let bidMNSDifference = playerCurrentOffer! - assumedPlayerMNS  // find the player's "myBidMNSDifference" slot value
+        let bidMNSDifference = playerCurrentOffer! - assumedPlayerMNS
         
         print(playerMoveType)
         // do the saving of a new experience, learning what the opponent just did
@@ -265,12 +268,11 @@ struct NGModel {
         // some admin work
         modelPreviousOffer = modelCurrentOffer
     
-        // first offer
-        if modelCurrentOffer == nil { // make an opening bid
-            // now the model decides what strategy it should use to respond
-            decideModelStrategy()
-            // we haven't made an opening offer, so specifically do that (the values in an opening bid chunk work differently to a normal bid chunk)
-            modelMakeOpeningOffer()
+        // if making the first offer ("Opening" offer)
+        if modelCurrentOffer == nil {
+            
+            decideModelStrategy() // model decides what strategy it should use to respond
+            modelMakeOpeningOffer() // make an opening offer
         }
 
         else if !(playerMoveType == "Decision" || playerMoveType == "Quit") { // if the player has not ended the round, normal bidding
@@ -307,7 +309,7 @@ struct NGModel {
                 if modelMoveType == "Bid" {
                     if let modelChangeBid = chunk?.slotvals["myMove"]?.description {
                         modelCurrentOffer = modelPreviousOffer! + Int(Float(modelChangeBid)!)
-                        if modelCurrentOffer == modelPreviousOffer { modelInsists = true}
+                        if modelCurrentOffer == modelPreviousOffer { modelInsists = true} // bid hasn't changed
                     }
                 // any non-bids (accept, reject, quit) fall into this else condition
                 } else {
@@ -333,7 +335,7 @@ struct NGModel {
                 
             }
             
-            isItTheSameOffer()
+            isItTheSameOffer()  // checks to see if the model is going to make the same bid as the player just made, if yes, then accept the player's offer (as they both want the same split)
             model.time += 0.1 + latency
             
         }
@@ -378,9 +380,7 @@ struct NGModel {
         else if modelDecision == "Reject" {
             modelHasQuit = true}
         else if modelMoveType == "Quit" {
-            modelHasQuit = true    }
-
-        //newRound(playerOffered: true)  a bit easier to keep this one in the viewModel
+            modelHasQuit = true}
     }
     
     mutating func runningAverageMNS(modelMNS: Int) -> Int{
@@ -390,7 +390,6 @@ struct NGModel {
             averagedMNS.remove(at: 0)
             averagedMNS.append(modelMNS)
         }
-        //print(averagedMNS)
         
         return Int(averagedMNS.reduce(0,+)/averagedMNS.count)
     }
@@ -435,7 +434,6 @@ struct NGModel {
         
         resetGameVariables(newGame: false)
         currentRoundNumber += 1
-        
         assumedPlayerMNS = runningAverageMNS(modelMNS: modelMNS) // the location fo this function is good
         
         update()

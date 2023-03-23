@@ -3,22 +3,4 @@
    uuid = "2BD71850-1585-4F5E-918C-7CBFEFF4E3A7"
    type = "1"
    version = "2.0">
-   <Breakpoints>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "EE85D6DD-6FBA-4EAC-B2DA-F9872089A123"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Negotiation/ViewModel.swift"
-            startingColumnNumber = "15"
-            endingColumnNumber = "15"
-            startingLineNumber = "116"
-            endingLineNumber = "116"
-            landmarkName = "playerAccepts()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-   </Breakpoints>
 </Bucket>

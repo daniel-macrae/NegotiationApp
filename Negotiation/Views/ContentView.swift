@@ -9,7 +9,6 @@ struct ContentView: View {
     @State private var sliderValue : Float = 0.0
     @State private var finalOfferToggle : Bool = false
     @State private var OfferAccepted: Bool = false
-    @State private var round_no: Int = 1
     @State private var isQuitting: Bool = false
     @State private var gameOver: Bool = false
     @State private var finalScreen: Bool = false
@@ -44,8 +43,8 @@ struct ContentView: View {
                                     RejectButton(text: viewModel.quitButtonText, action: {viewModel.playerRejectsFinalOffer();
                                         finalOfferToggle = false;
                                         //round_no = round_no + 1;
-                                        round_no = viewModel.currentRound;
-                                        if round_no >= viewModel.numberOfRounds {
+                                        //round_no = viewModel.currentRound;
+                                        if viewModel.currentRound >= viewModel.numberOfRounds {
                                             gameOver = true
                                         }
                                         
@@ -54,8 +53,8 @@ struct ContentView: View {
                                     AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                         finalOfferToggle = false;
                                         //round_no = round_no + 1;
-                                        round_no = viewModel.currentRound;
-                                        if round_no == viewModel.numberOfRounds {
+                                        //round_no = viewModel.currentRound;
+                                        if viewModel.currentRound == viewModel.numberOfRounds {
                                             gameOver = true
                                         }
                                         
@@ -110,7 +109,7 @@ struct ContentView: View {
             .onAppear{viewModel.sendMessage("Hello " + String(player_name), isMe: false, PSA: false)}
         .toolbar {
             // middle of top toolbar: show the round # out of 5
-            ToolbarItem(placement: .principal) { round_box(round_no: round_no, maxRoundNumber: viewModel.numberOfRounds) }
+            ToolbarItem(placement: .principal) { round_box(round_no: viewModel.currentRound, maxRoundNumber: viewModel.numberOfRounds) }
             // right side, show infoButton
             ToolbarItem(placement: .primaryAction) { infoButton(viewModel: viewModel, isQuitting: $isQuitting) }
         }
@@ -134,8 +133,8 @@ struct ScoresDisplay: View {
                 VStack{
                     Text("Score = " + String(modelScore))
                     Text("MNS = " + String(modelMNS)) //  MARK: REMOVE - IN THE LONG RUN
+                    // display declared MNS
                     if let modelDecMNS = modelDeclaredMNS {Text("Declared\nMNS = " + String(modelDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body)).lineLimit(2, reservesSpace: true)}
-                    //if let modelDecMNS = modelDeclaredMNS {Text("D MNS = " + String(modelDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body))}
                 }.layoutPriority(2)
                 
                 Spacer()
@@ -144,9 +143,8 @@ struct ScoresDisplay: View {
                     Text("Score = " + String(playerScore))
                     // What to display here? We cant just
                     Text("MNS = " + String(playerMNS))  // MARK: REMOVE - IN THE LONG RUN
-                    // display the declared MNS, seems easier than looking for it
+                    // display the declared MNS
                     if let playerDecMNS = playerDeclaredMNS {Text("Declared\nMNS = " + String(playerDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body)).lineLimit(2, reservesSpace: true)}  // font size changes dynamically
-                    //if let playerDecMNS = playerDeclaredMNS {Text("D MNS = " + String(playerDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body))}
                 }.layoutPriority(2)
                 UserIcon()
                 
@@ -349,11 +347,14 @@ struct infoButton: View {
         }
         .sheet(isPresented: $showMenu) {
             ZStack{
-                backgroundImg(image: "thirdbackground2").background()
+                backgroundImg(image: "SolidBackground").background()
                     .ignoresSafeArea(.all)
                 VStack {
-                    Text("How to play")
+                    Spacer()
+                    Text("How to Play:")
                         .font(.largeTitle)
+                        .foregroundColor(Color.white)
+                    Spacer()
                     ScrollView{
                         Text("The game of nines is a negotiation game played between two players, the proposer (you) and the responder (model). The game is played over several rounds, and in each round, the proposer makes an offer, and the responder can either accept or reject the offer. The goal of the game is to maximize the total score over all rounds, where the score is calculated by subtracting the proposer's offer from the number nine.").padding(.all).foregroundColor(.white)
                         Text("At the start of each round, both players declare their minimum acceptable score (MNS), which is the minimum score they are willing to accept. The proposer makes the first offer, which must be a number between 0 and 9, and the responder can either accept or reject the offer. If the responder accepts the offer, the round ends, and both players receive a score equal to the difference between nine and the offer.").foregroundColor(.white)
