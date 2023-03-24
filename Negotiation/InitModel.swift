@@ -68,10 +68,11 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
     // similarity score
     var M_li: Double? = nil
     
-    let defaultMli = -0.3
+    let defaultMli = -0.2
     
     // this one should be covered in the Declarative memory already, but put it here for completeness' sake
     if x.isEqual(value: y) { M_li = 0 }
+    
     
     // in the case that both slot values are numbers, compute a similarity score
     // as in the equation at the top of page 7 of the paper
@@ -100,7 +101,12 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
             else if string1 == "Aggressive" { M_li =  -0.1 }
             else if string1 == "Neutral" { M_li = 0 }
             else { M_li = defaultMli }
-        }
+        } else if string2 == "Decision" && string1 != "Decision" { // if requesting a decision, and the chunk in memory is not a decision
+            return nil
+        } else if string2 == "Opening" && string1 != "Opening" { // if requesting an opening offer
+            return nil
+        } else if string2 == "true" && string1 == "false" { // if requesting an final
+            return nil }
         else { M_li =  defaultMli }  // paper does -1 here, but we have more slots so that would cause those additional slots to contribute to a very high mismatch penalty
         
     // else, the slots values don't match, they are dissimilar

@@ -16,7 +16,7 @@ struct gameOverView: View {
         if viewModel.playerScore > viewModel.modelScore {
             return "win"
         } else if viewModel.playerScore == viewModel.modelScore {
-            return "tie"
+            return "Tie"
         } else { return "lose" }
     }
 

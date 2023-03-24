@@ -11,6 +11,8 @@ class NGViewModel: ObservableObject {
     // variables relating to the game state and game management
     var currentRound: Int  {model.currentRoundNumber}
     var numberOfRounds: Int  {model.maxRoundNumber}
+    var gameOver: Bool = false
+    
     @Published var offerHasBeenMade: Bool = false
     @Published var MNSDeclared: Bool = false
     var quitButtonText: String {
@@ -217,7 +219,7 @@ class NGViewModel: ObservableObject {
         }
         
         // The model makes a new bid
-        else if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") && model.modelIsFinalOffer == false {
+        else if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") {
             
             if model.modelIsFinalOffer == true {
                 let msg = "This is my final offer, I want " + String(model.modelCurrentOffer!) + " points, you would get " + String(9-model.modelCurrentOffer!) + " points"
@@ -231,6 +233,8 @@ class NGViewModel: ObservableObject {
                 let string = String(format: bidMSGs.randomElement()!, model.modelCurrentOffer!, 9-model.modelCurrentOffer!)
                 self.sendMessage(string, isMe: false, PSA: false)
             }
+            print("VM: modelIsFinal " + String(model.modelIsFinalOffer))
+            print("VM: modelIsFinal " + String(modelIsFinalOffer))
             
         }
         
@@ -251,6 +255,7 @@ class NGViewModel: ObservableObject {
         model.resetGameVariables(newGame: true)  // reset the game variables when returning to the ContentView
         openingNewGame()
         offerHasBeenMade = false;     MNSDeclared = false
+        gameOver = false
     }
     
     func loadModel(name: String) {   // this function gets used when picking a model
@@ -261,6 +266,7 @@ class NGViewModel: ObservableObject {
     func createNewPlayer(newName: String){
         model.currentPlayerName = newName
         model.playerNames.insert(newName, at: 0)  // insert new player to start of playerNames list, means they become the first option on the selection page
+        model.loadPlayerModel(playerName: newName)
     }
     
     func removePlayer(name: String) -> Void {
@@ -323,8 +329,13 @@ class NGViewModel: ObservableObject {
         playerIsNext = true
         
         
-        if currentRound < numberOfRounds {
+        if !model.gameOver {
             sendMessage("Your MNS for the next round is " + String(playerMNS), isMe: false, PSA: true)
+            gameOver = false
+        } else {
+            gameOver = true
+            model.gameOver = false
+            
         }
         
         

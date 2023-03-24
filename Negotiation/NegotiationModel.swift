@@ -9,7 +9,8 @@ struct NGModel {
     
     // MARK: Game state management
     var currentRoundNumber: Int = 1
-    var maxRoundNumber: Int = 5
+    var maxRoundNumber: Int = 2
+    var gameOver: Bool = false
     
     var MNS_combinations: Array<(Int, Int)> = [(2,2),(1,3),(3,1),(2,2),(3,3),(2,3),(3,2),(3,4),(4,3),(2,4),(4,4)]
     /// Model's total score
@@ -236,10 +237,12 @@ struct NGModel {
     mutating func isItTheSameOffer() {
         //This should be called too in case the player offers the same as the model just did instead of just accepting
         // For now it seems enough as it is
-        if let playerOffer = playerCurrentOffer{
-            if modelCurrentOffer == (9 - playerOffer) {
+        if let playerOffer = playerCurrentOffer {
+            if modelCurrentOffer! <= (9 - playerOffer) {
                 modelMoveType = "Decision"
                 modelDecision = "Accept"
+                
+                print(" \n \n MODEL IS DUMB \n \n")
                 
                 modelMadeADecision()
             }
@@ -288,7 +291,7 @@ struct NGModel {
             query.setSlot(slot: "myStrategy", value: modelStrategy)
             query.setSlot(slot: "opponentMoveType", value: playerMoveType)
             query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)
-            query.setSlot(slot: "myBidMNSDifference", value: bidMNSDifference.description)
+            query.setSlot(slot: "myBidMNSDifference", value: String(modelPreviousOffer! - modelMNS))
             if playerIsFinalOffer == true{ query.setSlot(slot: "myMoveType", value: "Decision") }
 
             if playerPreviousOffer != nil { // if model plays first, playerPreviousffer is still nil after one play from the model
@@ -298,6 +301,9 @@ struct NGModel {
             else {
                 query.setSlot(slot: "opponentMove", value: "N/A")
             }
+            
+            query.setSlot(slot: "myIsFinal", value: true.description)
+            
             
             print("M: Query chunk \(query)")
             
@@ -313,6 +319,14 @@ struct NGModel {
                     if let modelChangeBid = chunk?.slotvals["myMove"]?.description {
                         modelCurrentOffer = modelPreviousOffer! + Int(Float(modelChangeBid)!)
                         if modelCurrentOffer == modelPreviousOffer { modelInsists = true} // bid hasn't changed
+                        
+                        //if modelCurrentOffer! < (9-playerCurrentOffer!) {
+                        //    modelDecision = "Accept"
+                        //    modelMoveType = "Decision"
+                        //    modelMadeADecision()
+                        //    print(" \n \n OVERRIDING BID BECAUSE ITS WORSE \n \n")
+                        //}
+                        
                     }
                 // any non-bids (accept, reject, quit) fall into this else condition
                 } else {
@@ -333,6 +347,7 @@ struct NGModel {
                 }
                 else {
                     model.addToTrace(string: "modelResponse() Failed bid retrieval, insist on previous offer")
+                    modelIsFinalOffer = true
                     modelInsists = true
                 }
                 
@@ -435,8 +450,19 @@ struct NGModel {
             updateScores(playerOffered: playerOffered)
         }
         
+        
+        if currentRoundNumber >= maxRoundNumber {
+            gameOver=true
+            //resetGameVariables(newGame: true)
+        }  // do something here to end the game
+        else {
+            currentRoundNumber += 1
+            gameOver=false
+            
+        }
         resetGameVariables(newGame: false)
-        currentRoundNumber += 1
+        
+        
         assumedPlayerMNS = runningAverageMNS(modelMNS: modelMNS) // the location fo this function is good
         
         update()
@@ -456,6 +482,7 @@ struct NGModel {
         if newGame {
             if verbose {print("\n \n \n \n    !!  NEW GAME  !!  \n \n \n \n ")}
             playerScore = 0; modelScore = 0
+            //gameOver=false
             currentRoundNumber = 1
         }
         savePlayerModel()

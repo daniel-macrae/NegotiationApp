@@ -10,7 +10,7 @@ struct ContentView: View {
     @State private var finalOfferToggle : Bool = false
     @State private var OfferAccepted: Bool = false
     @State private var isQuitting: Bool = false
-    @State private var gameOver: Bool = false
+    //private var gameOver: Bool {viewModel.gameOver}
     @State private var finalScreen: Bool = false
  
     var body: some View {
@@ -30,10 +30,10 @@ struct ContentView: View {
                     .layoutPriority(1)
                 Divider()
                     //Spacer()
-                    if gameOver {
+                    if viewModel.gameOver {
                         VStack{
                             Spacer()
-                            BidButton(text: "Continue", isPlayerTurn: viewModel.isPlayerTurn, action: { finalScreen = true } )
+                            BidButton(text: "Continue", isPlayerTurn: viewModel.isPlayerTurn, modelIsFinal:viewModel.modelIsFinalOffer, action: { finalScreen = true } )
                             Spacer()
                         }
                     } else if viewModel.MNSDeclared {
@@ -42,21 +42,11 @@ struct ContentView: View {
                                 Spacer()
                                 RejectButton(text: viewModel.quitButtonText, action: {viewModel.playerRejectsFinalOffer();
                                     finalOfferToggle = false;
-                                    //round_no = round_no + 1;
-                                    //round_no = viewModel.currentRound;
-                                    if viewModel.currentRound >= viewModel.numberOfRounds {
-                                        gameOver = true
-                                    }
                                     
                                 }, offerHasBeenMade: viewModel.offerHasBeenMade, isPlayerTurn: viewModel.isPlayerTurn)
                                 Spacer()
                                 AcceptButton(text: "Accept Offer", action: {viewModel.playerAccepts();
                                     finalOfferToggle = false;
-                                    //round_no = round_no + 1;
-                                    //round_no = viewModel.currentRound;
-                                    if viewModel.currentRound == viewModel.numberOfRounds {
-                                        gameOver = true
-                                    }
                                     
                                 }, offerHasBeenMade: viewModel.offerHasBeenMade, isPlayerTurn: viewModel.isPlayerTurn)
                                 Spacer()
@@ -75,7 +65,7 @@ struct ContentView: View {
                                 Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
                                     viewModel.FinalOfferPlayerChanged()}
                                 Spacer()
-                                BidButton(text: "Send Offer", isPlayerTurn: viewModel.isPlayerTurn, action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false})
+                                BidButton(text: "Send Offer", isPlayerTurn: viewModel.isPlayerTurn, modelIsFinal:viewModel.modelIsFinalOffer, action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false})
                                 Spacer()
                             }
                         }
@@ -89,7 +79,7 @@ struct ContentView: View {
                         Spacer()
                         .frame(maxHeight: .infinity)
                         HStack {
-                            BidButton(text: "Declare MNS", isPlayerTurn: viewModel.isPlayerTurn, action: {
+                            BidButton(text: "Declare MNS", isPlayerTurn: viewModel.isPlayerTurn, modelIsFinal:viewModel.modelIsFinalOffer, action: {
                                 viewModel.declarePlayerMNS(value: sliderValue)
                             }).padding()
                         }
@@ -176,6 +166,7 @@ struct GameButton: View{
 struct BidButton: View {
     let text: String
     let isPlayerTurn: Bool
+    let modelIsFinal: Bool
     let action: () -> Void
     let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76, alpha: 0.75))
     let screenWidth = UIScreen.main.bounds.size.width
@@ -185,10 +176,10 @@ struct BidButton: View {
             Button(text, action: action)
                 .frame(width: screenWidth * 0.6, height:50)  // width is 60% of screen width
                 .foregroundColor(.white)
-                .background(isPlayerTurn ? buttonColor : Color.gray)//.animation(.easeInOut)
+                .background((isPlayerTurn && !modelIsFinal) ? buttonColor : Color.gray)//.animation(.easeInOut)
                 .buttonStyle(CustomButtonStyle())
                 .cornerRadius(50)
-                .disabled(!isPlayerTurn)
+                .disabled( (!isPlayerTurn || modelIsFinal) )
         }
     }
 }
