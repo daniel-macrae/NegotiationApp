@@ -63,6 +63,7 @@ func readCSV() -> DataFrame? {
 
 
 
+// this is the mismatch function used for partial retrieval in the NegotiationModel file
 
 func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
     // similarity score
@@ -78,7 +79,7 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
     // as in the equation at the top of page 7 of the paper
     else if let l = x.number(), let i = y.number() {
         
-        let fraq = pow((l-i),2) / 2
+        let fraq = pow((l-i), 2) / 2
         M_li = (1 / (fraq + 1)) - 1
         
     // if both slots are strings, check to see if they are similar strategy values
@@ -101,12 +102,13 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
             else if string1 == "Aggressive" { M_li =  -0.1 }
             else if string1 == "Neutral" { M_li = 0 }
             else { M_li = defaultMli }
-        } else if string2 == "Decision" && string1 != "Decision" { // if requesting a decision, and the chunk in memory is not a decision
+        }
+        else if string2 == "Decision" && string1 != "Decision" { // if requesting a decision, and the chunk in memory is not a decision
             return nil
-        } else if string2 == "Opening" && string1 != "Opening" { // if requesting an opening offer
+        }
+        else if string2 == "Opening" && string1 != "Opening" { // if requesting an opening offer
             return nil
-        } else if string2 == "true" && string1 == "false" { // if requesting an final
-            return nil }
+        }
         else { M_li =  defaultMli }  // paper does -1 here, but we have more slots so that would cause those additional slots to contribute to a very high mismatch penalty
         
     // else, the slots values don't match, they are dissimilar

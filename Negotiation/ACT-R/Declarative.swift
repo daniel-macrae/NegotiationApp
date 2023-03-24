@@ -18,13 +18,13 @@ class Declarative: Codable  {
     /// Parameter that controls spreading activation from the goal (W in ACT-R)
     var goalActivation: Double = 1
     /// Retrieval threshold parameter (rt in ACT-R)
-    var retrievalThreshold: Double = -2
+    var retrievalThreshold: Double = -3
     /// Activation noise parameter (ans in ACT-R). Can be nil to switch off noise.
     var activationNoise: Double? = 0.25
     /// A dictionary with all the chunks in DM, indexed by chunk name
     var chunks = [String:Chunk]()
     /// The mismatch penalty, to be used in partial matching (mp in ACT-R)
-    var misMatchPenalty: Double = 5
+    var misMatchPenalty: Double = 3
     /// The latency factor parameter (lf in ACT-R)
     var latencyFactor = 0.2
     

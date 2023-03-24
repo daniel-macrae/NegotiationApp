@@ -43,9 +43,9 @@ class NGViewModel: ObservableObject {
         else {return nil}    }
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}
-    var isPlayerTurn: Bool = false
-    var playerIsNext: Bool = false // this is a temporary vairable, used to make isPlayerTurn true after animations have finished
-    var animDuration: Double = 0.5
+    @Published var isPlayerTurn: Bool = false
+    @Published var playerIsNext: Bool = false // this is a temporary vairable, used to make isPlayerTurn true after animations have finished
+    @Published var animDuration: Double = 0.5
     
     
     init() {
@@ -233,12 +233,7 @@ class NGViewModel: ObservableObject {
                 let string = String(format: bidMSGs.randomElement()!, model.modelCurrentOffer!, 9-model.modelCurrentOffer!)
                 self.sendMessage(string, isMe: false, PSA: false)
             }
-            print("VM: modelIsFinal " + String(model.modelIsFinalOffer))
-            print("VM: modelIsFinal " + String(modelIsFinalOffer))
-            
         }
-        
-
     }
     
     
@@ -288,28 +283,38 @@ class NGViewModel: ObservableObject {
         let PSA: Bool
     }
     
-    
     // simple sendMessage function isMe: true if the player is the sender false is the model. PSA is the grey messages about MNSs and score changes
     func sendMessage(_ text:String, isMe: Bool, PSA: Bool){
         
-        // MARK: This allows the model and the game to take 1 second before the message animation starts
+        isPlayerTurn = false
+        
+        // This allows the model and the game to take 1 second before the message animation starts
         var delay: Double {if isMe {return 0.0} else {return 1.0}}
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             self.messages.append(Message(text: text, sender: isMe, PSA: PSA))
         }
         
-        // MARK: This is to delay the player's buttons becoming active while animations are running
-        DispatchQueue.main.asyncAfter(deadline: .now() + animDuration) {
-            if self.playerIsNext {self.isPlayerTurn=true; self.playerIsNext = false}
+        // This is to delay the player's buttons becoming active while animations are running
+        // basically, it prevents the player from making bids while the model is active, or while a new round is being prepared
+        DispatchQueue.main.asyncAfter(deadline: .now() + animDuration + delay) {
+            self.makePlayerButtonsActive()
         }
+    }
     
+    
+    // this funtion allows the other functions to toggle whether the player's buttons are clickable
+    func makePlayerButtonsActive() {
+        if self.playerIsNext {
+            isPlayerTurn = true
+            playerIsNext = false}
     }
     
     
     func openingNewGame() {
-        sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
-        //isPlayerTurn = true
+        isPlayerTurn = false
         playerIsNext = true
+        sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
+        
     }
     
     // function to display the grey messages (PSAs) about score changes and the player MNS value for a new round
