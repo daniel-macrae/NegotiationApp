@@ -45,7 +45,7 @@ class NGViewModel: ObservableObject {
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}
     @Published var isPlayerTurn: Bool = false
     @Published var playerIsNext: Bool = false // this is a temporary vairable, used to make isPlayerTurn true after animations have finished
-    @Published var animDuration: Double = 0.5
+    @Published var animDuration: Double = 0.3
     
     
     init() {
@@ -78,11 +78,15 @@ class NGViewModel: ObservableObject {
          */
         
         isPlayerTurn = false
+        playerIsNext = true
+        
+        //messages.append(Message())
+        
         model.declareModelMNS()
         sendMessage("My MNS is " + String(model.modelDeclaredMNS!), isMe: false, PSA: false)
         MNSDeclared = true  // if the model has declared its MNS, then so has the player
         
-        playerIsNext = true
+        
         
         
         
@@ -128,8 +132,9 @@ class NGViewModel: ObservableObject {
         
         offerHasBeenMade = true
         
-        modelResponseMessage()
         playerIsNext = true
+        modelResponseMessage()
+        
         
         
         
@@ -176,6 +181,7 @@ class NGViewModel: ObservableObject {
     
     func modelResponseMessage() {
         
+        //messages.append(Message(text: "...", sender: false, PSA: false))
         // make the cognitive model respond
         model.modelResponse()
         
@@ -192,8 +198,10 @@ class NGViewModel: ObservableObject {
             default:
                 self.sendMessage("I accept your offer", isMe: false, PSA: false)
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + model.modelResponseDuration + animDuration) {
+                self.interRoundScoreDisplay(playerDecided:false,decisionAccept:true)
+            }
             
-            interRoundScoreDisplay(playerDecided:false,decisionAccept:true)
         }
         // if the model rejects the player's bid
         else if model.modelMoveType == "Decision" && model.modelDecision! == "Reject" {
@@ -208,14 +216,21 @@ class NGViewModel: ObservableObject {
                 self.sendMessage("I reject your final offer.", isMe: false, PSA: false)
             }
             
-            interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
+            DispatchQueue.main.asyncAfter(deadline: .now() + model.modelResponseDuration  + animDuration) {
+                self.interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
+            }
+            
+            //interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
             
         }
         
         // if the model quits the game
         else if model.modelMoveType == "Quit" {
             self.sendMessage("I want to quit this negotiation.",  isMe: false, PSA: false)
-            interRoundScoreDisplay(playerDecided:false, decisionAccept:false)
+            DispatchQueue.main.asyncAfter(deadline: .now() + model.modelResponseDuration  + animDuration) {
+                self.interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
+            }
+            //interRoundScoreDisplay(playerDecided:false, decisionAccept:false)
         }
         
         // The model makes a new bid
@@ -283,28 +298,60 @@ class NGViewModel: ObservableObject {
         let PSA: Bool
     }
     
+    
+    func modelSendMessage(_ text:String, isMe: Bool, PSA: Bool){
+        print("hi")
+    }
+    
     // simple sendMessage function isMe: true if the player is the sender false is the model. PSA is the grey messages about MNSs and score changes
     func sendMessage(_ text:String, isMe: Bool, PSA: Bool){
         
         isPlayerTurn = false
         
-        // This allows the model and the game to take 1 second before the message animation starts
-        var delay: Double {if isMe {return 0.0} else {return 1.0}}
+        var delay: Double
+        if isMe {delay = 0.0} // if the player is sending a message
+        else {delay = 1.0}
+        
+        var modelDuration: Double
+        if isMe || PSA {modelDuration = 0.0}
+        else {modelDuration = model.modelResponseDuration}
+        
+        // controls the delay of the messages showing up
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            self.messages.append(Message(text: text, sender: isMe, PSA: PSA))
+            
+            // if the model is sending a message, it should show the 'typing' animation for as long as the model needs to make an offer ("modelDuration"), and then this text message box is filled with the actual offer
+            if isMe==false && PSA==false {
+                
+                self.messages.append(Message(text: "...", sender: false, PSA: false))
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + modelDuration) {
+                    //delay = 4.0
+                    if let modelMessIndex = self.messages.lastIndex(where: {$0.text == "..."}) {
+                        //print(modelMessIndex.description)
+                        self.messages[modelMessIndex] = Message(text: text, sender: false, PSA: false)
+                    }
+                }
+                
+            }
+            // player and PSA messages fall into this conditon
+            else {
+                self.messages.append(Message(text: text, sender: isMe, PSA: PSA))
+            }
         }
         
         // This is to delay the player's buttons becoming active while animations are running
         // basically, it prevents the player from making bids while the model is active, or while a new round is being prepared
-        DispatchQueue.main.asyncAfter(deadline: .now() + animDuration + delay) {
-            self.makePlayerButtonsActive()
+        if isMe == false && playerIsNext == true {
+            DispatchQueue.main.asyncAfter(deadline: .now() + animDuration + delay + modelDuration) {
+                self.makePlayerButtonsActive()
+            }
         }
     }
     
     
     // this funtion allows the other functions to toggle whether the player's buttons are clickable
     func makePlayerButtonsActive() {
-        if self.playerIsNext {
+        if playerIsNext {
             isPlayerTurn = true
             playerIsNext = false}
     }
@@ -312,10 +359,17 @@ class NGViewModel: ObservableObject {
     
     func openingNewGame() {
         isPlayerTurn = false
-        playerIsNext = true
+        
         sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
+        playerIsNext = true
+        sendMessage("Hello " + String(currentPlayerName), isMe: false, PSA: false)
+
         
     }
+    
+    //func removeMessage() {
+    //    messages[messages.endIndex-1] = Message(text: "...", sender: false, PSA: false)
+    //}
     
     // function to display the grey messages (PSAs) about score changes and the player MNS value for a new round
     func interRoundScoreDisplay(playerDecided: Bool, decisionAccept: Bool){

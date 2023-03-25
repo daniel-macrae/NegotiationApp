@@ -42,6 +42,7 @@ struct ContentView: View {
                                 Spacer()
                                 RejectButton(text: viewModel.quitButtonText, action: {viewModel.playerRejectsFinalOffer();
                                     finalOfferToggle = false;
+                                    //viewModel.removeMessage()
                                     
                                 }, offerHasBeenMade: viewModel.offerHasBeenMade, isPlayerTurn: viewModel.isPlayerTurn)
                                 Spacer()
@@ -96,7 +97,7 @@ struct ContentView: View {
             }
         }
         .background(backgroundImg(image: "SolidBackground"))
-            .onAppear{viewModel.sendMessage("Hello " + String(player_name), isMe: false, PSA: false)}
+            
         .toolbar {
             // middle of top toolbar: show the round # out of 5
             ToolbarItem(placement: .principal) { round_box(round_no: viewModel.currentRound, maxRoundNumber: viewModel.numberOfRounds) }
@@ -416,8 +417,9 @@ struct MessageView: View{
     let message: NGViewModel.Message
     let screenWidth = UIScreen.main.bounds.size.width
     //let paddingVal : Int = 13
+    
     var body: some View {
-            
+            // if its a player message
             if message.sender{
                 HStack{
                     Spacer()
@@ -427,18 +429,26 @@ struct MessageView: View{
                         .foregroundColor(Color.white)
                         .cornerRadius(20)
                 }
+            // else if it is not a PSA, it must be a model message
             } else if !message.PSA{
                 HStack{
-                    Text(message.text)
+                    if message.text == "..." {   // MARK: Maybe we can do some kind of animation with the three dots here?
+                        Text("...")
+                            .padding(13)
+                            .background(Color.white.opacity(0.6))
+                            .foregroundColor(Color.black.opacity(0.7))
+                            .cornerRadius(20)
+                    } else {
+                        Text(message.text)
                         //.frame(minWidth: screenWidth * 0, idealWidth: screenWidth * 0.1 , maxWidth: screenWidth * 0.6, alignment: .leading)
-                        .padding(13)
-                        .background(Color.white.opacity(0.6))
-                        .foregroundColor(Color.black.opacity(0.7))
-                        .cornerRadius(20)
-                        
-                        
+                            .padding(13)
+                            .background(Color.white.opacity(0.6))
+                            .foregroundColor(Color.black.opacity(0.7))
+                            .cornerRadius(20)
+                    }
                     Spacer()
                 }
+            // a game info PSA
             } else {
                 HStack{
                     Spacer()
@@ -468,7 +478,7 @@ struct ChatBox: View{
                         HStack{
                             Spacer()
                         }.id("Empty")
-                    }.onChange(of: messages.count){ _ in
+                    }.onChange(of: messages){ _ in
                         withAnimation(.easeOut(duration: viewModel.animDuration)){
                             scrollView.scrollTo("Empty", anchor: .bottom)
                         }

@@ -9,11 +9,16 @@ The viewModel contains a isPlayerTurn variable that disables the player's offer 
 
 The number of rounds is temporarily set to 2 ("maxRoundNumber" variable at the top of the model file) because it allows us to get to the end of the game faster, for debugging, but this should be changed back to 5 once we're done with everything.
 
+A very new feature is the model's "typing message". So when the model needs to send a message, a message with just "..." is sent, to show that the model is typing. After some duration (currently set to 2 seconds in the negotiationModel file as the _modelResponseDuration_ variable), the viewModel replaces the ... text in the message with the actual text of the model's bid/decision/whatever else. We might look at letting the model itself decide how long it takes to respond by also learning how long the player is taking.
+
+
 Model bugs:
 - N/A, but we're keeping an eye on how well the retrievals are working.
+- Potentially look at the model's timing, especially if we want it to replicate how long the player takes ot make a bid.
 
 UI bugs:
 - The back button on the contentView disappears if you finish a game, then press "new game" on the end-game screen. Important note for this one, the navigationLinks that lead to the contentView *must* call the viewModel.resetGame() function for the game to initialise itself properly (especially if the player leaves the contentView and comes back to it, the scores and bids should be reset), not having this causes a lot of headaches...
+- Double check to see if the model's typing messages are timed right, and that its not possible for the player to respond while messages are being sent by the model or any PSAs.
 
 
 Other things for us to adjust or improve:

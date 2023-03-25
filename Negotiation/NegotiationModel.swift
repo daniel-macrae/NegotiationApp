@@ -11,6 +11,7 @@ struct NGModel {
     var currentRoundNumber: Int = 1
     var maxRoundNumber: Int = 2
     var gameOver: Bool = false
+    var modelResponseDuration: Double = 2.0
     
     var MNS_combinations: Array<(Int, Int)> = [(2,2),(1,3),(3,1),(2,2),(3,3),(2,3),(3,2),(3,4),(4,3),(2,4),(4,4)]
     /// Model's total score
@@ -48,7 +49,7 @@ struct NGModel {
     var modelInsists = false
     var playerInsists = false
     
-    //MNS runnig average
+    //MNS running average
     var assumedPlayerMNS = 0
     //Need some function to get these from JSONManager
     var playerNames: [String] = ["Daniel", "Sara", "Luka"]
@@ -324,7 +325,7 @@ struct NGModel {
                 model.addToTrace(string: "modelResponse() Successfully Retrieved Bid \(chunk!)")
             }
             else {
-                // eforcing cause it never retrieves the decision chunks
+                // enforcing cause it never retrieves the decision chunks
                 if playerIsFinalOffer == true {
                     modelMoveType = "Decision"
                     modelDecision = "Reject"
