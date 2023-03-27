@@ -13,7 +13,7 @@ struct TitleScreen: View {
        
         NavigationStack{
             ZStack{
-                NavigationLink(destination: SelectModelScreen(viewModel: viewModel), isActive: $nextPage, label: {})
+                NavigationLink(destination: SelectModelScreen(viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $nextPage, label: {})
                     
                 VStack{
                     Image("text1")

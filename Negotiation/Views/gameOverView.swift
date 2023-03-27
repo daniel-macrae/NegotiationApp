@@ -16,7 +16,7 @@ struct gameOverView: View {
         if viewModel.playerScore > viewModel.modelScore {
             return "win"
         } else if viewModel.playerScore == viewModel.modelScore {
-            return "Tie"
+            return "tie"
         } else { return "lose" }
     }
 
@@ -37,8 +37,8 @@ struct gameOverView: View {
                     
                     statsView(playerPoints: Int(viewModel.playerScore), modelPoints: Int(viewModel.modelScore))
                     Spacer()
-                    FinalButtons(isQuitting: $isQuitting, newGame: $newGame)
-                    Spacer()
+                FinalButtons(isQuitting: $isQuitting, newGame: $newGame).padding(.vertical)
+
                 
             }.background(backgroundImg(image: "secondbackground"))
         }
@@ -50,13 +50,13 @@ struct FinalButtons: View{
     @Binding var newGame: Bool
 
     var body: some View{
-        HStack{
-            GameButton(text: "New Game", action: {
+        VStack{
+            gameOverButton(text: "New Game", action: {
                 newGame = true
-            })
-            QuitButton(text: "Return to Start", action: {
+            }, buttonColor: Color(UIColor(red:0.40, green:0.30, blue:0.76, alpha: 0.75)))
+            gameOverButton(text: "Return to Start", action: {
                 isQuitting = true
-            })
+            }, buttonColor: Color.red)
         }
     }
 }
@@ -75,9 +75,25 @@ struct statsView: View{
     }
 }
 
-//struct SwiftUIView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        let model = NGViewModel()
-//        gameOverView(viewModel: model)
-//    }
-//}
+
+struct gameOverButton: View{
+    let text: String
+    let action: () -> Void
+    let buttonColor : Color
+    
+    var body: some View {
+            Button(text, action: action)
+                .frame(width: 160, height:50)
+                .foregroundColor(.white)
+                .background(buttonColor)
+                .buttonStyle(CustomButtonStyle())
+                .cornerRadius(50)
+    }
+}
+
+struct SwiftUIView_Previews: PreviewProvider {
+    static var previews: some View {
+        let model = NGViewModel()
+        gameOverView(viewModel: model)
+    }
+}

@@ -12,12 +12,15 @@ struct ContentView: View {
     @State private var isQuitting: Bool = false
     //private var gameOver: Bool {viewModel.gameOver}
     @State private var finalScreen: Bool = false
+    @State private var toSelectModel: Bool = false
  
     var body: some View {
         NavigationStack {
             NavigationLink(destination: TitleScreen(viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $isQuitting, label: {})
                 
             NavigationLink(destination: gameOverView(viewModel: viewModel, player_name: player_name).navigationBarBackButtonHidden(true), isActive: $finalScreen, label: {})
+            
+            NavigationLink(destination:SelectModelScreen(viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $toSelectModel, label: {})
             
             // main VStack!
             VStack {
@@ -33,7 +36,7 @@ struct ContentView: View {
                     if viewModel.gameOver {
                         VStack{
                             Spacer()
-                            BidButton(text: "Continue", isPlayerTurn: viewModel.isPlayerTurn, modelIsFinal:viewModel.modelIsFinalOffer, action: { finalScreen = true } )
+                            GameButton(text: "Continue", action: { finalScreen = true })
                             Spacer()
                         }
                     } else if viewModel.MNSDeclared {
@@ -100,6 +103,8 @@ struct ContentView: View {
             
         .toolbar {
             // middle of top toolbar: show the round # out of 5
+            ToolbarItem(placement:.navigationBarLeading){backButton(action: {toSelectModel = true})}
+            
             ToolbarItem(placement: .principal) { round_box(round_no: viewModel.currentRound, maxRoundNumber: viewModel.numberOfRounds) }
             // right side, show infoButton
             ToolbarItem(placement: .primaryAction) { infoButton(viewModel: viewModel, isQuitting: $isQuitting) }
@@ -177,7 +182,7 @@ struct BidButton: View {
             Button(text, action: action)
                 .frame(width: screenWidth * 0.6, height:50)  // width is 60% of screen width
                 .foregroundColor(.white)
-                .background((isPlayerTurn && !modelIsFinal) ? buttonColor : Color.gray)//.animation(.easeInOut)
+                .background((isPlayerTurn && !modelIsFinal) ? buttonColor : Color.gray)
                 .buttonStyle(CustomButtonStyle())
                 .cornerRadius(50)
                 .disabled( (!isPlayerTurn || modelIsFinal) )
@@ -236,22 +241,6 @@ struct CustomButtonStyle: ButtonStyle {
             .padding()
             .scaleEffect(configuration.isPressed ? 1.5 : 1)
             .animation(.easeOut(duration: 0.2), value: configuration.isPressed)
-    }
-}
-
-
-struct QuitButton: View{
-    let text: String
-    let action: () -> Void
-    let buttonColor = Color.red
-    
-    var body: some View {
-            Button(text, action: action)
-                .frame(width: 160, height:50)
-                .foregroundColor(.white)
-                .background(buttonColor)
-                .buttonStyle(CustomButtonStyle())
-                .cornerRadius(50)
     }
 }
 

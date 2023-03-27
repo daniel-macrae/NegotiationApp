@@ -23,7 +23,6 @@ UI bugs:
 
 Other things for us to adjust or improve:
 - Increase set of messages. 
-- Buttons on the gameOverView should be lower? I think they look a little awkward. maybe they should be on top of each other as well?
 - [should be fixed, but maybe use the lab computer to check this next week] It should not be possible for the player to declare a new MNS before the newRound PSAs happen (it seems to be possible if the player clicks very quickly after accepting/rejecting a bid).
 - Change icon colours
 

@@ -13,6 +13,7 @@ struct SelectModelScreen: View {
     @State private var StartGame = false
     @State private var goBack = false
     @State private var loadNames = false
+    @State private var toTitlePage = false
     
     var names: [String] {viewModel.playerNames}  // get the names to display here
     
@@ -23,17 +24,16 @@ struct SelectModelScreen: View {
         
         NavigationStack {
             VStack {
-                NavigationLink(destination: ContentView(viewModel: viewModel, player_name : $name), isActive: $StartGame, label: {})
+                NavigationLink(destination: ContentView(viewModel: viewModel, player_name : $name).navigationBarBackButtonHidden(true), isActive: $StartGame, label: {})
                     // when we enter the contentview, reset the game variables
                     .onChange(of: StartGame) { (newValue) in
                         if newValue { viewModel.resetGame() }
                     }
-                
+                NavigationLink(destination: TitleScreen(viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $toTitlePage, label: {})
+        
                 if showNameField {
                     
                     VStack{
-                        //backButton(action: {showNameField=false
-                            //goBack=false; selectedOption = 0})
                         VStack{
                             Spacer()
                             HStack{
@@ -42,7 +42,9 @@ struct SelectModelScreen: View {
                                 nextPageButton(action: {
                                     StartGame = true;
                                     viewModel.createNewPlayer(newName: name);
-                                    showNameField = false})
+                                    showNameField = false}).disabled(name.isEmpty)
+                                    .background((name.isEmpty) ? Color.gray : Color.green)
+                                    .cornerRadius(50)
                                 Spacer()
                             }
                             Spacer()
@@ -52,21 +54,22 @@ struct SelectModelScreen: View {
                     
                 } else if loadNames {
                     VStack{
-                        //backButton(action: {loadNames=false
-                            //goBack=false})
                         Spacer()
                         HStack{
                             VStack{
-                                Picker("", selection: $selectedOption){
-                                    ForEach(0..<names.count, id: \.self){
-                                        index in
-                                        Text(names[index]).foregroundColor(Color.black)
-                                            .onAppear{  name = names[index]  }
-                                    }
-                                }.pickerStyle(MenuPickerStyle())
-                                    .frame(width:200)
-                                    .background(Color.white.opacity(0.4))
-                                    .cornerRadius(20)
+                                HStack{
+                                    Picker("", selection: $selectedOption){
+                                        ForEach(0..<names.count, id: \.self){
+                                            index in
+                                            Text(names[index]).foregroundColor(Color.black)
+                                                .onAppear{  name = names[index]  }
+                                        }
+                                    }.pickerStyle(MenuPickerStyle())
+                                        .frame(width:200)
+                                        .background(Color.white.opacity(0.4))
+                                        .cornerRadius(20)
+                                    
+                                }
                                 
                                 removePlayerButton(action: {
                                     viewModel.removePlayer(name: name);
@@ -103,7 +106,16 @@ struct SelectModelScreen: View {
 
         }
         .background(backgroundImg(image:"secondbackground")).ignoresSafeArea(.all)
-        //.navigationBarBackButtonHidden(goBack)
+        .toolbar {
+            // middle of top toolbar: show the round # out of 5
+            ToolbarItem(placement:.navigationBarLeading){backButton(action: {
+                if loadNames || showNameField {
+                    loadNames = false
+                    showNameField = false
+                } else {
+                    toTitlePage = true
+                }})}
+        }
     }
 }
 
@@ -132,7 +144,7 @@ struct backButton: View{
                     Image(systemName: "chevron.backward")
                     Text("Back")
                 }
-                .padding(.all).foregroundColor(Color.white)
+                .padding(.all).foregroundColor(Color.black)
                 Spacer()
             }
         }
@@ -149,6 +161,7 @@ struct removePlayerButton: View {
         Button(String("Remove Player")) {showingAlert = true}//.foregroundColor(Color.orange)   // looks better as white?
             .font(.subheadline)
             .buttonStyle(.borderedProminent)
+            .cornerRadius(50)
             .tint(.red)
             .alert(isPresented: $showingAlert) {
                 Alert(title: Text("Are you sure you would like to delete this user?"),
@@ -184,7 +197,6 @@ struct nextPageButton: View{
         Button(action: action){Image(systemName: "paperplane")}
             .frame(width: 50, height:50)
             .foregroundColor(.white)
-            .background(Color.green)
             .buttonStyle(CustomButtonStyle())
             .cornerRadius(50)
         
