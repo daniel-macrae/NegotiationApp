@@ -144,7 +144,8 @@ struct backButton: View{
                     Image(systemName: "chevron.backward")
                     Text("Back")
                 }
-                .padding(.all).foregroundColor(Color.white)
+                //.padding(.all)
+                .foregroundColor(Color.white)
                 Spacer()
             }
         }

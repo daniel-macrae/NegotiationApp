@@ -13,7 +13,12 @@ struct NGModel {
     var gameOver: Bool = false
     var modelResponseDuration: Double = 2.0
     
-    var MNS_combinations: Array<(Int, Int)> = [(2,2),(1,3),(3,1),(2,2),(3,3),(2,3),(3,2),(3,4),(4,3),(2,4),(4,4)]
+    //var MNS_combinations: Array<(Int, Int)> = [(2,2),(1,3),(3,1),(2,2),(3,3),(2,3),(3,2),(3,4),(4,3),(2,4),(4,4)]
+    var MNS_combinations: Array<(Int, Int)> = [(1,1),(2,2),(3,3),(4,4),
+                                               (1,2),(2,1),(1,3),(3,1),(1,4),(4,1),(1,5),(5,1),
+                                               (2,3),(3,2),(2,4),(4,2),(2,5),(5,2),
+                                               (3,4),(4,3),(3,5),(5,3),
+                                               (4,5),(5,4)]
     /// Model's total score
     var modelScore = 0
     /// Player's total score
@@ -377,7 +382,7 @@ struct NGModel {
         
     }
     
-    mutating func modelMadeADecision(){
+    mutating func modelMadeADecision() {
         if modelDecision == "Accept" {
             modelHasQuit = false}
         else if modelDecision == "Reject" {
@@ -386,7 +391,24 @@ struct NGModel {
             modelHasQuit = true}
     }
     
-    mutating func runningAverageMNS(modelMNS: Int) -> Int{
+    mutating func runningAverageMNS() -> Int {
+        
+        // MARK: ATTEMPT AT BLENDED RETREIVAL OF MNSs
+        // IS NOT ACTUALLY USED
+        
+        let playerMNSQuery = Chunk(s: "queryMNS", m: model)
+        playerMNSQuery.setSlot(slot: "isa", value: "MNS")
+        //playerMNSQuery.setSlot(slot: "MNS")
+        
+        let (latency, chunk) = model.dm.blendedRetrieve(chunk: playerMNSQuery)
+        
+        if let expectedplayerMNS = chunk!.slotvals["myMNS"] {
+            print("blended retrieval MNS value: " + expectedplayerMNS.description)
+        }
+        model.time += latency
+        
+        // AS NORMAL:
+        
         if averagedMNS.count < 5 {
             averagedMNS.append(modelMNS)
         } else{
@@ -405,8 +427,21 @@ struct NGModel {
     mutating func pickMNS() {
         if verbose {print("M: picking new MNS values")}
         let randomMNS = MNS_combinations.randomElement()!
+ 
         playerMNS = randomMNS.0
         modelMNS = randomMNS.1
+        
+        
+        // MARK: ATTEMPT AT BLENDED RETREIVAL OF MNSs
+        let newMNS = Chunk(s: "MNS" + model.time.description, m: model)
+        newMNS.setSlot(slot: "isa", value: "MNS")
+        newMNS.setSlot(slot: "myMNS", value: modelMNS.description)
+        
+        model.dm.addToDM(newMNS)
+        model.addToTrace(string: "Added MNS of this new round to memory")
+        model.time += 0.1
+        update()
+
     }
 
     
@@ -442,7 +477,7 @@ struct NGModel {
         }
         // set up a new round
         resetGameVariables(newGame: false)
-        assumedPlayerMNS = runningAverageMNS(modelMNS: modelMNS)
+        //assumedPlayerMNS = runningAverageMNS()
         
         savePlayerModel() // save the model's memories into a json file
         update()
@@ -469,7 +504,7 @@ struct NGModel {
         }
         
         pickMNS()  // new MNS values for the next round
-        assumedPlayerMNS = runningAverageMNS(modelMNS: modelMNS)
+        assumedPlayerMNS = runningAverageMNS()
         model.waitingForAction = true
     }
     

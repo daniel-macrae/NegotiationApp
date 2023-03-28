@@ -243,6 +243,7 @@ class Declarative: Codable  {
             for (slot, value) in ch1.slotvals {
                 switch value {
                 case .Number(let num):
+                    print("hi")
                     if let val1 = currentReturn[slot] {
                         currentReturn[slot] = val1 + num * pChunk
                     } else {

@@ -27,7 +27,7 @@ struct ContentView: View {
                 Spacer().frame(height: 5) // put a little bit of space in between the toolbar and the content
                 ScoresDisplay(playerDeclaredMNS: viewModel.playerDeclaredMNS,
                               modelDeclaredMNS: viewModel.modelDeclaredMNS,
-                              playerScore:viewModel.playerScore, modelScore:viewModel.modelScore, playerMNS:viewModel.playerMNS, modelMNS:viewModel.modelMNS)
+                              playerScore:viewModel.playerScore, modelScore:viewModel.modelScore, playerMNS:viewModel.playerMNS, modelMNS:viewModel.modelMNS, showModelDecMNS:viewModel.displayDeclaredMNS, animDuration:viewModel.animDuration)
                 Spacer()
                 ChatBox(viewModel: viewModel, messages: viewModel.messages)
                     .layoutPriority(1)
@@ -120,27 +120,35 @@ struct ScoresDisplay: View {
     var modelScore: Int
     var playerMNS: Int
     var modelMNS: Int
+    var showModelDecMNS: Bool
+    var animDuration: Double
     
     var body: some View {
         ZStack{
             HStack{
-                
                 ComputerIcon()
+                
                 VStack{
                     Text("Score = " + String(modelScore))
                     Text("MNS = " + String(modelMNS)) //  MARK: REMOVE - IN THE LONG RUN
                     // display declared MNS
-                    if let modelDecMNS = modelDeclaredMNS {Text("Declared\nMNS = " + String(modelDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body)).lineLimit(2, reservesSpace: true)}
+                    if let modelDecMNS = modelDeclaredMNS {Text("Declared\nMNS = " + String(modelDecMNS))
+                        .font(.custom("Sans-Regular",size: 15, relativeTo: .body)) // REMOVE THIS LINE
+                        .lineLimit(2, reservesSpace: true)
+                    }
+                    
                 }.layoutPriority(2)
                 
                 Spacer()
                 
                 VStack{
                     Text("Score = " + String(playerScore))
-                    // What to display here? We cant just
                     Text("MNS = " + String(playerMNS))  // MARK: REMOVE - IN THE LONG RUN
                     // display the declared MNS
-                    if let playerDecMNS = playerDeclaredMNS {Text("Declared\nMNS = " + String(playerDecMNS)).font(.custom("Sans-Regular",size: 15, relativeTo: .body)).lineLimit(2, reservesSpace: true)}  // font size changes dynamically
+                    if let playerDecMNS = playerDeclaredMNS {Text("Declared\nMNS = " + String(playerDecMNS))
+                            .font(.custom("Sans-Regular",size: 15, relativeTo: .body))  // REMOVE THIS LINE
+                            .lineLimit(2, reservesSpace: true)
+                    }
                 }.layoutPriority(2)
                 UserIcon()
                 
@@ -148,6 +156,7 @@ struct ScoresDisplay: View {
         }.padding(.all)
             .background(Color.white.opacity(0.5))
             .cornerRadius(20)
+            .animation(.linear(duration: animDuration))
     }
 }
 
@@ -458,9 +467,9 @@ struct ChatBox: View{
     //let animationDuration: Double = 0.5
     var body: some View{
         ZStack {
-            ScrollView{
+            ScrollView {
                 ScrollViewReader { scrollView in
-                    VStack{
+                    VStack {
                         ForEach(messages){ message in
                             MessageView(message: message).padding([.horizontal,.top], 8)
                         }
@@ -471,8 +480,6 @@ struct ChatBox: View{
                         withAnimation(.easeOut(duration: viewModel.animDuration)){
                             scrollView.scrollTo("Empty", anchor: .bottom)
                         }
-                        
-                        
                     }
                     
                 }

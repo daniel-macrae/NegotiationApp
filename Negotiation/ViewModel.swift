@@ -35,17 +35,14 @@ class NGViewModel: ObservableObject {
     var modelNegotiationValue: String {
         if let val = model.modelCurrentOffer {return String(val)}
         else {return "N/A"}    }
-    var playerDeclaredMNS: Int? {
-        if let val = model.playerDeclaredMNS {return val}
-        else {return nil}    }
-    var modelDeclaredMNS: Int? {
-        if let val = model.modelDeclaredMNS {return val}
-        else {return nil}    }
+    var playerDeclaredMNS: Int?
+    var modelDeclaredMNS: Int?
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}
     @Published var isPlayerTurn: Bool = false
     @Published var playerIsNext: Bool = false // this is a temporary vairable, used to make isPlayerTurn true after animations have finished
-    @Published var animDuration: Double = 0.3
+    @Published var animDuration: Double = 0.5
+    @Published var displayDeclaredMNS: Bool = false
     
     
     init() {
@@ -265,6 +262,7 @@ class NGViewModel: ObservableObject {
         model.resetGameVariables(newGame: true)  // reset the game variables when returning to the ContentView
         openingNewGame()
         offerHasBeenMade = false;     MNSDeclared = false
+        modelDeclaredMNS = nil; playerDeclaredMNS = nil
         gameOver = false
     }
     
@@ -312,9 +310,9 @@ class NGViewModel: ObservableObject {
         if isMe {delay = 0.0} // if the player is sending a message
         else {delay = 1.0}
         
-        var modelDuration: Double
+        var modelDuration: Double // how long until the model's full message should be sent
         if isMe || PSA {modelDuration = 0.0}
-        else {modelDuration = model.modelResponseDuration}
+        else {modelDuration = model.modelResponseDuration - delay}
         
         // controls the delay of the messages showing up
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
@@ -329,6 +327,7 @@ class NGViewModel: ObservableObject {
                     if let modelMessIndex = self.messages.lastIndex(where: {$0.text == "..."}) {
                         //print(modelMessIndex.description)
                         self.messages[modelMessIndex] = Message(text: text, sender: false, PSA: false)
+                        if let val = self.model.modelDeclaredMNS {self.modelDeclaredMNS = val} // toggle display of declared MNS after the model has sent its message
                     }
                 }
                 
@@ -336,6 +335,7 @@ class NGViewModel: ObservableObject {
             // player and PSA messages fall into this conditon
             else {
                 self.messages.append(Message(text: text, sender: isMe, PSA: PSA))
+                if let val = self.model.playerDeclaredMNS {self.playerDeclaredMNS = val}
             }
         }
         
@@ -386,6 +386,8 @@ class NGViewModel: ObservableObject {
         MNSDeclared = false
         offerHasBeenMade = false
         playerIsNext = true
+        displayDeclaredMNS = false
+        modelDeclaredMNS = nil; playerDeclaredMNS = nil
         
         
         if !model.gameOver {
