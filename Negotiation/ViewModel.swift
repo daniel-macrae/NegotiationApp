@@ -61,7 +61,8 @@ class NGViewModel: ObservableObject {
     /// a function when the player declares their MNS
     func declarePlayerMNS(value: Float){
         model.playerDeclaredMNS = Int(value)
-        self.sendMessage("My MNS is " + String(Int(value)), isMe: true, PSA : false)
+        let string = String(format: mnsDeclarationMSGs.randomElement()!, Int(value))
+        self.sendMessage(string, isMe: true, PSA : false)
         
         // Now the model responds
         
@@ -80,10 +81,11 @@ class NGViewModel: ObservableObject {
         //messages.append(Message())
         
         model.declareModelMNS()
-        sendMessage("My MNS is " + String(model.modelDeclaredMNS!), isMe: false, PSA: false)
+        let string = String(format: mnsResponseMSGs.randomElement()!, Int(value))
+        sendMessage("string" + String(model.modelDeclaredMNS!), isMe: false, PSA: false)
         MNSDeclared = true  // if the model has declared its MNS, then so has the player
         
-        
+        mnsDeclarationMSGs
         
         
         
@@ -362,7 +364,8 @@ class NGViewModel: ObservableObject {
         
         sendMessage("Your MNS for this round is " + String(playerMNS), isMe: false, PSA: true)
         playerIsNext = true
-        sendMessage("Hello " + String(currentPlayerName), isMe: false, PSA: false)
+        let string = String(format: openingMSGs.randomElement()!, currentPlayerName)
+        sendMessage(string, isMe: false, PSA: false)
 
         
     }
