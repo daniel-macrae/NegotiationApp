@@ -61,35 +61,32 @@ class NGViewModel: ObservableObject {
     /// a function when the player declares their MNS
     func declarePlayerMNS(value: Float){
         model.playerDeclaredMNS = Int(value)
-        let string = String(format: mnsDeclarationMSGs.randomElement()!, Int(value))
-        self.sendMessage(string, isMe: true, PSA : false)
-        
-        // Now the model responds
-        
-        /// seemed to cause problems
-        /*
-         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { //makes it more lifelike i guess when adding a wait
-            self.model.declareModelMNS()
-            self.sendMessage("My MNS is " + String(self.model.modelDeclaredMNS!), isMe: false, PSA: false)
-            self.MNSDeclared = true  // if the model has declared its MNS, then so has the player
-        }
-         */
+        let pString = String(format: mnsDeclarationMSGs.randomElement()!, Int(value))
+        sendMessage(pString, isMe: true, PSA : false)
         
         isPlayerTurn = false
         playerIsNext = true
         
-        //messages.append(Message())
-        
+        // make the model determine its MNS
         model.declareModelMNS()
-        let string = String(format: mnsResponseMSGs.randomElement()!, Int(value))
-        sendMessage("string" + String(model.modelDeclaredMNS!), isMe: false, PSA: false)
+        
+        // based on the model's trategy, find a message template to declare its MNS
+        switch model.modelStrategy {
+            case "Cooperative":
+                let mString = String(format: mnsResponseMSGsCoopNeutral.randomElement()!, model.modelDeclaredMNS!)
+                sendMessage(mString, isMe: false, PSA: false)
+            case "Aggressive":
+                let mString = String(format: mnsResponseMSGsAggressive.randomElement()!, model.modelDeclaredMNS!)
+                sendMessage(mString, isMe: false, PSA: false)
+            case "Neutral":
+                let mString = String(format: mnsResponseMSGsCoopNeutral.randomElement()!, model.modelDeclaredMNS!)
+                sendMessage(mString, isMe: false, PSA: false)
+            default:
+                let mString = String(format: "My MNS is %d", model.modelDeclaredMNS!)
+                sendMessage(mString, isMe: false, PSA: false)
+        }
+        
         MNSDeclared = true  // if the model has declared its MNS, then so has the player
-        
-        mnsDeclarationMSGs
-        
-        
-        
-        
         
     }
     

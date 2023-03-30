@@ -14,21 +14,19 @@ import Foundation
 
 let openingMSGs = [
     "Hello there,  %@.", 
-    "Hi  %@, nice to meet you.", 
-    "Greetings,  %@.", 
-    "Hello  %@, I hope you're doing well today.", 
-    "Hi there,  %@. Shall we get started?", 
-    "Good day,  %@. Let's begin our negotiation.", 
-    "Hello  %@, I'm looking forward to working with you.", 
-    "Hi  %@, it's great to connect with you. How can we proceed?", 
-    "Greetings,  %@. I'm excited to negotiate with you.", 
-    "Hello  %@, I appreciate the opportunity to negotiate with you."
-
+    "Hi %@, nice to meet you.",
+    "Greetings, %@.",
+    "Hello %@, I hope you're doing well today.",
+    "Hi there, %@. Shall we get started?",
+    "Good day, %@. Let's begin our negotiation.",
+    "Hello %@, I'm looking forward to working with you.",
+    "Hi %@, it's great to connect with you. How can we proceed?",
+    "Greetings, %@. I'm excited to negotiate with you.",
+    "Hello %@, I appreciate the opportunity to negotiate with you."
 ]
 
 
 let mnsDeclarationMSGs = [
-
     "Just to be transparent, my MNS for this negotiation is %d.", 
     "I wanted to let you know that %d is my MNS for this negotiation.", 
     "Before we begin, I should mention that my MNS is %d.", 
@@ -48,26 +46,28 @@ let mnsDeclarationMSGs = [
 ]
 
 // could be separated in different tones
-let mnsResponseMSGs = [
-"Thank you for letting me know. My MNS is  %d, so I believe we can find a mutually beneficial solution."
-"I appreciate the transparency. My MNS is  %d."
-"Thanks for sharing. My MNS is  %d, but I'm sure we can reach an agreement that meets both our needs."
-"Okay. My MNS is  %d, but I'm open to exploring different options with you."
-"Got it. My MNS is  %d, but I'm willing to see if we can come up with a solution that works for both of us."
-"Thank you for being upfront. My MNS is actually  %d, but I'm open to discussing different scenarios with you."
-"I see. My MNS is  %d, so I think we can find a compromise that satisfies us both."
-"Thanks for sharing your MNS. Mine is  %d."
-"I appreciate your honesty. My MNS is  %d, but I'm open to exploring different ways we can reach a mutually beneficial agreement."
-"Understood. My MNS is  %d, but I'm willing to negotiate and see if we can find common ground."
-// aggressive
-"That's higher than I was expecting. My MNS is actually 'number', so I'm not sure we can find common ground."
-"I appreciate your honesty, but my MNS is 'number', and I won't accept anything less."
-"I understand where you're coming from, but my MNS is non-negotiable at 'number'."
-"Thanks for sharing, but my MNS is 'number', and I won't consider anything below that."
-"I appreciate your transparency, my MNS is firm at 'number'."
-"My MNS is 'number', and I won't budge on that."
-"I appreciate your willingness to negotiate, my MNS is set at 'number', and I won't consider anything less"
+let mnsResponseMSGsCoopNeutral = [
+    "Thank you for letting me know. My MNS is  %d, so I believe we can find a mutually beneficial solution.",
+    "I appreciate the transparency. My MNS is  %d.",
+    "Thanks for sharing. My MNS is  %d, but I'm sure we can reach an agreement that meets both our needs.",
+    "Okay. My MNS is  %d, but I'm open to exploring different options with you.",
+    "Got it. My MNS is  %d, but I'm willing to see if we can come up with a solution that works for both of us.",
+    "Thank you for being upfront. My MNS is actually  %d, but I'm open to discussing different scenarios with you.",
+    "I see. My MNS is  %d, so I think we can find a compromise that satisfies us both.",
+    "Thanks for sharing your MNS. Mine is  %d.",
+    "I appreciate your honesty. My MNS is  %d, but I'm open to exploring different ways we can reach a mutually beneficial agreement.",
+    "Understood. My MNS is  %d, but I'm willing to negotiate and see if we can find common ground."
+]
 
+
+let mnsResponseMSGsAggressive = [
+    "That's higher than I was expecting. My MNS is actually %d, so I'm not sure we're going to find common ground.",
+    "I appreciate your honesty, but my MNS is %d, and I won't accept anything less.",
+    "I understand where you're coming from, but my MNS is non-negotiable at 'number'.",
+    "Thanks for sharing, but my MNS is %d, and I won't consider anything below that.",
+    "I appreciate your transparency, my MNS is firm at %d.",
+    "My MNS is %d, and I won't budge on that.",
+    "I appreciate your willingness to negotiate, my MNS is set at %d, and I won't consider anything less",
 ]
 
 
