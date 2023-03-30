@@ -11,7 +11,9 @@ struct NGModel {
     var currentRoundNumber: Int = 1
     var maxRoundNumber: Int = 2
     var gameOver: Bool = false
-    var modelResponseDuration: Double = 2.0
+    var modelResponseDuration: Double = 3.0
+    var playerResponseDuration: Double?
+    var defaultDuration: Double = 3.0  /// in cases of failed retrieval, or the MNS declaration, it takes the model this long to send a messge
     
     //var MNS_combinations: Array<(Int, Int)> = [(2,2),(1,3),(3,1),(2,2),(3,3),(2,3),(3,2),(3,4),(4,3),(2,4),(4,4)]
     var MNS_combinations: Array<(Int, Int)> = [(1,1),(2,2),(3,3),(4,4),
@@ -110,12 +112,16 @@ struct NGModel {
     
     // function for the model to declare its MNS
     mutating func declareModelMNS(){
+        model.time += playerResponseDuration!
         decideModelStrategy()
         if modelStrategy == "Aggressive"{
             modelDeclaredMNS = modelMNS + 1 // lie about the MNS
         } else {
             modelDeclaredMNS = modelMNS  // tell the truth
         }
+        modelResponseDuration = defaultDuration
+        
+        model.time += 0.1 + modelResponseDuration
     }
 
     // function that allows the model to infer the player's strategy
@@ -215,6 +221,8 @@ struct NGModel {
         newExperience.setSlot(slot: "myIsFinal", value: playerIsFinalOffer.description)
         newExperience.setSlot(slot: "opponentIsFinal", value: modelIsFinalOffer.description)
         
+        newExperience.setSlot(slot: "myDuration", value: time_to_pulses(time_val: playerResponseDuration!).description)
+        
         // deal with the "my" slots, from the POV of the player (player='my')
         if playerMoveType! == "Bid" {
             let changePlayerBid = playerPreviousOffer! - playerCurrentOffer!
@@ -261,6 +269,8 @@ struct NGModel {
                 modelMoveType = "Decision"
                 modelDecision = "Accept"
                 
+                modelResponseDuration = defaultDuration
+                
                 modelMadeADecision()
             }
         }
@@ -268,6 +278,8 @@ struct NGModel {
     
     
     mutating func modelResponse() {
+        model.time += playerResponseDuration!
+        
         if verbose {print("\n \n MODEL IS RESPONDING TO PLAYER BID. Number of chunks in its memory: " + String(model.dm.chunks.count))}
         
         
@@ -327,6 +339,7 @@ struct NGModel {
                         modelMadeADecision()
                     }
                 }
+                
                 model.addToTrace(string: "modelResponse() Successfully Retrieved Bid \(chunk!)")
             }
             else {
@@ -344,8 +357,21 @@ struct NGModel {
                 
             }
             
+            // MARK: Timing
+            // determine how long it takes the model to make an offer
+            if let duration = chunk?.slotvals["myDuration"]?.description {
+                modelResponseDuration = pulses_to_time(pulses_val: Int(Double(duration)!))
+                print("SUCCESS:")
+            } else {
+                modelResponseDuration = defaultDuration
+                print("DEFAULT:")
+            }
+            print(modelResponseDuration)
+            
+            
+            
             isItTheSameOffer()  // checks to see if the model is going to make the same bid as the player just made, if yes, then accept the player's offer (as they both want the same split)
-            model.time += 0.1 + latency
+            model.time += 0.1 + latency + modelResponseDuration
             
         }
     }
@@ -377,7 +403,20 @@ struct NGModel {
             model.addToTrace(string: "Failed retrieval of opening offer, random offer")
             modelMoveType = "Opening"
         }
-        model.time += 0.1 + latency
+        
+        // MARK: Timing
+        // determine how long it takes the model to make an opening offer
+        if let duration = chunk?.slotvals["myDuration"]?.description {
+            print(duration)
+            modelResponseDuration = pulses_to_time(pulses_val: Int(Double(duration)!))
+            print("SUCCESS:")
+        } else {
+            modelResponseDuration = defaultDuration
+            print("DEFAULT:")
+        }
+        print(modelResponseDuration)
+        
+        model.time += 0.1 + latency + modelResponseDuration
         
         
     }

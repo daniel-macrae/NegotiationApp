@@ -63,11 +63,11 @@ let mnsResponseMSGsCoopNeutral = [
 let mnsResponseMSGsAggressive = [
     "That's higher than I was expecting. My MNS is actually %d, so I'm not sure we're going to find common ground.",
     "I appreciate your honesty, but my MNS is %d, and I won't accept anything less.",
-    "I understand where you're coming from, but my MNS is non-negotiable at 'number'.",
+    "I understand where you're coming from, but my MNS is non-negotiable at %d.",
     "Thanks for sharing, but my MNS is %d, and I won't consider anything below that.",
     "I appreciate your transparency, my MNS is firm at %d.",
     "My MNS is %d, and I won't budge on that.",
-    "I appreciate your willingness to negotiate, my MNS is set at %d, and I won't consider anything less",
+    "I appreciate your willingness to negotiate, my MNS is set at %d, and I won't consider anything less"
 ]
 
 

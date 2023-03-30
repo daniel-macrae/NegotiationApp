@@ -269,7 +269,6 @@ struct UserIcon: View {
                     .frame(width: 40, height: 20)
                     .cornerRadius(8)
                     .offset(y: 20)
-                    
                 Text("You")
                     .foregroundColor(.white)
                     .font(.headline)
@@ -296,7 +295,6 @@ struct ComputerIcon: View {
                     .frame(width: 60, height: 20)
                     .cornerRadius(8)
                     .offset(y: 20)
-                    
                 Text("Model")
                     .foregroundColor(.white)
                     .font(.headline)
@@ -414,7 +412,6 @@ struct Toggle_box: View{
 struct MessageView: View{
     let message: NGViewModel.Message
     let screenWidth = UIScreen.main.bounds.size.width
-    //let paddingVal : Int = 13
     
     var body: some View {
             // if its a player message
@@ -481,10 +478,7 @@ struct ChatBox: View{
                             scrollView.scrollTo("Empty", anchor: .bottom)
                         }
                     }
-                    
                 }
-                //.transition(.slide.animation(.easeInOut(duration: 1.0)))
-                //.transition(.slide)
                 .animation(.linear(duration: viewModel.animDuration))
             }
         }.background(Color.white.opacity(0.8))

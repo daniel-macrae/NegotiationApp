@@ -45,6 +45,10 @@ class NGViewModel: ObservableObject {
     @Published var displayDeclaredMNS: Bool = false
     
     
+    // TIMING
+    var playerResponseStartTime = Date() /// is reset whenever the player's bid buttons become active
+    //var playerResponseDuration: Double?
+    
     init() {
         model = NGModel() // make just one active model file
         model.pickMNS()
@@ -60,6 +64,9 @@ class NGViewModel: ObservableObject {
     
     /// a function when the player declares their MNS
     func declarePlayerMNS(value: Float){
+        model.playerResponseDuration = Double(Date().timeIntervalSince(playerResponseStartTime))
+        print("Duration=" + String(model.playerResponseDuration!))
+         
         model.playerDeclaredMNS = Int(value)
         let pString = String(format: mnsDeclarationMSGs.randomElement()!, Int(value))
         sendMessage(pString, isMe: true, PSA : false)
@@ -92,6 +99,9 @@ class NGViewModel: ObservableObject {
     
     // this function deals with processing the player's offer
     func playerMakeOffer(playerBid: Float) {
+        model.playerResponseDuration = Double(Date().timeIntervalSince(playerResponseStartTime))
+        print("Duration=" + String(model.playerResponseDuration!))
+        
         if self.playerIsFinalOffer {
             self.sendMessage("This is my final offer: " + String(Int(playerBid)) + " points for me, " + String(9 - Int(playerBid)) + " for you.", isMe: true, PSA: false)
         } else {
@@ -139,6 +149,8 @@ class NGViewModel: ObservableObject {
     
     // player accepts the model's offer
     func playerAccepts () {
+        model.playerResponseDuration = Double(Date().timeIntervalSince(playerResponseStartTime))
+        
         self.sendMessage(acceptingSentencesNeutral.randomElement()!, isMe: true, PSA: false)
         model.playerMoveType = "Decision";     model.playerDecision = "Accept"
         model.playerPreviousOffer = model.playerCurrentOffer
@@ -150,6 +162,8 @@ class NGViewModel: ObservableObject {
     
     // player rejects the model's offer
     func playerRejectsFinalOffer() {
+        model.playerResponseDuration = Double(Date().timeIntervalSince(playerResponseStartTime))
+        
         self.sendMessage(decliningSentencesNeutral.randomElement()!, isMe: true, PSA: false)
         model.playerMoveType = "Decision";     model.playerDecision = "Reject"
         model.playerHasQuit = true
@@ -161,6 +175,8 @@ class NGViewModel: ObservableObject {
     }
     
     func playerQuitsRound() {
+        model.playerResponseDuration = Double(Date().timeIntervalSince(playerResponseStartTime))
+        
         self.sendMessage("I want to quit this negotiation.",  isMe: true, PSA: false)
         model.playerMoveType = "Quit";     model.playerDecision = "Quit"
         model.playerHasQuit = true
@@ -295,10 +311,11 @@ class NGViewModel: ObservableObject {
         let PSA: Bool
     }
     
-    
-    func modelSendMessage(_ text:String, isMe: Bool, PSA: Bool){
-        print("hi")
+    // function to bound the times down
+    func sigmoid(_ x: Double) -> Double {
+        return tanh((x/15.0)) * 10
     }
+    
     
     // simple sendMessage function isMe: true if the player is the sender false is the model. PSA is the grey messages about MNSs and score changes
     func sendMessage(_ text:String, isMe: Bool, PSA: Bool){
@@ -311,7 +328,12 @@ class NGViewModel: ObservableObject {
         
         var modelDuration: Double // how long until the model's full message should be sent
         if isMe || PSA {modelDuration = 0.0}
-        else {modelDuration = model.modelResponseDuration - delay}
+        else {
+            modelDuration = model.modelResponseDuration
+            print(modelDuration)
+            modelDuration = sigmoid(modelDuration) // limit the duration so that its not unbearably long
+            print(modelDuration)
+        }
         
         // controls the delay of the messages showing up
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
@@ -322,9 +344,8 @@ class NGViewModel: ObservableObject {
                 self.messages.append(Message(text: "...", sender: false, PSA: false))
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + modelDuration) {
-                    //delay = 4.0
+                    
                     if let modelMessIndex = self.messages.lastIndex(where: {$0.text == "..."}) {
-                        //print(modelMessIndex.description)
                         self.messages[modelMessIndex] = Message(text: text, sender: false, PSA: false)
                         if let val = self.model.modelDeclaredMNS {self.modelDeclaredMNS = val} // toggle display of declared MNS after the model has sent its message
                     }
@@ -352,7 +373,9 @@ class NGViewModel: ObservableObject {
     func makePlayerButtonsActive() {
         if playerIsNext {
             isPlayerTurn = true
-            playerIsNext = false}
+            playerIsNext = false
+            playerResponseStartTime = Date()
+        }
     }
     
     

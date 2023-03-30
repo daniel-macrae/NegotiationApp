@@ -117,3 +117,41 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
     //if M_li == 0 {print("MATCH!")}
     return M_li
 }
+
+
+let a = 1.1
+let b = 0.015
+let t_0 = 0.011
+
+func noise(s: Double) -> Double {
+    let random = Double.random(in: 0.001 ..< 0.999)
+    return s * log((1-random)/random)
+}
+
+func time_to_pulses(time_val: Double) -> Int {
+    var time = time_val
+    var pulses = 0
+    var pulse_duration = t_0
+    
+    while time >= pulse_duration {
+        time -= pulse_duration
+        pulses += 1
+        pulse_duration = a * pulse_duration + noise(s: (a * b * pulse_duration))
+    }
+    
+    return pulses
+}
+
+func pulses_to_time(pulses_val: Int) -> Double {
+    var pulses = pulses_val
+    var time = 0.0
+    var pulse_duration = t_0
+    
+    while pulses >= 0 {
+        time += pulse_duration
+        pulses -= 1
+        pulse_duration = a * pulse_duration + noise(s: (a * b * pulse_duration))
+    }
+    
+    return time
+}
