@@ -42,6 +42,7 @@ struct SelectModelScreen: View {
                                 nextPageButton(action: {
                                     StartGame = true;
                                     viewModel.createNewPlayer(newName: name);
+                                    viewModel.firstTime = true; 
                                     showNameField = false}).disabled(name.isEmpty)
                                     .background((name.isEmpty) ? Color.gray : Color.green)
                                     .cornerRadius(50)
@@ -76,7 +77,7 @@ struct SelectModelScreen: View {
                                     if !names.isEmpty {name = names[0]} else {loadNames=false; goBack = false}
                                 })
                             }
-                            nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name); selectedOption = 0}).background(Color.green).cornerRadius(50)
+                            nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name);          viewModel.firstTime = false; selectedOption = 0}).background(Color.green).cornerRadius(50)
                         }
                         Spacer()
                     }

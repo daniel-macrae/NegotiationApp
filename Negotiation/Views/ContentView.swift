@@ -109,7 +109,10 @@ struct ContentView: View {
             
             ToolbarItem(placement: .principal) { round_box(round_no: viewModel.currentRound, maxRoundNumber: viewModel.numberOfRounds) }
             // right side, show infoButton
-            ToolbarItem(placement: .primaryAction) { infoButton(viewModel: viewModel, isQuitting: $isQuitting) }
+            ToolbarItem(placement: .primaryAction) { infoButton(viewModel: viewModel) }
+        }
+        .sheet(isPresented: $viewModel.firstTime){
+            infoText()
         }
     }
 }
@@ -355,12 +358,33 @@ struct round_box: View{
     }
 }
 
+
+struct infoText: View{
+    var body: some View{
+        ZStack{
+            backgroundImg(image: "SolidBackground").background()
+                .ignoresSafeArea(.all)
+            VStack {
+                Spacer()
+                Text("How to Play:")
+                    .font(.largeTitle)
+                    .foregroundColor(Color.white)
+                Spacer()
+                ScrollView{
+                    Text("The game of nines is a negotiation game played between two players, the proposer (you) and the responder (model). The game is played over several rounds, and in each round, the proposer makes an offer, and the responder can either accept or reject the offer. The goal of the game is to maximize the total score over all rounds, where the score is calculated by subtracting the proposer's offer from the number nine.").padding(.all).foregroundColor(.white)
+                    Text("At the start of each round, both players declare their minimum acceptable score (MNS), which is the minimum score they are willing to accept. The proposer makes the first offer, which must be a number between 0 and 9, and the responder can either accept or reject the offer. If the responder accepts the offer, the round ends, and both players receive a score equal to the difference between nine and the offer.").foregroundColor(.white)
+                        .padding(.all)
+                    Text("If the responder rejects the offer, the proposer can make a new offer and the responder can again choose to accept or reject the offer. If the proposer makes a final offer, the responder must accept or reject it, and the round ends regardless of their decision. The game continues for a fixed number of rounds, and the player with the highest total score at the end of the game is the winner.").foregroundColor(.white)
+                        .padding(.all)
+                }.background(.black.opacity(0.3))
+            }
+        }
+    }
+}
 struct infoButton: View {
     var viewModel: NGViewModel
     @State private var showMenu = false
     @State private var showExplanation = false
-    @Binding var isQuitting: Bool
-
     var body: some View {
         VStack {
             Button(action: { showMenu = true } ) {
@@ -369,24 +393,7 @@ struct infoButton: View {
             }.scaleEffect(1.6)
         }
         .sheet(isPresented: $showMenu) {
-            ZStack{
-                backgroundImg(image: "SolidBackground").background()
-                    .ignoresSafeArea(.all)
-                VStack {
-                    Spacer()
-                    Text("How to Play:")
-                        .font(.largeTitle)
-                        .foregroundColor(Color.white)
-                    Spacer()
-                    ScrollView{
-                        Text("The game of nines is a negotiation game played between two players, the proposer (you) and the responder (model). The game is played over several rounds, and in each round, the proposer makes an offer, and the responder can either accept or reject the offer. The goal of the game is to maximize the total score over all rounds, where the score is calculated by subtracting the proposer's offer from the number nine.").padding(.all).foregroundColor(.white)
-                        Text("At the start of each round, both players declare their minimum acceptable score (MNS), which is the minimum score they are willing to accept. The proposer makes the first offer, which must be a number between 0 and 9, and the responder can either accept or reject the offer. If the responder accepts the offer, the round ends, and both players receive a score equal to the difference between nine and the offer.").foregroundColor(.white)
-                            .padding(.all)
-                        Text("If the responder rejects the offer, the proposer can make a new offer and the responder can again choose to accept or reject the offer. If the proposer makes a final offer, the responder must accept or reject it, and the round ends regardless of their decision. The game continues for a fixed number of rounds, and the player with the highest total score at the end of the game is the winner.").foregroundColor(.white)
-                            .padding(.all)
-                    }.background(.black.opacity(0.3))
-                }
-            }
+            infoText()
         }
     }
             

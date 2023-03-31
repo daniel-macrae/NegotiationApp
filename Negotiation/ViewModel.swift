@@ -22,7 +22,7 @@ class NGViewModel: ObservableObject {
     
     var playerNames: [String] {model.playerNames}
     var currentPlayerName: String {model.currentPlayerName!}
-    
+    var firstTime: Bool = false
     // player and model states
     var playerScore: Int {Int(model.playerScore)}
     var modelScore: Int {Int(model.modelScore)}
