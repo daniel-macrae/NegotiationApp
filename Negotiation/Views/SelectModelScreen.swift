@@ -76,7 +76,7 @@ struct SelectModelScreen: View {
                                     if !names.isEmpty {name = names[0]} else {loadNames=false; goBack = false}
                                 })
                             }
-                            nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name); selectedOption = 0})
+                            nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name); selectedOption = 0}).background(Color.green).cornerRadius(50)
                         }
                         Spacer()
                     }
@@ -198,9 +198,7 @@ struct nextPageButton: View{
         Button(action: action){Image(systemName: "paperplane")}
             .frame(width: 50, height:50)
             .foregroundColor(.white)
-            .buttonStyle(CustomButtonStyle())
-            .cornerRadius(50)
-        
+            .buttonStyle(CustomButtonStyle())        
     }
 }
 struct SelectModelScreenButton: View{
