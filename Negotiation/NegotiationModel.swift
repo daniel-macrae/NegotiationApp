@@ -532,6 +532,7 @@ struct NGModel {
         playerHasQuit = false; modelHasQuit = false
         playerDeclaredMNS = nil; modelDeclaredMNS = nil
         modelInsists = false; playerInsists = false
+        modelResponseDuration = defaultDuration
         
         
         if newGame {

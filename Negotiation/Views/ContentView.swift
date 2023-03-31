@@ -66,7 +66,7 @@ struct ContentView: View {
                             //.frame(maxHeight: .infinity)
                             HStack{
                                 Spacer()
-                                Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
+                                Toggle_box(offerHasBeenMade: viewModel.offerHasBeenMade, finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
                                     viewModel.FinalOfferPlayerChanged()}
                                 Spacer()
                                 BidButton(text: "Send Offer", isPlayerTurn: viewModel.isPlayerTurn, modelIsFinal:viewModel.modelIsFinalOffer, action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false})
@@ -393,6 +393,7 @@ struct infoButton: View {
 
 struct Toggle_box: View{
     var toggleAction: ((Bool) -> Void)?
+    let offerHasBeenMade: Bool
     @Binding var finalOfferToggle: Bool
     
     var body: some View{
@@ -402,12 +403,22 @@ struct Toggle_box: View{
                     .foregroundColor(finalOfferToggle ? Color.green : Color.gray)
                 Toggle("", isOn: $finalOfferToggle)
                     .foregroundColor(finalOfferToggle ? Color.green : Color.gray).labelsHidden()
-            }.padding(.all, 8).background(Color.white.opacity(0.75)).cornerRadius(20)
+            }
+            .padding(.all, 8)
+            .background(offerHasBeenMade ? Color.white.opacity(0.75) : Color.gray.opacity(0.75))
+            .cornerRadius(20)
+            .disabled(!offerHasBeenMade)
+
             Spacer()
         }
         .scaleEffect(0.8)
     }
 }
+
+
+
+
+
 
 struct MessageView: View{
     let message: NGViewModel.Message

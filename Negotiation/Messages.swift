@@ -84,7 +84,7 @@ let bidMSGs = [
     "How about I bid %d points, and you get %d points in return?", 
     "I propose %d points for me, %d points for you. What do you think?", 
     "If I bid %d points, would you be willing to accept %d points?", 
-    "I suggest we split the points %d for you and %d for me. Agreed?", 
+    "I suggest we split the points %d for me and %d for you. Agreed?", 
     "I'll bid %d points, and you'll receive %d points. Does that seem fair?", 
     "What if I bid %d points, and you get %d points out of the total?", 
     "I'm thinking %d points for me and %d points for you. How does that sound?", 

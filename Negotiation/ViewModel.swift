@@ -401,7 +401,7 @@ class NGViewModel: ObservableObject {
             if playerDecided == true {
                 sendMessage("You earned " + String((9 - model.modelCurrentOffer!) - playerMNS) + " points this round.", isMe: false, PSA: true)}
             else{
-                sendMessage("You earned " + String((9 - model.playerCurrentOffer!) - playerMNS) + " points this round.", isMe: false, PSA: true)}}
+                sendMessage("You earned " + String((model.playerCurrentOffer!) - playerMNS) + " points this round.", isMe: false, PSA: true)}}
         else{sendMessage("No points were earned this round.", isMe: false, PSA: true)}
         
         // make a new round, once the PSAs have been sent
