@@ -65,9 +65,11 @@ struct ContentView: View {
                             //Spacer()
                             //.frame(maxHeight: .infinity)
                             HStack{
-                                Spacer()
-                                Toggle_box(offerHasBeenMade: viewModel.offerHasBeenMade, finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
-                                    viewModel.FinalOfferPlayerChanged()}
+                                if viewModel.offerHasBeenMade{
+                                    Spacer()
+                                    Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
+                                        viewModel.FinalOfferPlayerChanged()}
+                                }
                                 Spacer()
                                 BidButton(text: "Send Offer", isPlayerTurn: viewModel.isPlayerTurn, modelIsFinal:viewModel.modelIsFinalOffer, action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false})
                                 Spacer()
@@ -213,7 +215,8 @@ struct AcceptButton: View{
     var body: some View {
         withAnimation(.easeInOut) {
             Button(text, action: action)
-                .frame(width: 160, height:50)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
                 .foregroundColor(.white)
                 .background(offerHasBeenMade&&isPlayerTurn ? buttonColor : Color.gray)
                 .cornerRadius(50)
@@ -234,7 +237,8 @@ struct RejectButton: View{
     var body: some View {
         withAnimation(.easeInOut) {
             Button(text, action: action)
-                .frame(width: 160, height:50)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
                 .foregroundColor(.white)
                 .background(offerHasBeenMade&&isPlayerTurn ? buttonColor : Color.gray)
                 .cornerRadius(50)
@@ -393,7 +397,6 @@ struct infoButton: View {
 
 struct Toggle_box: View{
     var toggleAction: ((Bool) -> Void)?
-    let offerHasBeenMade: Bool
     @Binding var finalOfferToggle: Bool
     
     var body: some View{
@@ -405,10 +408,8 @@ struct Toggle_box: View{
                     .foregroundColor(finalOfferToggle ? Color.green : Color.gray).labelsHidden()
             }
             .padding(.all, 8)
-            .background(offerHasBeenMade ? Color.white.opacity(0.75) : Color.gray.opacity(0.75))
+            .background(Color.white.opacity(0.75))
             .cornerRadius(20)
-            .disabled(!offerHasBeenMade)
-
             Spacer()
         }
         .scaleEffect(0.8)
