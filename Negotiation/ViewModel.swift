@@ -313,7 +313,7 @@ class NGViewModel: ObservableObject {
     
     // function to bound the times down
     func sigmoid(_ x: Double) -> Double {
-        return tanh((x/15.0)) * 10
+        return tanh((x/15.0)) * 8
     }
     
     

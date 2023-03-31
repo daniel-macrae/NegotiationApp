@@ -113,6 +113,9 @@ struct NGModel {
     // function for the model to declare its MNS
     mutating func declareModelMNS(){
         model.time += playerResponseDuration!
+        
+        assumedPlayerMNS = runningAverageMNS()
+        
         decideModelStrategy()
         if modelStrategy == "Aggressive"{
             modelDeclaredMNS = modelMNS + 1 // lie about the MNS
@@ -544,7 +547,6 @@ struct NGModel {
         }
         
         pickMNS()  // new MNS values for the next round
-        assumedPlayerMNS = runningAverageMNS()
         model.waitingForAction = true
     }
     
