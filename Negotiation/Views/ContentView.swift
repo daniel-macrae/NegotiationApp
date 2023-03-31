@@ -403,9 +403,9 @@ struct Toggle_box: View{
         HStack{
             VStack(alignment: .center){
                 Text("Final Offer?")
-                    .foregroundColor(finalOfferToggle ? Color.green : Color.gray)
+                    .foregroundColor(finalOfferToggle ? Color.green : Color.black.opacity(0.75))
                 Toggle("", isOn: $finalOfferToggle)
-                    .foregroundColor(finalOfferToggle ? Color.green : Color.gray).labelsHidden()
+                    .foregroundColor(finalOfferToggle ? Color.green : Color.black).labelsHidden()
             }
             .padding(.all, 8)
             .background(Color.white.opacity(0.75))
