@@ -65,7 +65,6 @@ class NGViewModel: ObservableObject {
     /// a function when the player declares their MNS
     func declarePlayerMNS(value: Float){
         model.playerResponseDuration = Double(Date().timeIntervalSince(playerResponseStartTime))
-        print("Duration=" + String(model.playerResponseDuration!))
          
         model.playerDeclaredMNS = Int(value)
         let pString = String(format: mnsDeclarationMSGs.randomElement()!, Int(value))
@@ -100,7 +99,6 @@ class NGViewModel: ObservableObject {
     // this function deals with processing the player's offer
     func playerMakeOffer(playerBid: Float) {
         model.playerResponseDuration = Double(Date().timeIntervalSince(playerResponseStartTime))
-        print("Duration=" + String(model.playerResponseDuration!))
         
         if self.playerIsFinalOffer {
             self.sendMessage("This is my final offer: " + String(Int(playerBid)) + " points for me, " + String(9 - Int(playerBid)) + " for you.", isMe: true, PSA: false)
@@ -330,9 +328,7 @@ class NGViewModel: ObservableObject {
         if isMe || PSA {modelDuration = 0.0}
         else {
             modelDuration = model.modelResponseDuration
-            print(modelDuration)
             modelDuration = sigmoid(modelDuration) // limit the duration so that its not unbearably long
-            print(modelDuration)
         }
         
         // controls the delay of the messages showing up

@@ -9,7 +9,7 @@ struct NGModel {
     
     // MARK: Game state management
     var currentRoundNumber: Int = 1
-    var maxRoundNumber: Int = 2
+    var maxRoundNumber: Int = 5
     var gameOver: Bool = false
     var modelResponseDuration: Double = 3.0
     var playerResponseDuration: Double?
@@ -285,11 +285,8 @@ struct NGModel {
         
         if verbose {print("\n \n MODEL IS RESPONDING TO PLAYER BID. Number of chunks in its memory: " + String(model.dm.chunks.count))}
         
-        
         detectPlayerStrategy()
-        
         saveNewExperience()
-        
         decideModelStrategy() // model decides what strategy it should use to respond
         
         
@@ -333,7 +330,6 @@ struct NGModel {
                     if let modelChangeBid = chunk?.slotvals["myMove"]?.description {
                         modelCurrentOffer = modelPreviousOffer! + Int(Float(modelChangeBid)!)
                         if modelCurrentOffer == modelPreviousOffer { modelInsists = true} // bid hasn't changed
-                        
                     }
                 // any non-bids (accept, reject, quit) fall into this else condition
                 } else {
@@ -342,7 +338,6 @@ struct NGModel {
                         modelMadeADecision()
                     }
                 }
-                
                 model.addToTrace(string: "modelResponse() Successfully Retrieved Bid \(chunk!)")
             }
             else {
@@ -352,26 +347,19 @@ struct NGModel {
                     modelDecision = "Reject"
                     modelMadeADecision()
                     model.addToTrace(string: "modelResponse() Failed bid retrieval, reject offer")
-                }
-                else {
+                } else {
                     model.addToTrace(string: "modelResponse() Failed bid retrieval, insist on previous offer")
                     modelInsists = true
                 }
-                
             }
             
             // MARK: Timing
             // determine how long it takes the model to make an offer
             if let duration = chunk?.slotvals["myDuration"]?.description {
                 modelResponseDuration = pulses_to_time(pulses_val: Int(Double(duration)!))
-                print("SUCCESS:")
             } else {
                 modelResponseDuration = defaultDuration
-                print("DEFAULT:")
             }
-            print(modelResponseDuration)
-            
-            
             
             isItTheSameOffer()  // checks to see if the model is going to make the same bid as the player just made, if yes, then accept the player's offer (as they both want the same split)
             model.time += 0.1 + latency + modelResponseDuration
@@ -386,10 +374,7 @@ struct NGModel {
         query.setSlot(slot: "myMNS", value: modelMNS.description)
         query.setSlot(slot: "myMoveType", value: "Opening")
         query.setSlot(slot: "myStrategy", value: modelStrategy)
-        //query.setSlot(slot: "opponentMoveType", value: "Opening")
-        //query.setSlot(slot: "opponentMove", value: playerCurrentOffer!.description)
-        //query.setSlot(slot: "opponentIsFinal", value: playerIsFinalOffer.description)  // possible (but unlikely) that the player makes their first bid 'final'
-    
+        
         print("M: Model opening offer query chunk: \(query)")
         
         let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
@@ -400,7 +385,6 @@ struct NGModel {
             // MARK: We might have to check first if the retrieved chunk is actually an opening bid chunk (sometimes it got a decision chunk here, which causes the next line to crash because the myMove is a string)
             modelCurrentOffer = Int(Float(modelOffer)!) // This is a mess we need to fix it
             modelMoveType = "Opening" // say bid instead of 'opening', makes saving chunks later on better
-            
         } else {
             modelCurrentOffer = Int.random(in: modelDeclaredMNS!..<10)  /// model makes a completely random offer above their declared MNS
             model.addToTrace(string: "Failed retrieval of opening offer, random offer")
@@ -412,16 +396,10 @@ struct NGModel {
         if let duration = chunk?.slotvals["myDuration"]?.description {
             print(duration)
             modelResponseDuration = pulses_to_time(pulses_val: Int(Double(duration)!))
-            print("SUCCESS:")
         } else {
             modelResponseDuration = defaultDuration
-            print("DEFAULT:")
         }
-        print(modelResponseDuration)
-        
         model.time += 0.1 + latency + modelResponseDuration
-        
-        
     }
     
     mutating func modelMadeADecision() {
@@ -435,36 +413,23 @@ struct NGModel {
     
     mutating func runningAverageMNS() -> Int {
         
-        // MARK: ATTEMPT AT BLENDED RETREIVAL OF MNSs
-        // IS NOT ACTUALLY USED
-        
         let playerMNSQuery = Chunk(s: "queryMNS", m: model)
         playerMNSQuery.setSlot(slot: "isa", value: "MNS")
-        //playerMNSQuery.setSlot(slot: "MNS")
         
         let (latency, chunk) = model.dm.blendedRetrieve(chunk: playerMNSQuery)
-        
-        if let expectedplayerMNS = chunk!.slotvals["myMNS"] {
-            print("blended retrieval MNS value: " + expectedplayerMNS.description)
-        }
         model.time += latency
         
-        // AS NORMAL:
-        
-        if averagedMNS.count < 5 {
-            averagedMNS.append(modelMNS)
-        } else{
-            averagedMNS.remove(at: 0)
-            averagedMNS.append(modelMNS)
+        if let expectedplayerMNS = chunk!.slotvals["myMNS"]?.description {
+            let assumedPlayerMNS = Int(round(Double(expectedplayerMNS)!))  // round to an integer MNs value
+            return assumedPlayerMNS
+        } else {
+            return 3 // just a default, never gets used anyway
         }
-        
-        return Int(averagedMNS.reduce(0,+)/averagedMNS.count)
     }
 
     
     // MARK: GAME MANAGEMENT FUNCTIONS
     
-            
     // select new MNSs for both players (call this once a round finishes)
     mutating func pickMNS() {
         if verbose {print("M: picking new MNS values")}
