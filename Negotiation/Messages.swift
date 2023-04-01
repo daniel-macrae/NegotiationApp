@@ -37,26 +37,26 @@ let mnsDeclarationMSGs = [
     "I think it's important to share that my MNS for this negotiation is %d.", 
     "Before we delve deeper, I want to state that my MNS is %d.", 
     "Just so we're on the same page, %d is my MNS for this negotiation.", 
-    "Before we begin, I should let you know that my MNS for this negotiation is  %d.",
-    "Just to clarify,  %d is my MNS for this negotiation.",
-    "Before we dive in, I want to state that my MNS is  %d.",
-    "I think it's important to mention that my MNS is  %d for this negotiation.",
-    "Let's set some expectations. My MNS for this negotiation is  %d.",
-    "Thanks for joining me. Before we get started, I want to establish that my MNS is  %d."
+    "Before we begin, I should let you know that my MNS for this negotiation is %d.",
+    "Just to clarify, %d is my MNS for this negotiation.",
+    "Before we dive in, I want to state that my MNS is %d.",
+    "I think it's important to mention that my MNS is %d for this negotiation.",
+    "Let's set some expectations. My MNS for this negotiation is %d.",
+    "Thanks for joining me. Before we get started, I want to establish that my MNS is %d."
 ]
 
 // could be separated in different tones
 let mnsResponseMSGsCoopNeutral = [
-    "Thank you for letting me know. My MNS is  %d, so I believe we can find a mutually beneficial solution.",
-    "I appreciate the transparency. My MNS is  %d.",
-    "Thanks for sharing. My MNS is  %d, but I'm sure we can reach an agreement that meets both our needs.",
-    "Okay. My MNS is  %d, but I'm open to exploring different options with you.",
-    "Got it. My MNS is  %d, but I'm willing to see if we can come up with a solution that works for both of us.",
-    "Thank you for being upfront. My MNS is actually  %d, but I'm open to discussing different scenarios with you.",
-    "I see. My MNS is  %d, so I think we can find a compromise that satisfies us both.",
-    "Thanks for sharing your MNS. Mine is  %d.",
-    "I appreciate your honesty. My MNS is  %d, but I'm open to exploring different ways we can reach a mutually beneficial agreement.",
-    "Understood. My MNS is  %d, but I'm willing to negotiate and see if we can find common ground."
+    "Thank you for letting me know. My MNS is %d, so I believe we can find a mutually beneficial solution.",
+    "I appreciate the transparency. My MNS is %d.",
+    "Thanks for sharing. My MNS is %d, but I'm sure we can reach an agreement that meets both our needs.",
+    "Okay. My MNS is %d, but I'm open to exploring different options with you.",
+    "Got it. My MNS is %d, but I'm willing to see if we can come up with a solution that works for both of us.",
+    "Thank you for being upfront. My MNS is actually %d, but I'm open to discussing different scenarios with you.",
+    "I see. My MNS is %d, so I think we can find a compromise that satisfies us both.",
+    "Thanks for sharing your MNS. Mine is %d.",
+    "I appreciate your honesty. My MNS is %d, but I'm open to exploring different ways we can reach a mutually beneficial agreement.",
+    "Understood. My MNS is %d, but I'm willing to negotiate and see if we can find common ground."
 ]
 
 
@@ -92,16 +92,16 @@ let bidMSGs = [
 ]
 
 let insistMSGs = [
-"I insist, I want %d points, which leaves %d for you.",
-"No, thank you. My offer still stands: %d points for me and %d for you.",
-"I understand your position, but I really insist on getting %d points, which still leaves %d for you.",
-"I appreciate your offer, but I'm still insistent on %d points for me and %d points for you.",
-"I really think %d points for me and %d points for you is the best deal. I insist we go with that.",
-"I'm sorry, but I must insist on %d points for myself, and %d points for you.",
-"I respect your opinion, but I insist that %d points for me and %d points for you is the fairest split.",
-"I hear what you're saying, but I still want %d points for me and %d points for you. Can we please agree on that?",
-"I insist that %d points for me and %d points for you is the best option.",
-"I appreciate your efforts to find a compromise, but I must insist on %d points for me and %d points for you."
+    "I insist, I want %d points, which leaves %d for you.",
+    "No, thank you. My offer still stands: %d points for me and %d for you.",
+    "I understand your position, but I really insist on getting %d points, which still leaves %d for you.",
+    "I appreciate your offer, but I'm still insistent on %d points for me and %d points for you.",
+    "I really think %d points for me and %d points for you is the best deal. I insist we go with that.",
+    "I'm sorry, but I must insist on %d points for myself, and %d points for you.",
+    "I respect your opinion, but I insist that %d points for me and %d points for you is the fairest split.",
+    "I hear what you're saying, but I still want %d points for me and %d points for you. Can we please agree on that?",
+    "I insist that %d points for me and %d points for you is the best option.",
+    "I appreciate your efforts to find a compromise, but I must insist on %d points for me and %d points for you."
 ]
 
 let acceptingSentencesNeutral = [

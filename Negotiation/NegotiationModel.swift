@@ -152,7 +152,6 @@ struct NGModel {
             query.setSlot(slot: "myMNS", value: assumedPlayerMNS.description)
         } else if playerMoveType! == "Decision" || playerMoveType! == "Quit" {
             query.setSlot(slot: "myMove", value: playerDecision!)
-            
         }
         
         if modelMoveType == "Bid" {
@@ -180,13 +179,10 @@ struct NGModel {
                 strategyChunk.setSlot(slot: "strategy", value: playerStrategy)
                 model.dm.addToDM(strategyChunk)
             }
-            
         } else {
             model.addToTrace(string: "detectPlayerStrategy() strategy chunk retrieval failed!")  // this still happens a few times
         }
-        
         model.time += 0.1
-
     }
     
     // the model decide's its strategy by trying to retrieve one of the two strategy chunks
@@ -394,8 +390,7 @@ struct NGModel {
         // MARK: Timing
         // determine how long it takes the model to make an opening offer
         if let duration = chunk?.slotvals["myDuration"]?.description {
-            print(duration)
-            modelResponseDuration = pulses_to_time(pulses_val: Int(Double(duration)!))
+            modelResponseDuration = pulses_to_time(pulses_val: Int(round(Double(duration)!)))
         } else {
             modelResponseDuration = defaultDuration
         }
@@ -484,7 +479,6 @@ struct NGModel {
         }
         // set up a new round
         resetGameVariables(newGame: false)
-        //assumedPlayerMNS = runningAverageMNS()
         
         savePlayerModel() // save the model's memories into a json file
         update()
