@@ -71,6 +71,7 @@ struct NGModel {
     internal var model: Model // = initNewModel() // just load an empty model
     
     init() {
+        playerNames = listFiles()
         if !playerNames.isEmpty {
             (model, _) = loadModel(name: playerNames.first!)
         } else {
@@ -88,19 +89,44 @@ struct NGModel {
         let index = playerNames.firstIndex(of: playerName)
         playerNames.move(fromOffsets: IndexSet(integer: index!), toOffset: 0)
         
+        currentPlayerName = playerName
+        
         // decide the model's strategy, Neutral if the model is newly initalised
         if new {modelStrategy = "Neutral"}
         else {decideModelStrategy()}
         
         model.softReset()
         update()
+        if new {savePlayerModel()} // if a new user, save the model, so that the user is retained in the playerNames next time time app is run
     }
     
+    mutating func removePlayer(name: String) {
+        if let index = playerNames.firstIndex(of: name) {
+            playerNames.remove(at: index)        // removes the player from the list of names in the Model file
+            deletePlayerFile(name: name)         // removes the ACT-R model json file (this function is defined in JSONManager.swift)
+        } else {
+            printV("M: Can't remove player, name not found")
+        }
+    }
     
     
     func savePlayerModel() {
         saveModel(model: model, filename: currentPlayerName!) // save the model
         printV("M: model saved!")
+    }
+    
+    mutating func addNewPlayer(newName: String) -> Bool {
+        let playerAlreadyExists = playerNames.contains(newName)
+        
+        if !playerAlreadyExists {
+            currentPlayerName = newName
+            playerNames.insert(newName, at: 0)  // insert new player to start of playerNames list, means they become the first option on the selection page
+            loadPlayerModel(playerName: newName)
+            
+            return playerAlreadyExists
+        } else {
+            return playerAlreadyExists
+        }
     }
     
     

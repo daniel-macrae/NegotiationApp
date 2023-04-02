@@ -43,6 +43,7 @@ class NGViewModel: ObservableObject {
     @Published var playerIsNext: Bool = false // this is a temporary vairable, used to make isPlayerTurn true after animations have finished
     @Published var animDuration: Double = 0.5
     @Published var displayDeclaredMNS: Bool = false
+    @Published var playerAlreadyExists: Bool = false // to toggle error message if the user inputs a player name that already exists
     
     
     // TIMING
@@ -280,23 +281,15 @@ class NGViewModel: ObservableObject {
     }
     
     func loadModel(name: String) {   // this function gets used when picking a model
-        model.currentPlayerName = name
         model.loadPlayerModel(playerName: name)
     }
     
     func createNewPlayer(newName: String){
-        model.currentPlayerName = newName
-        model.playerNames.insert(newName, at: 0)  // insert new player to start of playerNames list, means they become the first option on the selection page
-        model.loadPlayerModel(playerName: newName)
+        playerAlreadyExists = model.addNewPlayer(newName: newName)
     }
     
     func removePlayer(name: String) -> Void {
-        if let index = model.playerNames.firstIndex(of: name) {
-            model.playerNames.remove(at: index)  // removes the player from the list of names in the Model file
-            deletePlayerFile(name: name)         // removes the ACT-R model json file (this function is defined in JSONManager.swift)
-        } else {
-            print("VM: Can't remove player, name not found")
-        }
+        model.removePlayer(name: name)
     }
     
     
