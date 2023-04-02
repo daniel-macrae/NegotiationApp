@@ -284,8 +284,9 @@ class NGViewModel: ObservableObject {
         model.loadPlayerModel(playerName: name)
     }
     
-    func createNewPlayer(newName: String){
+    func createNewPlayer(newName: String) -> Bool {
         playerAlreadyExists = model.addNewPlayer(newName: newName)
+        return playerAlreadyExists
     }
     
     func removePlayer(name: String) -> Void {

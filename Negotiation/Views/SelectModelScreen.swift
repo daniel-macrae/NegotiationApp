@@ -14,11 +14,13 @@ struct SelectModelScreen: View {
     @State private var goBack = false
     @State private var loadNames = false
     @State private var toTitlePage = false
+    @State private var playerAlreadyExists = false
+    
+    
     
     var names: [String] {viewModel.playerNames}  // get the names to display here
     
     @State var selectedOption: Int = 0
-    
     
     var body: some View {
         
@@ -40,12 +42,20 @@ struct SelectModelScreen: View {
                                 Spacer()
                                 textFieldView(name: $name)
                                 nextPageButton(action: {
-                                    StartGame = true;
-                                    viewModel.createNewPlayer(newName: name);
-                                    viewModel.firstTime = true; 
-                                    showNameField = false}).disabled(name.isEmpty)
+                                    playerAlreadyExists = viewModel.createNewPlayer(newName: name);
+                                    if viewModel.playerAlreadyExists == false {
+                                        StartGame = true;
+                                        viewModel.firstTime = true;
+                                        showNameField = false}
+                                }).disabled(name.isEmpty)
                                     .background((name.isEmpty) ? Color.gray : Color.green)
                                     .cornerRadius(50)
+                                    // error message to show if the player already exists
+                                    .alert(isPresented: $playerAlreadyExists) {
+                                        Alert(title: Text("This player already exists"),
+                                              message: Text("This username is already in use, please consider entering a different name, or removing the exisiting user."),
+                                              dismissButton: .default(Text("OK"), action: {playerAlreadyExists = false}))
+                                    }
                                 Spacer()
                             }
                             Spacer()
@@ -78,6 +88,7 @@ struct SelectModelScreen: View {
                                 })
                             }
                             nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name);          viewModel.firstTime = false; selectedOption = 0}).background(Color.green).cornerRadius(50)
+                            
                         }
                         Spacer()
                     }
