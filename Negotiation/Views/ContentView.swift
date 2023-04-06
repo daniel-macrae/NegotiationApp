@@ -134,8 +134,8 @@ struct ScoresDisplay: View {
                 ComputerIcon()
                 
                 VStack{
-                    Text("Score = " + String(modelScore))
-                    Text("MNS = " + String(modelMNS)) //  MARK: REMOVE - IN THE LONG RUN
+                    // Text("Score = " + String(modelScore))
+                    // Text("MNS = " + String(modelMNS)) //  MARK: Don't show the model score or MNS to the player
                     // display declared MNS
                     if let modelDecMNS = modelDeclaredMNS {Text("Declared\nMNS = " + String(modelDecMNS))
                         .font(.custom("Sans-Regular",size: 15, relativeTo: .body)) // REMOVE THIS LINE
@@ -148,12 +148,12 @@ struct ScoresDisplay: View {
                 
                 VStack{
                     Text("Score = " + String(playerScore))
-                    Text("MNS = " + String(playerMNS))  // MARK: REMOVE - IN THE LONG RUN
-                    // display the declared MNS
-                    if let playerDecMNS = playerDeclaredMNS {Text("Declared\nMNS = " + String(playerDecMNS))
-                            .font(.custom("Sans-Regular",size: 15, relativeTo: .body))  // REMOVE THIS LINE
-                            .lineLimit(2, reservesSpace: true)
-                    }
+                    Text("MNS = " + String(playerMNS))
+                    // MARK: Don't display the declared MNS
+                    //if let playerDecMNS = playerDeclaredMNS {Text("Declared\nMNS = " + String(playerDecMNS))
+                    //        .font(.custom("Sans-Regular",size: 15, relativeTo: .body))  // REMOVE THIS LINE
+                    //        .lineLimit(2, reservesSpace: true)
+                    //}
                 }.layoutPriority(2)
                 UserIcon()
                 

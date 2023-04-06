@@ -59,7 +59,7 @@ struct NGModel {
     //MNS running average
     var assumedPlayerMNS = 0
     //Need some function to get these from JSONManager
-    var playerNames: [String] = ["Daniel", "Sara", "Luka"]
+    var playerNames: [String] = []
     var currentPlayerName: String?
     
     /// Boolean that states whether the model is waiting for an action.
@@ -308,7 +308,7 @@ struct NGModel {
         if verbose {print("\n \n MODEL IS RESPONDING TO PLAYER BID. Number of chunks in its memory: " + String(model.dm.chunks.count))}
         
         detectPlayerStrategy()
-        saveNewExperience()
+        
         decideModelStrategy() // model decides what strategy it should use to respond
         
         
@@ -320,9 +320,12 @@ struct NGModel {
         if modelCurrentOffer == nil {
 
             modelMakeOpeningOffer() // make an opening offer
+            saveNewExperience()
         }
 
-        else if !(playerMoveType! == "Decision" || playerMoveType! == "Quit") { // if the player has not ended the round, normal bidding
+        else if !(playerMoveType! == "Decision" || playerMoveType! == "Quit") {// if the player has not ended the round, normal bidding
+            saveNewExperience()
+            
             let query = Chunk(s: "query", m: model)
             query.setSlot(slot: "isa", value: "negotiation instance")
             query.setSlot(slot: "myStrategy", value: modelStrategy)
@@ -386,6 +389,8 @@ struct NGModel {
             isItTheSameOffer()  // checks to see if the model is going to make the same bid as the player just made, if yes, then accept the player's offer (as they both want the same split)
             model.time += 0.1 + latency + modelResponseDuration
             
+        } else{
+            saveNewExperience()
         }
     }
     

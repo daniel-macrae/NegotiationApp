@@ -105,14 +105,14 @@ class NGViewModel: ObservableObject {
             self.sendMessage("This is my final offer: " + String(Int(playerBid)) + " points for me, " + String(9 - Int(playerBid)) + " for you.", isMe: true, PSA: false)
         } else {
             // check if the player is insisting
-            if let playerLastOffer = model.playerCurrentOffer{
-                if Int(playerBid) == playerLastOffer{
+            if let playerLastOffer = model.playerCurrentOffer {
+                if Int(playerBid) == playerLastOffer {
                     model.playerInsists = true
                 }
                 else{model.playerInsists = false}
             }
             //send message
-            if model.playerInsists == true{
+            if model.playerInsists == true {
                 let string = String(format: insistMSGs.randomElement()!, Int(playerBid), Int(9-playerBid))
                 self.sendMessage(string, isMe: true, PSA: false)
             }
@@ -209,7 +209,7 @@ class NGViewModel: ObservableObject {
             default:
                 self.sendMessage("I accept your offer", isMe: false, PSA: false)
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + model.modelResponseDuration + animDuration) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + sigmoid(model.modelResponseDuration) + animDuration) {
                 self.interRoundScoreDisplay(playerDecided:false,decisionAccept:true)
             }
             
@@ -227,7 +227,7 @@ class NGViewModel: ObservableObject {
                 self.sendMessage("I reject your final offer.", isMe: false, PSA: false)
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + model.modelResponseDuration  + animDuration) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + sigmoid(model.modelResponseDuration)  + animDuration) {
                 self.interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
             }
             
@@ -238,7 +238,7 @@ class NGViewModel: ObservableObject {
         // if the model quits the game
         else if model.modelMoveType == "Quit" {
             self.sendMessage("I want to quit this negotiation.",  isMe: false, PSA: false)
-            DispatchQueue.main.asyncAfter(deadline: .now() + model.modelResponseDuration  + animDuration) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + sigmoid(model.modelResponseDuration)  + animDuration) {
                 self.interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
             }
             //interRoundScoreDisplay(playerDecided:false, decisionAccept:false)
