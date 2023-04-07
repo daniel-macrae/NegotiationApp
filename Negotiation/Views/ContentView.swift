@@ -371,10 +371,14 @@ struct infoText: View{
                     .foregroundColor(Color.white)
                 Spacer()
                 ScrollView{
-                    Text("The game of nines is a negotiation game played between two players, the proposer (you) and the responder (model). The game is played over several rounds, and in each round, the proposer makes an offer, and the responder can either accept or reject the offer. The goal of the game is to maximize the total score over all rounds, where the score is calculated by subtracting the proposer's offer from the number nine.").padding(.all).foregroundColor(.white)
-                    Text("At the start of each round, both players declare their minimum acceptable score (MNS), which is the minimum score they are willing to accept. The proposer makes the first offer, which must be a number between 0 and 9, and the responder can either accept or reject the offer. If the responder accepts the offer, the round ends, and both players receive a score equal to the difference between nine and the offer.").foregroundColor(.white)
+                    Text("The Game of Nines is played between two players, who have to decide how to split 9 points between themselves. However, each player has their own Minimum Necessary Score (MNS) that indicates the lowest number of points they need to get from the negotiation. Players score by agreeing a deal where they get more points than their MNS value. For example, if you get 6 points, and your MNS is 4, you score 2 on that round. But, if the negotiation leads to you getting less points than your MNS, points will be deducted from your score.").padding(.all).foregroundColor(.white)
+                    Text("The game works as follows; first, you must declare to the opponent what your MNS is; it is not necessary for you to tell the truth, but if you lie more often, then the opponent might do so as well.").foregroundColor(.white)
                         .padding(.all)
-                    Text("If the responder rejects the offer, the proposer can make a new offer and the responder can again choose to accept or reject the offer. If the proposer makes a final offer, the responder must accept or reject it, and the round ends regardless of their decision. The game continues for a fixed number of rounds, and the player with the highest total score at the end of the game is the winner.").foregroundColor(.white)
+                    Text("Once you've both declared your MNSs, both players iteratively make bids on how to split the 9 points using the slider and the bid buttons at the bottom of the screen. This negotiation goes on until one of the players accepts or rejects the opponents bid, while both players can also quit the round at any time, resulting in 0 points for both players.").foregroundColor(.white)
+                        .padding(.all)
+                    Text("The game consists of 5 rounds of negotiation, where the MNS values change on each round. The winner is whoever gets the highest score after these five rounds. Good luck!").foregroundColor(.white)
+                        .padding(.all)
+                    Text("To return to the game, close this window by swiping down from the top of the screen.").foregroundColor(.white)
                         .padding(.all)
                 }.background(.black.opacity(0.3))
             }

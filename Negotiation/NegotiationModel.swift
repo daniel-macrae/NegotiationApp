@@ -28,7 +28,6 @@ struct NGModel {
     /// Player's MNS, score and reward
     var playerMNS: Int = 0  // these now get randomly chosen before each round
     var modelMNS: Int = 0
-    var averagedMNS: [Int] = []
     
     var playerDeclaredMNS: Int?
     var modelDeclaredMNS: Int?

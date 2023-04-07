@@ -16,7 +16,6 @@
 		620BEBD029A7B89700DAE4FF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 620BEBCF29A7B89700DAE4FF /* Assets.xcassets */; };
 		620BEBD329A7B89700DAE4FF /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 620BEBD229A7B89700DAE4FF /* Preview Assets.xcassets */; };
 		6213022329C5BC9E0053F232 /* Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6213022229C5BC9E0053F232 /* Messages.swift */; };
-		6213022929CCD2220053F232 /* PremadeMemory EDITS.csv in Resources */ = {isa = PBXBuildFile; fileRef = 6213022829CCD2220053F232 /* PremadeMemory EDITS.csv */; };
 		622F29AE29AA984000E1C774 /* BufferCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622F29A929AA983F00E1C774 /* BufferCondition.swift */; };
 		622F29AF29AA984000E1C774 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622F29A729AA983F00E1C774 /* Support.swift */; };
 		622F29B029AA984000E1C774 /* Procedural.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622F29A829AA983F00E1C774 /* Procedural.swift */; };
@@ -51,7 +50,6 @@
 		620BEBCF29A7B89700DAE4FF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		620BEBD229A7B89700DAE4FF /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		6213022229C5BC9E0053F232 /* Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Messages.swift; path = Negotiation/Messages.swift; sourceTree = SOURCE_ROOT; };
-		6213022829CCD2220053F232 /* PremadeMemory EDITS.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "PremadeMemory EDITS.csv"; sourceTree = "<group>"; };
 		622F299F29AA983E00E1C774 /* Vision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vision.swift; sourceTree = "<group>"; };
 		622F29A029AA983E00E1C774 /* Declarative.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Declarative.swift; sourceTree = "<group>"; };
 		622F29A129AA983E00E1C774 /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
@@ -105,7 +103,6 @@
 		620BEBCA29A7B89300DAE4FF /* Negotiation */ = {
 			isa = PBXGroup;
 			children = (
-				6213022829CCD2220053F232 /* PremadeMemory EDITS.csv */,
 				6213022229C5BC9E0053F232 /* Messages.swift */,
 				6213022129C126A60053F232 /* Views */,
 				622F299C29AA981E00E1C774 /* ACT-R */,
@@ -223,7 +220,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				62D93B6329BD1BD1007883D4 /* PremadeMemory.csv in Resources */,
-				6213022929CCD2220053F232 /* PremadeMemory EDITS.csv in Resources */,
 				620BEBD329A7B89700DAE4FF /* Preview Assets.xcassets in Resources */,
 				620BEBD029A7B89700DAE4FF /* Assets.xcassets in Resources */,
 			);
