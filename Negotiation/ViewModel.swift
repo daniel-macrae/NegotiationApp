@@ -352,7 +352,7 @@ class NGViewModel: ObservableObject {
         // This is to delay the player's buttons becoming active while animations are running
         // basically, it prevents the player from making bids while the model is active, or while a new round is being prepared
         if isMe == false && playerIsNext == true {
-            DispatchQueue.main.asyncAfter(deadline: .now() + (2*animDuration) + delay + modelDuration) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + (1.5*animDuration) + delay + modelDuration) {
                 self.makePlayerButtonsActive()
             }
         }

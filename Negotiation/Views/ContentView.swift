@@ -69,10 +69,14 @@ struct ContentView: View {
                                     Spacer()
                                     Toggle_box(finalOfferToggle: $finalOfferToggle).onChange(of: finalOfferToggle) { value in
                                         viewModel.FinalOfferPlayerChanged()}
+                                    Spacer()
+                                    BidButton(text: "Send Offer", isPlayerTurn: viewModel.isPlayerTurn, modelIsFinal:viewModel.modelIsFinalOffer, action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false})
+                                    Spacer()
+                                } else {
+                                    Spacer()
+                                    BidButton(text: "Send Offer", isPlayerTurn: viewModel.isPlayerTurn, modelIsFinal:viewModel.modelIsFinalOffer, action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false}).padding(.bottom).padding(.top)
+                                    Spacer()
                                 }
-                                Spacer()
-                                BidButton(text: "Send Offer", isPlayerTurn: viewModel.isPlayerTurn, modelIsFinal:viewModel.modelIsFinalOffer, action: {viewModel.playerMakeOffer(playerBid: sliderValue); finalOfferToggle = false})
-                                Spacer()
                             }
                         }
                         
