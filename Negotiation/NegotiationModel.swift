@@ -55,14 +55,11 @@ struct NGModel {
     var modelInsists = false
     var playerInsists = false
     
-    //MNS running average
-    var assumedPlayerMNS = 0
+    
+    var assumedPlayerMNS = 0 /// what the model thinks the player's MNS is
     //Need some function to get these from JSONManager
     var playerNames: [String] = []
     var currentPlayerName: String?
-    
-    /// Boolean that states whether the model is waiting for an action.
-    var waitingForAction = true
     
     func printV(_ text: String) {if verbose {print(text)}}
     
@@ -139,7 +136,7 @@ struct NGModel {
     mutating func declareModelMNS(){
         model.time += playerResponseDuration!
         
-        assumedPlayerMNS = runningAverageMNS()
+        assumedPlayerMNS = inferPlayerMNS()
         
         decideModelStrategy()
         if modelStrategy == "Aggressive"{
@@ -234,20 +231,15 @@ struct NGModel {
         
         let newExperience = model.generateNewChunk(string: "instance") // from the player's POV
          
-        // "myStrategy","myMNS","myBidMNSDifference","opponentMoveType","opponentMove","opponentIsFinal",
-        // "myMoveType","myMove","myIsFinal"
+        // fill in the "my" slots from the POV of the move the player just made
         newExperience.setSlot(slot: "isa", value: "negotiation instance")
-        
         newExperience.setSlot(slot: "myMoveType", value: playerMoveType!)
         newExperience.setSlot(slot: "myStrategy", value: playerStrategy)
         newExperience.setSlot(slot: "myMNS", value: assumedPlayerMNS.description)
         newExperience.setSlot(slot: "myBidMNSDifference", value: playerMNSBidDifference.description)
         newExperience.setSlot(slot: "myIsFinal", value: playerIsFinalOffer.description)
-        newExperience.setSlot(slot: "opponentIsFinal", value: modelIsFinalOffer.description)
-        
         newExperience.setSlot(slot: "myDuration", value: time_to_pulses(time_val: playerResponseDuration!).description)
         
-        // deal with the "my" slots, from the POV of the player (player='my')
         if playerMoveType! == "Bid" {
             let changePlayerBid = playerPreviousOffer! - playerCurrentOffer!
             newExperience.setSlot(slot: "myMove", value: changePlayerBid.description)}
@@ -258,10 +250,14 @@ struct NGModel {
             newExperience.setSlot(slot: "myBidMNSDifference", value: "N/A")
         }
 
+        
         // deal with the "opponent" slots, from the POV of the model (model's previous bid = opponent move)
         // filling these slots does require that the model has already made its opening offer, otherwise, these slots are not filled
         if modelMoveType != nil {
             newExperience.setSlot(slot: "opponentMoveType", value: modelMoveType!)
+            newExperience.setSlot(slot: "opponentIsFinal", value: modelIsFinalOffer.description)
+            
+            // do not add anything if the model made an opening bid
             if modelMoveType! == "Bid" {
                 if modelCurrentOffer != nil && modelPreviousOffer != nil  {
                     let changeModelBid = modelCurrentOffer! - modelPreviousOffer!
@@ -269,8 +265,6 @@ struct NGModel {
                 } else {
                     newExperience.setSlot(slot: "opponentMove", value: modelCurrentOffer!.description)
                 }
-            } else if modelMoveType! == "Opening" {
-                newExperience.setSlot(slot: "opponentMove", value: modelCurrentOffer!.description)
             }
             else if modelMoveType! == "Decision" || modelMoveType! == "Quit" {// if quit the only point to find the strategy is to reinforce the chunk
                 newExperience.setSlot(slot: "opponentMove", value: modelDecision!)}
@@ -281,11 +275,10 @@ struct NGModel {
 
         model.time += 0.1
         update()
-        waitingForAction = true
     }
  
     
-    mutating func isItTheSameOffer() {
+    mutating func shouldIReconsider() {
         // this function is called if the model makes a bid thats identical, or worse, than the player's offer
         // it is very rarely used, but helps the model "reason" about its bids better in edge cases
         if let playerOffer = playerCurrentOffer {
@@ -306,19 +299,18 @@ struct NGModel {
         
         if verbose {print("\n \n MODEL IS RESPONDING TO PLAYER BID. Number of chunks in its memory: " + String(model.dm.chunks.count))}
         
-        detectPlayerStrategy()
+        detectPlayerStrategy() // model figures out what strategy the player is using, based on the move they just made
         
         decideModelStrategy() // model decides what strategy it should use to respond
         
-        
+        // update variables
         modelPreviousOffer = modelCurrentOffer
-        // reset variable indicating if the model is making an identical bid
         modelInsists = false
+        
     
         // if making the first offer ("Opening" offer)
         if modelCurrentOffer == nil {
-
-            modelMakeOpeningOffer() // make an opening offer
+            modelMakeOpeningOffer()
             saveNewExperience()
         }
 
@@ -340,8 +332,8 @@ struct NGModel {
             if playerIsFinalOffer == true { query.setSlot(slot: "myMoveType", value: "Decision") }
             else {query.setSlot(slot: "myMoveType", value: "Bid")}
             
+            // actual retrieval
             print("M: Query chunk \(query)")
-            
             let (latency, chunk) = model.dm.partialRetrieve(chunk: query, mismatchFunction: chunkMismatchFunction)
             
             if let modelNewMoveType = chunk?.slotvals["myMoveType"]?.description {
@@ -385,7 +377,7 @@ struct NGModel {
                 modelResponseDuration = defaultDuration
             }
             
-            isItTheSameOffer()  // checks to see if the model is going to make the same bid as the player just made, if yes, then accept the player's offer (as they both want the same split)
+            shouldIReconsider()  // checks to see if the model is going to make the same bid as the player just made, if yes, then accept the player's offer (as they both want the same split)
             model.time += 0.1 + latency + modelResponseDuration
             
         } else{
@@ -425,6 +417,8 @@ struct NGModel {
             modelResponseDuration = defaultDuration
         }
         model.time += 0.1 + latency + modelResponseDuration
+        
+        shouldIReconsider()
     }
     
     mutating func modelMadeADecision() {
@@ -436,7 +430,7 @@ struct NGModel {
             modelHasQuit = true}
     }
     
-    mutating func runningAverageMNS() -> Int {
+    mutating func inferPlayerMNS() -> Int {
         
         let playerMNSQuery = Chunk(s: "queryMNS", m: model)
         playerMNSQuery.setSlot(slot: "isa", value: "MNS")
@@ -536,7 +530,6 @@ struct NGModel {
         }
         
         pickMNS()  // new MNS values for the next round
-        model.waitingForAction = true
     }
     
     
@@ -571,7 +564,6 @@ struct NGModel {
                 count += 1
             }
             dmContent.sort { $0.activation > $1.activation }
-            waitingForAction = true
         }
 
 }

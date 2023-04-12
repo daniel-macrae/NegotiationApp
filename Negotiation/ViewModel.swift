@@ -121,7 +121,6 @@ class NGViewModel: ObservableObject {
                 self.sendMessage(string, isMe: true, PSA: false)
             }
         
-            //self.sendMessage("This is my offer: I want " + String(Int(playerBid))  + " points, you'd get " + String(9 - Int(playerBid)) + " points", isMe: true, PSA: false)
         }
         
         isPlayerTurn = false
@@ -231,8 +230,6 @@ class NGViewModel: ObservableObject {
                 self.interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
             }
             
-            //interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
-            
         }
         
         // if the model quits the game
@@ -241,7 +238,6 @@ class NGViewModel: ObservableObject {
             DispatchQueue.main.asyncAfter(deadline: .now() + sigmoid(model.modelResponseDuration)  + animDuration) {
                 self.interRoundScoreDisplay(playerDecided:false,decisionAccept:false)
             }
-            //interRoundScoreDisplay(playerDecided:false, decisionAccept:false)
         }
         
         // The model makes a new bid
@@ -380,9 +376,6 @@ class NGViewModel: ObservableObject {
         
     }
     
-    //func removeMessage() {
-    //    messages[messages.endIndex-1] = Message(text: "...", sender: false, PSA: false)
-    //}
     
     // function to display the grey messages (PSAs) about score changes and the player MNS value for a new round
     func interRoundScoreDisplay(playerDecided: Bool, decisionAccept: Bool){
