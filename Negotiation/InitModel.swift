@@ -128,7 +128,7 @@ func noise(s: Double) -> Double {
     return s * log((1-random)/random)
 }
 
-func time_to_pulses(time_val: Double) -> Int {
+func timeToPulses(time_val: Double) -> Int {
     var time = time_val
     var pulses = 0
     var pulse_duration = t_0
@@ -142,7 +142,7 @@ func time_to_pulses(time_val: Double) -> Int {
     return pulses
 }
 
-func pulses_to_time(pulses_val: Int) -> Double {
+func pulsesToTime(pulses_val: Int) -> Double {
     var pulses = pulses_val
     var time = 0.0
     var pulse_duration = t_0

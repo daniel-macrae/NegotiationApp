@@ -238,7 +238,7 @@ struct NGModel {
         newExperience.setSlot(slot: "myMNS", value: assumedPlayerMNS.description)
         newExperience.setSlot(slot: "myBidMNSDifference", value: playerMNSBidDifference.description)
         newExperience.setSlot(slot: "myIsFinal", value: playerIsFinalOffer.description)
-        newExperience.setSlot(slot: "myDuration", value: time_to_pulses(time_val: playerResponseDuration!).description)
+        newExperience.setSlot(slot: "myDuration", value: timeToPulses(time_val: playerResponseDuration!).description)
         
         if playerMoveType! == "Bid" {
             let changePlayerBid = playerPreviousOffer! - playerCurrentOffer!
@@ -372,7 +372,7 @@ struct NGModel {
             // MARK: Timing
             // determine how long it takes the model to make an offer
             if let duration = chunk?.slotvals["myDuration"]?.description {
-                modelResponseDuration = pulses_to_time(pulses_val: Int(Double(duration)!))
+                modelResponseDuration = pulsesToTime(pulses_val: Int(Double(duration)!))
             } else {
                 modelResponseDuration = defaultDuration
             }
@@ -412,7 +412,7 @@ struct NGModel {
         // MARK: Timing
         // determine how long it takes the model to make an opening offer
         if let duration = chunk?.slotvals["myDuration"]?.description {
-            modelResponseDuration = pulses_to_time(pulses_val: Int(round(Double(duration)!)))
+            modelResponseDuration = pulsesToTime(pulses_val: Int(round(Double(duration)!)))
         } else {
             modelResponseDuration = defaultDuration
         }
