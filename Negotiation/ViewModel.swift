@@ -40,7 +40,7 @@ class NGViewModel: ObservableObject {
     var playerIsFinalOffer: Bool {model.playerIsFinalOffer}
     var modelIsFinalOffer: Bool {model.modelIsFinalOffer}
     @Published var isPlayerTurn: Bool = false
-    @Published var playerIsNext: Bool = false // this is a temporary vairable, used to make isPlayerTurn true after animations have finished
+    @Published var playerIsNext: Bool = false // this is a temporary variable, used to make isPlayerTurn true after animations have finished
     @Published var animDuration: Double = 0.5
     @Published var displayDeclaredMNS: Bool = false
     @Published var playerAlreadyExists: Bool = false // to toggle error message if the user inputs a player name that already exists
@@ -48,7 +48,7 @@ class NGViewModel: ObservableObject {
     
     // TIMING
     var playerResponseStartTime = Date() /// is reset whenever the player's bid buttons become active
-    //var playerResponseDuration: Double?
+
     
     init() {
         model = NGModel() // make just one active model file
@@ -56,14 +56,9 @@ class NGViewModel: ObservableObject {
     }
     
     
-    
-    
-    
-    
     // MARK: ########  THE PLAYER'S INTENETS  ########
     
-    
-    /// a function when the player declares their MNS
+    // a function when the player declares their MNS
     func declarePlayerMNS(value: Float){
         model.playerResponseDuration = Double(Date().timeIntervalSince(playerResponseStartTime))
          
@@ -74,10 +69,10 @@ class NGViewModel: ObservableObject {
         isPlayerTurn = false
         playerIsNext = true
         
-        // make the model determine its MNS
+        /// make the model determine its MNS
         model.declareModelMNS()
         
-        // based on the model's trategy, find a message template to declare its MNS
+        /// based on the model's trategy, find a message template to declare its MNS
         switch model.modelStrategy {
             case "Cooperative":
                 let mString = String(format: mnsResponseMSGsCoopNeutral.randomElement()!, model.modelDeclaredMNS!)
@@ -93,7 +88,7 @@ class NGViewModel: ObservableObject {
                 sendMessage(mString, isMe: false, PSA: false)
         }
         
-        MNSDeclared = true  // if the model has declared its MNS, then so has the player
+        MNSDeclared = true  /// if the model has declared its MNS, then so has the player
         
     }
     
@@ -104,14 +99,14 @@ class NGViewModel: ObservableObject {
         if self.playerIsFinalOffer {
             self.sendMessage("This is my final offer: " + String(Int(playerBid)) + " points for me, " + String(9 - Int(playerBid)) + " for you.", isMe: true, PSA: false)
         } else {
-            // check if the player is insisting
+            /// check if the player is insisting
             if let playerLastOffer = model.playerCurrentOffer {
                 if Int(playerBid) == playerLastOffer {
                     model.playerInsists = true
                 }
                 else{model.playerInsists = false}
             }
-            //send message
+            /// send message
             if model.playerInsists == true {
                 let string = String(format: insistMSGs.randomElement()!, Int(playerBid), Int(9-playerBid))
                 self.sendMessage(string, isMe: true, PSA: false)
@@ -124,23 +119,17 @@ class NGViewModel: ObservableObject {
         }
         
         isPlayerTurn = false
-        
-        
+
         model.playerPreviousOffer = model.playerCurrentOffer
         model.playerCurrentOffer = Int(playerBid)
         
         if model.playerPreviousOffer != nil { model.playerMoveType = "Bid" }
         else {model.playerMoveType = "Opening"}
         
-        // playerIsFinal is toggled with the button anyway, so no need to have it here as well
-        
         offerHasBeenMade = true
         
         playerIsNext = true
         modelResponseMessage()
-        
-        
-        
         
     }
     
@@ -153,7 +142,7 @@ class NGViewModel: ObservableObject {
         model.playerMoveType = "Decision";     model.playerDecision = "Accept"
         model.playerPreviousOffer = model.playerCurrentOffer
         
-        model.modelResponse() // model has to save this experience
+        model.modelResponse() /// model has to save this experience
         
         interRoundScoreDisplay(playerDecided:true, decisionAccept:true)
     }
@@ -163,11 +152,12 @@ class NGViewModel: ObservableObject {
         model.playerResponseDuration = Double(Date().timeIntervalSince(playerResponseStartTime))
         
         self.sendMessage(decliningSentencesNeutral.randomElement()!, isMe: true, PSA: false)
-        model.playerMoveType = "Decision";     model.playerDecision = "Reject"
+        if modelIsFinalOffer {model.playerDecision = "Reject"} else {model.playerDecision = "Quit"}
+        model.playerMoveType = "Decision";
         model.playerHasQuit = true
         model.playerPreviousOffer = model.playerCurrentOffer
         
-        model.modelResponse() // model has to save this experience
+        model.modelResponse() /// model has to save this experience, but won't actually make a move (in this case)
         
         interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
     }
@@ -180,7 +170,7 @@ class NGViewModel: ObservableObject {
         model.playerHasQuit = true
         model.playerPreviousOffer = model.playerCurrentOffer
         
-        model.modelResponse() // model has to save this experience
+        model.modelResponse() /// model has to save this experience
         
         interRoundScoreDisplay(playerDecided:true, decisionAccept:false)
     }
@@ -188,14 +178,13 @@ class NGViewModel: ObservableObject {
     
     // MARK: Model
     
-    
+    // for making the model respond, and displaying its text-message
     func modelResponseMessage() {
         
-        //messages.append(Message(text: "...", sender: false, PSA: false))
-        // make the cognitive model respond
+        /// make the cognitive model respond
         model.modelResponse()
         
-        // if the model accepts the player's bid
+        /// if the model accepts the player's bid
         if model.modelMoveType == "Decision" && model.modelDecision! == "Accept" {
             
             switch model.modelStrategy {
@@ -213,7 +202,7 @@ class NGViewModel: ObservableObject {
             }
             
         }
-        // if the model rejects the player's bid
+        /// if the model rejects the player's bid
         else if model.modelMoveType == "Decision" && model.modelDecision! == "Reject" {
             switch model.modelStrategy {
             case "Cooperative":
@@ -232,7 +221,7 @@ class NGViewModel: ObservableObject {
             
         }
         
-        // if the model quits the game
+        /// if the model quits the game
         else if model.modelMoveType == "Quit" {
             self.sendMessage("I want to quit this negotiation.",  isMe: false, PSA: false)
             DispatchQueue.main.asyncAfter(deadline: .now() + sigmoid(model.modelResponseDuration)  + animDuration) {
@@ -240,7 +229,7 @@ class NGViewModel: ObservableObject {
             }
         }
         
-        // The model makes a new bid
+        /// The model makes a new bid
         else if (model.modelMoveType == "Bid" || model.modelMoveType == "Opening") {
             
             if model.modelIsFinalOffer == true {
@@ -269,14 +258,14 @@ class NGViewModel: ObservableObject {
     }
     
     func resetGame() {
-        model.resetGameVariables(newGame: true)  // reset the game variables when returning to the ContentView
+        model.resetGameVariables(newGame: true)  /// reset the game variables when returning to the ContentView
         openingNewGame()
         offerHasBeenMade = false;     MNSDeclared = false
         modelDeclaredMNS = nil; playerDeclaredMNS = nil
         gameOver = false
     }
     
-    func loadModel(name: String) {   // this function gets used when picking a model
+    func loadModel(name: String) {   /// this function gets used when picking a model
         model.loadPlayerModel(playerName: name)
     }
     
@@ -295,7 +284,7 @@ class NGViewModel: ObservableObject {
     struct Message: Identifiable, Equatable {
         let id = UUID()
         let text:String
-        let sender: Bool //true is the player flase is the model
+        let sender: Bool /// true is the player false  is the model
         let PSA: Bool
     }
     
@@ -311,20 +300,20 @@ class NGViewModel: ObservableObject {
         isPlayerTurn = false
         
         var delay: Double
-        if isMe {delay = 0.0} // if the player is sending a message
+        if isMe {delay = 0.0} /// if the player is sending a message
         else {delay = 1.0}
         
-        var modelDuration: Double // how long until the model's full message should be sent
+        var modelDuration: Double /// how long until the model's full message should be sent
         if isMe || PSA {modelDuration = 0.0}
         else {
             modelDuration = model.modelResponseDuration
             modelDuration = sigmoid(modelDuration) // limit the duration so that its not unbearably long
         }
         
-        // controls the delay of the messages showing up
+        /// controls the delay of the messages showing up
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             
-            // if the model is sending a message, it should show the 'typing' animation for as long as the model needs to make an offer ("modelDuration"), and then this text message box is filled with the actual offer
+            /// if the model is sending a message, it should show the 'typing' animation for as long as the model needs to make an offer ("modelDuration"), and then this text message box is filled with the actual offer
             if isMe==false && PSA==false {
                 
                 self.messages.append(Message(text: "...", sender: false, PSA: false))
@@ -333,20 +322,20 @@ class NGViewModel: ObservableObject {
                     
                     if let modelMessIndex = self.messages.lastIndex(where: {$0.text == "..."}) {
                         self.messages[modelMessIndex] = Message(text: text, sender: false, PSA: false)
-                        if let val = self.model.modelDeclaredMNS {self.modelDeclaredMNS = val} // toggle display of declared MNS after the model has sent its message
+                        if let val = self.model.modelDeclaredMNS {self.modelDeclaredMNS = val} /// toggle display of declared MNS after the model has sent its message
                     }
                 }
                 
             }
-            // player and PSA messages fall into this conditon
+            /// player and PSA messages fall into this conditon
             else {
                 self.messages.append(Message(text: text, sender: isMe, PSA: PSA))
                 if let val = self.model.playerDeclaredMNS {self.playerDeclaredMNS = val}
             }
         }
         
-        // This is to delay the player's buttons becoming active while animations are running
-        // basically, it prevents the player from making bids while the model is active, or while a new round is being prepared
+        /// This is to delay the player's buttons becoming active while animations are running
+        /// basically, it prevents the player from making bids while the model is active, or while a new round is being prepared
         if isMe == false && playerIsNext == true {
             DispatchQueue.main.asyncAfter(deadline: .now() + (1.5*animDuration) + delay + modelDuration) {
                 self.makePlayerButtonsActive()
@@ -387,7 +376,7 @@ class NGViewModel: ObservableObject {
                 sendMessage("You earned " + String((model.playerCurrentOffer!) - playerMNS) + " points this round.", isMe: false, PSA: true)}}
         else{sendMessage("No points were earned this round.", isMe: false, PSA: true)}
         
-        // make a new round, once the PSAs have been sent
+        /// make a new round, once the PSAs have been sent
         model.newRound(playerOffered: !playerDecided)
         MNSDeclared = false
         offerHasBeenMade = false
