@@ -3,7 +3,7 @@
 import Foundation
 import TabularData
 
-
+// make a new model, and give it chunks in memory to start off with
 func initNewModel() -> Model {
     let model = Model()
     
@@ -11,7 +11,6 @@ func initNewModel() -> Model {
     if let df = dataframe  {
         
         let slotNames = df.columns.map { col in col.name }
-        //print(slotNames)
         for rowNum in 0..<df.shape.0 {
             
             let Experience = model.generateNewChunk(string: "instance")
@@ -19,7 +18,6 @@ func initNewModel() -> Model {
             Experience.setSlot(slot: "isa", value: "negotiation instance")
         
             for colNum in 0..<df.shape.1 {
-                //print(slotNames[colNum])
                 let val = dataRow[colNum, String.self]!
                 Experience.setSlot(slot: slotNames[colNum], value: val)
             }
@@ -50,12 +48,12 @@ func initNewModel() -> Model {
 
 
 
-
+// Function that reads the premadememory csv file, returns a dataframe
 func readCSV() -> DataFrame? {
     let options = CSVReadingOptions(hasHeaderRow: true, delimiter: ",")
     guard let fileUrl = Bundle.main.url(forResource: "PremadeMemory", withExtension: "csv") else { return nil }
 
-    // this is cursed, but the only way to get around the CSV containing different types (integers...)
+    
     let df = try! DataFrame(contentsOfCSVFile: fileUrl, types:["myStrategy":CSVType.string, "myMNS":CSVType.string, "myBidMNSDifference":CSVType.string, "opponentMoveType":CSVType.string, "opponentMove":CSVType.string, "opponentIsFinal":CSVType.string, "myMoveType":CSVType.string, "myMove":CSVType.string, "myIsFinal":CSVType.string], options: options)
     
     return df
@@ -71,18 +69,18 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
     
     let defaultMli = -0.2
     
-    // this one should be covered in the Declarative memory already, but put it here for completeness' sake
+    /// this one should be covered in the Declarative memory already, but put it here for completeness' sake
     if x.isEqual(value: y) { M_li = 0 }
     
     
-    // in the case that both slot values are numbers, compute a similarity score
-    // as in the equation at the top of page 7 of the paper
+    /// in the case that both slot values are numbers, compute a similarity score
+    /// as in the equation at the top of page 7 of the paper
     else if let l = x.number(), let i = y.number() {
         
         let fraq = pow((l-i), 2) / 2
         M_li = (1 / (fraq + 1)) - 1
         
-    // if both slots are strings, check to see if they are similar strategy values
+    /// if both slots are strings, check to see if they are similar strategy values
     } else if let string1 = x.text(), let string2 = y.text() {
         if string1 == string2 { M_li = 0 }
         if string1 == "Cooperative" {
@@ -103,21 +101,23 @@ func chunkMismatchFunction(_ x: Value, _ y: Value) -> Double? {
             else if string1 == "Neutral" { M_li = 0 }
             else { M_li = defaultMli }
         }
-        else if string2 == "Decision" && string1 != "Decision" { // if requesting a decision, and the chunk in memory is not a decision
+        else if string2 == "Decision" && string1 != "Decision" { /// if requesting a decision, and the chunk in memory is not a decision
             return nil
         }
-        else if string2 == "Opening" && string1 != "Opening" { // if requesting an opening offer
+        else if string2 == "Opening" && string1 != "Opening" { /// if requesting an opening offer
             return nil
         }
-        else { M_li =  defaultMli }  // paper does -1 here, but we have more slots so that would cause those additional slots to contribute to a very high mismatch penalty
+        else { M_li =  defaultMli }  /// paper does -1 here, but we have more slots so that would cause those additional slots to contribute to a very high mismatch penalty
         
-    // else, the slots values don't match, they are dissimilar
+    /// else, the slots values don't match, they are dissimilar
     } else { M_li = defaultMli }
     
-    //if M_li == 0 {print("MATCH!")}
+    
     return M_li
 }
 
+
+// MARK: Functions for the model's timekeeping
 
 let a = 1.1
 let b = 0.015

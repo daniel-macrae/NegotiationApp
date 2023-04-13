@@ -34,7 +34,7 @@ func loadModel(name: String) -> (Model, Bool) {
         //print(data)
         let model = try JSONDecoder().decode(Model.self, from: data)
         
-        for chunk in model.dm.chunks {  // assign the new model to each chunk...
+        for chunk in model.dm.chunks {  /// assign the new model to each chunk
             chunk.value.model = model
         }
         
@@ -43,7 +43,7 @@ func loadModel(name: String) -> (Model, Bool) {
     } catch {
         print("JSON: filename not found")
         let model = initNewModel()
-        return (model, true) // just return an new model
+        return (model, true) /// just return an new model
     }
     
 }
@@ -62,7 +62,6 @@ func deletePlayerFile(name: String) {
         } catch {
             print("JSON: User file not found, can't delete")
         }
-        //try FileManager.removeItem(fileURL)
     }
     catch {
         print("JSON: Player file could not be found, and was not deleted")
@@ -75,11 +74,11 @@ func listFiles() -> [String]  {
     var playerNames: [String] = []
     
     do {
-        // get the contents of the documents folder
+        /// get the contents of the documents folder
         let Path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let directoryContents = try FileManager.default.contentsOfDirectory(at: Path, includingPropertiesForKeys: nil, options: .skipsHiddenFiles).sorted { $0.path < $1.path }
 
-        // process the file directories so that its just the players' names
+        /// process the file directories so that its just the players' names
         for filepath in directoryContents {
             let jsonfilepath = filepath.deletingPathExtension().lastPathComponent//.path
             playerNames.append(jsonfilepath)

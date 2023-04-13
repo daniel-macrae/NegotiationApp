@@ -45,7 +45,8 @@ let mnsDeclarationMSGs = [
     "Thanks for joining me. Before we get started, I want to establish that my MNS is %d."
 ]
 
-// could be separated in different tones
+// messages for the model declaring its MNS
+
 let mnsResponseMSGsCoopNeutral = [
     "Thank you for letting me know. My MNS is %d, so I believe we can find a mutually beneficial solution.",
     "I appreciate the transparency. My MNS is %d.",
@@ -70,7 +71,7 @@ let mnsResponseMSGsAggressive = [
     "I appreciate your willingness to negotiate, my MNS is set at %d, and I won't consider anything less"
 ]
 
-
+// bid messages
 
 let bidMSGs = [
     "I'll bid %d points, you'd get %d.",
@@ -91,6 +92,8 @@ let bidMSGs = [
     "Let's agree on %d points for me and %d points for you. Deal?"
 ]
 
+// messages for if the players don't change from their previous offer
+
 let insistMSGs = [
     "I insist, I want %d points, which leaves %d for you.",
     "No, thank you. My offer still stands: %d points for me and %d for you.",
@@ -103,6 +106,8 @@ let insistMSGs = [
     "I insist that %d points for me and %d points for you is the best option.",
     "I appreciate your efforts to find a compromise, but I must insist on %d points for me and %d points for you."
 ]
+
+// bid accepting and declining sentences, with different moods
 
 let acceptingSentencesNeutral = [
     "I accept your offer.",
