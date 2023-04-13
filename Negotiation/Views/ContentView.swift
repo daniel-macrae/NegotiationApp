@@ -215,7 +215,7 @@ struct AcceptButton: View{
     let text: String
     let action: () -> Void
     //let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
-    let buttonColor = Color.green
+    let buttonColor = Color.green.opacity(0.85)
     let offerHasBeenMade: Bool
     let isPlayerTurn: Bool
     
@@ -237,7 +237,7 @@ struct RejectButton: View{
     let text: String
     let action: () -> Void
     //let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
-    let buttonColor = Color.red
+    let buttonColor = Color.red.opacity(0.85)
     let offerHasBeenMade: Bool
     let isPlayerTurn: Bool
     

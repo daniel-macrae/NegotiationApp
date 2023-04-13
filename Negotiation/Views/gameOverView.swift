@@ -56,7 +56,7 @@ struct FinalButtons: View{
             }, buttonColor: Color(UIColor(red:0.40, green:0.30, blue:0.76, alpha: 0.75)))
             gameOverButton(text: "Return to Start", action: {
                 isQuitting = true
-            }, buttonColor: Color.red)
+            }, buttonColor: Color(UIColor(red:0.40, green:0.30, blue:0.76, alpha: 0.75)))
         }
     }
 }

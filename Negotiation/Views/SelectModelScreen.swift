@@ -97,7 +97,7 @@ struct SelectModelScreen: View {
                         Spacer()
                         HStack{
                             Spacer()
-                            SelectModelScreenButton(text: "New Player", action: {showNameField = true
+                            SelectModelScreenButton(text: "New Session", action: {showNameField = true
                                 goBack = true
                             })
                             Spacer()
@@ -175,7 +175,7 @@ struct removePlayerButton: View {
             .font(.subheadline)
             .buttonStyle(.borderedProminent)
             .cornerRadius(50)
-            .tint(.red)
+            .tint(.red.opacity(0.85))
             .alert(isPresented: $showingAlert) {
                 Alert(title: Text("Are you sure you would like to delete this user?"),
                       message: Text("There is no undoing this action. All of the user's data will be deleted."),
