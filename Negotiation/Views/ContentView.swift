@@ -45,7 +45,6 @@ struct ContentView: View {
                                 Spacer()
                                 RejectButton(text: viewModel.quitButtonText, action: {viewModel.playerRejectsFinalOffer();
                                     finalOfferToggle = false;
-                                    //viewModel.removeMessage()
                                     
                                 }, offerHasBeenMade: viewModel.offerHasBeenMade, isPlayerTurn: viewModel.isPlayerTurn)
                                 Spacer()
@@ -62,8 +61,6 @@ struct ContentView: View {
                                 .background(Color.white.opacity(0.75))
                                 .cornerRadius(20)
                             
-                            //Spacer()
-                            //.frame(maxHeight: .infinity)
                             HStack{
                                 if viewModel.offerHasBeenMade{
                                     Spacer()
@@ -102,7 +99,7 @@ struct ContentView: View {
                 AppDelegate.orientationLock = .portrait // And making sure it stays that way
             }.onDisappear {
                 AppDelegate.orientationLock = .all // Unlocking the rotation when leaving the view
-                viewModel.messages = [] //Emptying the message log
+                viewModel.messages = [] // Emptying the message log
             }
         }
         .background(backgroundImg(image: "SolidBackground"))
@@ -138,8 +135,7 @@ struct ScoresDisplay: View {
                 ComputerIcon()
                 
                 VStack{
-                    // Text("Score = " + String(modelScore))
-                    // Text("MNS = " + String(modelMNS)) //  MARK: Don't show the model score or MNS to the player
+                    //  MARK: Don't show the model score or MNS to the player
                     // display declared MNS
                     if let modelDecMNS = modelDeclaredMNS {Text("Declared\nMNS = " + String(modelDecMNS))
                         .font(.custom("Sans-Regular",size: 15, relativeTo: .body)) // REMOVE THIS LINE
@@ -153,11 +149,6 @@ struct ScoresDisplay: View {
                 VStack{
                     Text("Score = " + String(playerScore))
                     Text("MNS = " + String(playerMNS))
-                    // MARK: Don't display the declared MNS
-                    //if let playerDecMNS = playerDeclaredMNS {Text("Declared\nMNS = " + String(playerDecMNS))
-                    //        .font(.custom("Sans-Regular",size: 15, relativeTo: .body))  // REMOVE THIS LINE
-                    //        .lineLimit(2, reservesSpace: true)
-                    //}
                 }.layoutPriority(2)
                 UserIcon()
                 
@@ -214,7 +205,6 @@ struct BidButton: View {
 struct AcceptButton: View{
     let text: String
     let action: () -> Void
-    //let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
     let buttonColor = Color.green.opacity(0.85)
     let offerHasBeenMade: Bool
     let isPlayerTurn: Bool
@@ -236,7 +226,6 @@ struct AcceptButton: View{
 struct RejectButton: View{
     let text: String
     let action: () -> Void
-    //let buttonColor = Color(UIColor(red:0.40, green:0.30, blue:0.76,alpha: 0.75))
     let buttonColor = Color.red.opacity(0.85)
     let offerHasBeenMade: Bool
     let isPlayerTurn: Bool

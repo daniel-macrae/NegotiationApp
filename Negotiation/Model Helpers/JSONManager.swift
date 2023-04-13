@@ -31,10 +31,9 @@ func loadModel(name: String) -> (Model, Bool) {
             .appendingPathComponent(filename)
         
         let data = try Data(contentsOf: fileURL)
-        //print(data)
         let model = try JSONDecoder().decode(Model.self, from: data)
         
-        for chunk in model.dm.chunks {  /// assign the new model to each chunk
+        for chunk in model.dm.chunks {  /// assign the model to each chunk, this seems to be lose when re-initalising a model
             chunk.value.model = model
         }
         
@@ -43,7 +42,7 @@ func loadModel(name: String) -> (Model, Bool) {
     } catch {
         print("JSON: filename not found")
         let model = initNewModel()
-        return (model, true) /// just return an new model
+        return (model, true) /// just return an new model if we can't find this player (is never used, but exists just in case)
     }
     
 }

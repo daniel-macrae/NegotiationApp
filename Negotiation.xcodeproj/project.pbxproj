@@ -103,15 +103,13 @@
 		620BEBCA29A7B89300DAE4FF /* Negotiation */ = {
 			isa = PBXGroup;
 			children = (
+				6279131929E838930022530D /* Model Helpers */,
 				6213022229C5BC9E0053F232 /* Messages.swift */,
 				6213022129C126A60053F232 /* Views */,
 				622F299C29AA981E00E1C774 /* ACT-R */,
 				620BEBCB29A7B89300DAE4FF /* NegotiationApp.swift */,
 				224EFBF229BCB43700B78AA2 /* AppDelegate.swift */,
 				622F29BD29AA998100E1C774 /* NegotiationModel.swift */,
-				622F29BF29B12E4A00E1C774 /* JSONManager.swift */,
-				62D93B5E29BBBE39007883D4 /* InitModel.swift */,
-				62D93B6229BD1BD0007883D4 /* PremadeMemory.csv */,
 				62A12FB629AA863E00FB7B09 /* ViewModel.swift */,
 				620BEBCF29A7B89700DAE4FF /* Assets.xcassets */,
 				620BEBD129A7B89700DAE4FF /* Preview Content */,
@@ -159,6 +157,16 @@
 				622F299F29AA983E00E1C774 /* Vision.swift */,
 			);
 			path = "ACT-R";
+			sourceTree = "<group>";
+		};
+		6279131929E838930022530D /* Model Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				622F29BF29B12E4A00E1C774 /* JSONManager.swift */,
+				62D93B5E29BBBE39007883D4 /* InitModel.swift */,
+				62D93B6229BD1BD0007883D4 /* PremadeMemory.csv */,
+			);
+			path = "Model Helpers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

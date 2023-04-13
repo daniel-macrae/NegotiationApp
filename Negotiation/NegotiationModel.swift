@@ -288,7 +288,6 @@ struct NGModel {
         if verbose {print("\n \n MODEL IS RESPONDING TO PLAYER BID. Number of chunks in its memory: " + String(model.dm.chunks.count))}
         
         detectPlayerStrategy() /// model figures out what strategy the player is using, based on the move they just made
-        
         decideModelStrategy() /// model decides what strategy it should use to respond
         
         /// update variables
@@ -508,7 +507,6 @@ struct NGModel {
         modelInsists = false; playerInsists = false
         modelResponseDuration = defaultDuration
         
-        
         if newGame {
             if verbose {print("\n \n \n \n    !!!  NEW GAME  !!!  \n \n \n \n ")}
             playerScore = 0; modelScore = 0
@@ -522,8 +520,6 @@ struct NGModel {
     
     
 
-    
-    
     
     
     

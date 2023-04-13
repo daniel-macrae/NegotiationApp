@@ -87,7 +87,7 @@ struct SelectModelScreen: View {
                                     if !names.isEmpty {name = names[0]} else {loadNames=false; goBack = false}
                                 })
                             }
-                            nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name);          viewModel.firstTime = false; selectedOption = 0}).background(Color.green).cornerRadius(50)
+                            nextPageButton(action: {StartGame = true; viewModel.loadModel(name: name);     viewModel.firstTime = false; selectedOption = 0}).background(Color.green).cornerRadius(50)
                             
                         }
                         Spacer()
@@ -171,7 +171,7 @@ struct removePlayerButton: View {
     @State private var showingAlert = false
     
     var body: some View {
-        Button(String("Remove Player")) {showingAlert = true}//.foregroundColor(Color.orange)   // looks better as white?
+        Button(String("Remove Player")) {showingAlert = true}
             .font(.subheadline)
             .buttonStyle(.borderedProminent)
             .cornerRadius(50)
