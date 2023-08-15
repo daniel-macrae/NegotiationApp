@@ -1,5 +1,5 @@
 # NegotiationApp
-Game of Nines app for the RUG MSc AI course Cognitive Modelling: Complex Behaviour. This app is written in Swift, for iOS devices.
+Game of Nines app for the RUG MSc AI course Cognitive Modelling: Complex Behaviour. This app is written in Swift, for iOS devices. The cognitive model, that plays as the opponent, is designed in accordance with the principles of ACT-R.
 
 ## Cognitive Model
 
